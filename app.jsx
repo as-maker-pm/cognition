@@ -199,54 +199,76 @@ function LoginPage() {
 
   const demo = (em, label) => { if (login(em)) t.success('Demo access', label); };
 
-  const features = [
-    { icon: Ic.sparkles, title: 'AI Transcript Analysis', desc: 'Automatically organized by topic with source attribution and behavioral cue detection.' },
-    { icon: Ic.alert,    title: 'Contradiction Detection', desc: 'Surface timeline conflicts and inconsistencies the moment they appear in testimony.' },
-    { icon: Ic.flag,     title: 'Sentiment Tracking', desc: 'Monitor emotional patterns and behavioral shifts across the full deposition.' },
-    { icon: Ic.checkC,   title: 'Goal Coverage', desc: 'Track deposition objectives in real-time and ensure nothing is left unaddressed.' },
+  const slides = [
+    {
+      heading: 'Deposition Intelligence for Modern Litigation',
+      sub: 'Purpose-built tools that give deposition firms and litigation teams a decisive edge — from first upload to final report.',
+    },
+    {
+      heading: 'Every Word, Organized and Attributed',
+      sub: 'Transcripts are automatically structured by topic, with every segment tagged by speaker, source confidence, and behavioral cue.',
+    },
+    {
+      heading: 'Surface Contradictions Before They Surface You',
+      sub: 'AI flags timeline conflicts, evasive responses, and inconsistencies the moment they appear — so nothing slips through.',
+    },
+    {
+      heading: 'Know Exactly Where You Stand on Every Goal',
+      sub: 'Set deposition objectives upfront and track coverage in real-time. Walk in prepared. Walk out with answers.',
+    },
   ];
+
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setSlide((s) => (s + 1) % slides.length), 5000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div className="min-h-screen flex">
-      {/* Left — Feature overview */}
-      <div className="hidden lg:flex lg:w-[58%] bg-[#0c1527] flex-col justify-between p-14 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }}/>
-        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#0c1527] to-transparent pointer-events-none"/>
+      {/* Left — Carousel */}
+      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #0c1527 0%, #0f2040 40%, #0a1a35 70%, #111827 100%)',
+      }}>
+        {/* Background texture layers */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(14,165,233,0.08) 0%, transparent 50%)',
+        }}/>
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}/>
+        <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(12,21,39,0.9), transparent)' }}/>
 
         {/* Logo */}
         <div className="relative">
           <span className="brand text-[1.6rem] text-white">Cognition</span>
         </div>
 
-        {/* Hero text + features */}
-        <div className="relative space-y-10">
-          <div>
-            <h1 className="brand text-white leading-[1.15] mb-3" style={{ fontSize: '3rem', fontWeight: 400 }}>
-              Deposition Intelligence<br/>for Modern Litigation
-            </h1>
-            <p className="brand text-white/40 text-base leading-relaxed max-w-sm" style={{ fontWeight: 400 }}>
-              Purpose-built tools for deposition firms and litigation teams.
-            </p>
-          </div>
-          <div className="space-y-6">
-            {features.map((f) => (
-              <div key={f.title} className="flex gap-4">
-                <div className="w-8 h-8 rounded bg-white/8 border border-white/10 flex items-center justify-center text-white/50 shrink-0 mt-0.5">
-                  <f.icon size={14}/>
-                </div>
-                <div>
-                  <div className="text-white/90 text-sm font-medium mb-0.5">{f.title}</div>
-                  <div className="text-white/40 text-sm leading-relaxed">{f.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Slide content */}
+        <div className="relative flex-1 flex flex-col justify-center">
+          {slides.map((s, i) => (
+            <div key={i} className="absolute inset-0 flex flex-col justify-center transition-all duration-700"
+              style={{ opacity: slide === i ? 1 : 0, transform: slide === i ? 'translateY(0)' : 'translateY(16px)', pointerEvents: slide === i ? 'auto' : 'none' }}>
+              <h1 className="brand text-white mb-5 leading-[1.15]" style={{ fontSize: '2.6rem', fontWeight: 400 }}>
+                {s.heading}
+              </h1>
+              <p className="text-white/45 leading-relaxed max-w-sm" style={{ fontSize: '1rem' }}>
+                {s.sub}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* Footer */}
-        <div className="relative">
-          <div className="w-8 h-px bg-white/15 mb-4"/>
-          <p className="text-white/25 text-xs tracking-widest uppercase">Trusted by leading litigation firms</p>
+        {/* Dots */}
+        <div className="relative flex items-center gap-2">
+          {slides.map((_, i) => (
+            <button key={i} onClick={() => setSlide(i)}
+              className="transition-all duration-300 rounded-full"
+              style={{ width: slide === i ? '24px' : '6px', height: '6px', background: slide === i ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)' }}
+            />
+          ))}
         </div>
       </div>
 
