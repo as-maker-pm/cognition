@@ -228,19 +228,32 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Carousel */}
-      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{ background: '#0f0e0d' }}>
-        {/* Subtle warm vignette */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse at 30% 60%, rgba(107,66,38,0.18) 0%, transparent 65%), radial-gradient(ellipse at 80% 10%, rgba(80,50,30,0.1) 0%, transparent 50%)',
+      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{ background: '#100e0c' }}>
+
+        {/* Large ambient glow — top right */}
+        <div className="absolute pointer-events-none" style={{
+          top: '-15%', right: '-10%', width: '70%', height: '70%',
+          background: 'radial-gradient(circle, rgba(107,66,38,0.35) 0%, rgba(107,66,38,0.1) 45%, transparent 70%)',
+          filter: 'blur(40px)',
         }}/>
-        {/* Fine grain texture */}
-        <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")',
-          backgroundRepeat: 'repeat',
-          backgroundSize: '128px 128px',
+        {/* Secondary glow — bottom left */}
+        <div className="absolute pointer-events-none" style={{
+          bottom: '-10%', left: '-5%', width: '55%', height: '55%',
+          background: 'radial-gradient(circle, rgba(80,50,28,0.3) 0%, transparent 65%)',
+          filter: 'blur(50px)',
         }}/>
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none" style={{ background: 'linear-gradient(to top, #0f0e0d, transparent)' }}/>
+        {/* Diagonal light streak */}
+        <div className="absolute pointer-events-none" style={{
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'linear-gradient(118deg, rgba(255,255,255,0.025) 0%, transparent 40%, rgba(107,66,38,0.06) 100%)',
+        }}/>
+        {/* Fine grain */}
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+          backgroundSize: '160px 160px',
+        }}/>
+        {/* Bottom fade to ground */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(16,14,12,0.95), transparent)' }}/>
 
         {/* Logo */}
         <div className="relative">
@@ -249,11 +262,11 @@ function LoginPage() {
 
         {/* Slide content */}
         <div className="flex-1 flex flex-col justify-center py-12 w-full">
-          <div className="w-full transition-all duration-700" style={{ opacity: 1, transform: 'translateY(0)' }}>
+          <div className="w-full">
             <h1 key={`h-${slide}`} className="brand text-white leading-[1.12] mb-6 w-full" style={{ fontSize: '3.4rem', fontWeight: 400 }}>
               {slides[slide].heading}
             </h1>
-            <p key={`p-${slide}`} className="text-white/40 leading-relaxed w-full" style={{ fontSize: '1.05rem' }}>
+            <p key={`p-${slide}`} className="text-white/65 leading-relaxed w-full" style={{ fontSize: '1.05rem' }}>
               {slides[slide].sub}
             </p>
           </div>
@@ -264,7 +277,7 @@ function LoginPage() {
           {slides.map((_, i) => (
             <button key={i} onClick={() => setSlide(i)}
               className="transition-all duration-300 rounded-full"
-              style={{ width: slide === i ? '20px' : '5px', height: '5px', background: slide === i ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)' }}
+              style={{ width: slide === i ? '20px' : '5px', height: '5px', background: slide === i ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.2)' }}
             />
           ))}
         </div>
