@@ -255,7 +255,7 @@ function LoginPage() {
               <h1 className="brand text-white leading-[1.12] mb-6" style={{ fontSize: '3.4rem', fontWeight: 400 }}>
                 {s.heading}
               </h1>
-              <p className="text-white/40 leading-relaxed" style={{ fontSize: '1.05rem', maxWidth: '38ch' }}>
+              <p className="text-white/40 leading-relaxed" style={{ fontSize: '1.05rem' }}>
                 {s.sub}
               </p>
             </div>
