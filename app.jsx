@@ -221,10 +221,10 @@ function LoginPage() {
         {/* Hero text + features */}
         <div className="relative space-y-10">
           <div>
-            <h1 className="brand text-white leading-[1.15] mb-3" style={{ fontSize: '3rem', fontWeight: 300 }}>
+            <h1 className="brand text-white leading-[1.15] mb-3" style={{ fontSize: '3rem', fontWeight: 400 }}>
               Deposition Intelligence<br/>for Modern Litigation
             </h1>
-            <p className="brand text-white/40 text-base leading-relaxed max-w-sm" style={{ fontWeight: 300 }}>
+            <p className="brand text-white/40 text-base leading-relaxed max-w-sm" style={{ fontWeight: 400 }}>
               Purpose-built tools for deposition firms and litigation teams.
             </p>
           </div>
@@ -259,7 +259,7 @@ function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 300 }}>Welcome back</h2>
+            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 400 }}>Welcome back</h2>
             <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
           </div>
 
