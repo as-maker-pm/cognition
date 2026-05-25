@@ -248,18 +248,15 @@ function LoginPage() {
         </div>
 
         {/* Slide content */}
-        <div className="relative flex-1 flex flex-col justify-center py-12">
-          {slides.map((s, i) => (
-            <div key={i} className="absolute inset-0 flex flex-col justify-center transition-all duration-700"
-              style={{ opacity: slide === i ? 1 : 0, transform: slide === i ? 'translateY(0)' : 'translateY(14px)', pointerEvents: slide === i ? 'auto' : 'none' }}>
-              <h1 className="brand text-white leading-[1.12] mb-6" style={{ fontSize: '3.4rem', fontWeight: 400 }}>
-                {s.heading}
-              </h1>
-              <p className="text-white/40 leading-relaxed" style={{ fontSize: '1.05rem' }}>
-                {s.sub}
-              </p>
-            </div>
-          ))}
+        <div className="flex-1 flex flex-col justify-center py-12 w-full">
+          <div className="w-full transition-all duration-700" style={{ opacity: 1, transform: 'translateY(0)' }}>
+            <h1 key={`h-${slide}`} className="brand text-white leading-[1.12] mb-6 w-full" style={{ fontSize: '3.4rem', fontWeight: 400 }}>
+              {slides[slide].heading}
+            </h1>
+            <p key={`p-${slide}`} className="text-white/40 leading-relaxed w-full" style={{ fontSize: '1.05rem' }}>
+              {slides[slide].sub}
+            </p>
+          </div>
         </div>
 
         {/* Dots */}
