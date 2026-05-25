@@ -92,18 +92,18 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
   const base = 'inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors disabled:opacity-50 disabled:pointer-events-none';
   const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-9 px-4 text-sm', icon: 'h-9 w-9 p-0' };
   const variants = {
-    primary:   'bg-[#1e3a8a] text-white hover:bg-[#1e40af]',
-    secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200',
-    outline:   'border border-slate-200 bg-white text-slate-900 hover:bg-slate-50',
-    ghost:     'text-slate-700 hover:bg-slate-100',
-    teal:      'bg-[#0d9488] text-white hover:bg-[#0f766e]',
+    primary:    'bg-[#0f172a] text-white hover:bg-[#1e3a8a]',
+    secondary:  'bg-slate-100 text-slate-900 hover:bg-slate-200',
+    outline:    'border border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
+    ghost:      'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+    teal:       'bg-[#0d9488] text-white hover:bg-[#0f766e]',
     destructive:'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
   };
   return <button className={cls(base, sizes[size], variants[variant], className)} {...rest}>{children}</button>;
 };
 
 const Input = ({ className = '', ...rest }) => (
-  <input className={cls('h-9 w-full rounded-md border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/15', className)} {...rest}/>
+  <input className={cls('h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-900/5 transition-colors', className)} {...rest}/>
 );
 
 const Badge = ({ variant = 'secondary', className = '', children }) => {
@@ -130,48 +130,47 @@ function TopNav({ onLogo, onUserManagement }) {
   const RoleIcon = { admin: Ic.shield, editor: Ic.edit, reader: Ic.eye }[user?.role] || (() => null);
 
   return (
-    <header className="border-b bg-white sticky top-0 z-40">
+    <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
       <div className="px-6 py-3 flex items-center justify-between">
-        <button onClick={onLogo} className="flex items-center gap-2 hover:opacity-80">
-          <div className="w-9 h-9 rounded-lg bg-[#1e3a8a] flex items-center justify-center">
-            <Ic.sparkles size={18} />
-            <span className="sr-only">DepoAI</span>
+        <button onClick={onLogo} className="flex items-center gap-2.5 hover:opacity-75 transition-opacity">
+          <div className="w-7 h-7 rounded bg-[#0f172a] flex items-center justify-center text-white">
+            <Ic.scale size={14}/>
           </div>
-          <span className="text-xl text-slate-900 font-semibold">DepoAI</span>
+          <span className="font-serif text-lg text-slate-900 tracking-tight" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
         </button>
-        <div className="flex items-center gap-4">
-          <div className="relative w-80">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search/></span>
-            <Input placeholder="Search depositions..." className="pl-10"/>
+        <div className="flex items-center gap-3">
+          <div className="relative w-72">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+            <Input placeholder="Search depositions..." className="pl-9 h-8 text-sm"/>
           </div>
-          <Button variant="ghost" size="icon" className="relative">
-            <Ic.bell size={18}/>
-            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-md bg-rose-600 text-white text-xs font-medium flex items-center justify-center">3</span>
+          <Button variant="ghost" size="icon" className="relative h-8 w-8">
+            <Ic.bell size={16}/>
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">3</span>
           </Button>
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1e3a8a] to-[#0d9488] text-white text-sm font-medium flex items-center justify-center hover:ring-2 ring-slate-200">
-              {initials || <Ic.user size={18}/>}
+            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#0f172a] text-white text-xs font-medium flex items-center justify-center hover:bg-[#1e3a8a] transition-colors">
+              {initials || <Ic.user size={14}/>}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
+              <div className="absolute right-0 mt-2 w-60 bg-white border border-slate-200 rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
                 <div className="px-3 py-2.5">
                   <div className="text-sm font-medium text-slate-900">{user?.name}</div>
                   <div className="text-xs text-slate-500 mt-0.5">{user?.email}</div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                    <RoleIcon size={12}/>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                    <RoleIcon size={11}/>
                     <span className="capitalize">{user?.role}</span>
-                    <span>•</span>
+                    <span>·</span>
                     <span>{user?.organization.name}</span>
                   </div>
                 </div>
                 <div className="h-px bg-slate-100 my-1"/>
                 {user?.role === 'admin' && (
-                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded hover:bg-slate-50 flex items-center gap-2">
-                    <Ic.user size={14}/> User Management
+                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-slate-50 flex items-center gap-2 text-slate-700">
+                    <Ic.user size={13}/> User Management
                   </button>
                 )}
-                <button onClick={() => { setMenuOpen(false); logout(); }} className="w-full text-left px-3 py-2 text-sm rounded hover:bg-rose-50 text-rose-600 flex items-center gap-2">
-                  <Ic.logout size={14}/> Log out
+                <button onClick={() => { setMenuOpen(false); logout(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-rose-50 text-rose-600 flex items-center gap-2">
+                  <Ic.logout size={13}/> Sign out
                 </button>
               </div>
             )}
@@ -195,70 +194,121 @@ function LoginPage() {
     setBusy(true);
     setTimeout(() => {
       const ok = login(email);
-      if (ok) t.success('Welcome back!', 'You have successfully logged in.');
-      else t.error('Login failed', 'Invalid email or password.');
+      if (ok) t.success('Welcome back');
+      else t.error('Sign in failed', 'Please check your credentials.');
       setBusy(false);
     }, 200);
   };
 
-  const demo = (em, label) => {
-    const ok = login(em);
-    if (ok) t.success('Demo login successful', label);
-  };
+  const demo = (em, label) => { if (login(em)) t.success('Demo access', label); };
+
+  const features = [
+    { icon: Ic.sparkles, title: 'AI Transcript Analysis', desc: 'Automatically organized by topic with source attribution and behavioral cue detection.' },
+    { icon: Ic.alert,    title: 'Contradiction Detection', desc: 'Surface timeline conflicts and inconsistencies the moment they appear in testimony.' },
+    { icon: Ic.flag,     title: 'Sentiment Tracking', desc: 'Monitor emotional patterns and behavioral shifts across the full deposition.' },
+    { icon: Ic.checkC,   title: 'Goal Coverage', desc: 'Track deposition objectives in real-time and ensure nothing is left unaddressed.' },
+  ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#1e3a8a] to-[#0d9488] rounded-xl text-white">
-              <Ic.scale size={24}/>
-            </div>
-            <span className="text-3xl text-slate-900 font-semibold tracking-tight">DepoAI</span>
+    <div className="min-h-screen flex">
+      {/* Left — Feature overview */}
+      <div className="hidden lg:flex lg:w-[58%] bg-[#0c1527] flex-col justify-between p-14 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '28px 28px' }}/>
+        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#0c1527] to-transparent pointer-events-none"/>
+
+        {/* Logo */}
+        <div className="relative flex items-center gap-3">
+          <div className="w-9 h-9 rounded bg-white/10 flex items-center justify-center text-white/90">
+            <Ic.scale size={18}/>
           </div>
-          <p className="text-slate-600">Deposition Intelligence Platform</p>
+          <span className="text-white text-xl tracking-tight" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
         </div>
 
-        <Card className="shadow-lg">
-          <div className="p-6 pb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Welcome back</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Sign in to your account to continue</p>
+        {/* Hero text + features */}
+        <div className="relative space-y-10">
+          <div>
+            <h1 className="text-white leading-[1.15] mb-3" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: '2.8rem', fontWeight: 400 }}>
+              Deposition Intelligence<br/>for Modern Litigation
+            </h1>
+            <p className="text-white/40 text-base leading-relaxed max-w-sm" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+              Purpose-built tools for deposition firms and litigation teams.
+            </p>
           </div>
-          <div className="px-6 pb-6">
-            <form onSubmit={submit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Email</label>
-                <Input type="email" placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+          <div className="space-y-6">
+            {features.map((f) => (
+              <div key={f.title} className="flex gap-4">
+                <div className="w-8 h-8 rounded bg-white/8 border border-white/10 flex items-center justify-center text-white/50 shrink-0 mt-0.5">
+                  <f.icon size={14}/>
+                </div>
+                <div>
+                  <div className="text-white/90 text-sm font-medium mb-0.5">{f.title}</div>
+                  <div className="text-white/40 text-sm leading-relaxed">{f.desc}</div>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Password</label>
-                <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
-              </div>
-              <Button type="submit" className="w-full" disabled={busy}>{busy ? 'Signing in...' : 'Sign in'}</Button>
-            </form>
+            ))}
+          </div>
+        </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-100">
-              <p className="text-sm text-slate-600 mb-3">Quick demo access:</p>
-              <div className="flex flex-col gap-2">
-                {[
-                  ['admin@smithdepo.com',  'Deposition Firm Admin',  Ic.film],
-                  ['editor@smithdepo.com', 'Deposition Firm Editor', Ic.film],
-                  ['admin@lawfirm.com',    'Law Firm Admin',         Ic.scale],
-                  ['reader@lawfirm.com',   'Law Firm Reader',        Ic.scale],
-                ].map(([em, label, Icn]) => (
-                  <Button key={em} variant="outline" className="justify-start" onClick={() => demo(em, label)}>
-                    <Icn size={14}/> {label}
-                  </Button>
-                ))}
-              </div>
+        {/* Footer */}
+        <div className="relative">
+          <div className="w-8 h-px bg-white/15 mb-4"/>
+          <p className="text-white/25 text-xs tracking-widest uppercase">Trusted by leading litigation firms</p>
+        </div>
+      </div>
+
+      {/* Right — Auth form */}
+      <div className="flex-1 flex items-center justify-center bg-white p-8">
+        <div className="w-full max-w-[340px]">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-2.5 mb-10">
+            <div className="w-8 h-8 rounded bg-[#0c1527] flex items-center justify-center text-white">
+              <Ic.scale size={15}/>
             </div>
+            <span className="text-[#0c1527] text-lg" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
+          </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-              <p className="text-sm text-slate-600 mb-1">New to DepoAI?</p>
-              <button className="text-sm font-medium text-[#0d9488] hover:text-[#0f766e]">Create your organization</button>
+          <div className="mb-8">
+            <h2 className="text-2xl text-slate-900 mb-1" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>Welcome back</h2>
+            <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
+          </div>
+
+          <form onSubmit={submit} className="space-y-4 mb-6">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Email address</label>
+              <Input type="email" placeholder="name@organization.com" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Password</label>
+              <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
+            </div>
+            <Button type="submit" className="w-full h-10 !bg-[#0c1527] hover:!bg-[#1e3a8a] !rounded-md" disabled={busy}>
+              {busy ? 'Signing in…' : 'Sign in'}
+            </Button>
+          </form>
+
+          <div className="border-t border-slate-100 pt-6">
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-3">Demo access</p>
+            <div className="space-y-2">
+              {[
+                ['admin@smithdepo.com',  'Deposition Firm — Admin',  Ic.film],
+                ['editor@smithdepo.com', 'Deposition Firm — Editor', Ic.film],
+                ['admin@lawfirm.com',    'Law Firm — Admin',         Ic.scale],
+                ['reader@lawfirm.com',   'Law Firm — Reader',        Ic.scale],
+              ].map(([em, label, Icn]) => (
+                <button key={em} onClick={() => demo(em, label)}
+                  className="w-full text-left px-3 py-2.5 text-sm text-slate-700 border border-slate-200 rounded-md hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2.5">
+                  <Icn size={13} className="text-slate-400 shrink-0"/>
+                  <span>{label}</span>
+                </button>
+              ))}
             </div>
           </div>
-        </Card>
+
+          <p className="mt-6 text-sm text-slate-500 text-center">
+            New to DepoAI?{' '}
+            <button className="text-[#1e3a8a] hover:text-[#1e40af] font-medium transition-colors">Create your organization</button>
+          </p>
+        </div>
       </div>
     </div>
   );
