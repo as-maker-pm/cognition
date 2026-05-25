@@ -136,7 +136,7 @@ function TopNav({ onLogo, onUserManagement }) {
           <div className="w-7 h-7 rounded bg-[#0f172a] flex items-center justify-center text-white">
             <Ic.scale size={14}/>
           </div>
-          <span className="font-serif text-lg text-slate-900 tracking-tight" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
+          <span className="brand text-[1.35rem] text-slate-900">Cognition</span>
         </button>
         <div className="flex items-center gap-3">
           <div className="relative w-72">
@@ -221,16 +221,16 @@ function LoginPage() {
           <div className="w-9 h-9 rounded bg-white/10 flex items-center justify-center text-white/90">
             <Ic.scale size={18}/>
           </div>
-          <span className="text-white text-xl tracking-tight" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
+          <span className="brand text-[1.6rem] text-white">Cognition</span>
         </div>
 
         {/* Hero text + features */}
         <div className="relative space-y-10">
           <div>
-            <h1 className="text-white leading-[1.15] mb-3" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: '2.8rem', fontWeight: 400 }}>
+            <h1 className="brand text-white leading-[1.15] mb-3" style={{ fontSize: '3rem', fontWeight: 300 }}>
               Deposition Intelligence<br/>for Modern Litigation
             </h1>
-            <p className="text-white/40 text-base leading-relaxed max-w-sm" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+            <p className="brand text-white/40 text-base leading-relaxed max-w-sm" style={{ fontWeight: 300 }}>
               Purpose-built tools for deposition firms and litigation teams.
             </p>
           </div>
@@ -264,11 +264,11 @@ function LoginPage() {
             <div className="w-8 h-8 rounded bg-[#0c1527] flex items-center justify-center text-white">
               <Ic.scale size={15}/>
             </div>
-            <span className="text-[#0c1527] text-lg" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>DepoAI</span>
+            <span className="brand text-[1.4rem] text-[#0c1527]">Cognition</span>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl text-slate-900 mb-1" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontWeight: 500 }}>Welcome back</h2>
+            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 300 }}>Welcome back</h2>
             <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
           </div>
 
@@ -305,7 +305,7 @@ function LoginPage() {
           </div>
 
           <p className="mt-6 text-sm text-slate-500 text-center">
-            New to DepoAI?{' '}
+            New to Cognition?{' '}
             <button className="text-[#1e3a8a] hover:text-[#1e40af] font-medium transition-colors">Create your organization</button>
           </p>
         </div>
