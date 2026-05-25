@@ -228,32 +228,38 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Carousel */}
-      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{ background: '#100e0c' }}>
+      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{ background: '#0e0c0a' }}>
 
-        {/* Large ambient glow — top right */}
-        <div className="absolute pointer-events-none" style={{
-          top: '-15%', right: '-10%', width: '70%', height: '70%',
-          background: 'radial-gradient(circle, rgba(107,66,38,0.35) 0%, rgba(107,66,38,0.1) 45%, transparent 70%)',
-          filter: 'blur(40px)',
+        {/* Orb 1 — large warm brown, top-right */}
+        <div className="orb1 absolute pointer-events-none" style={{
+          top: '-20%', right: '-15%', width: '75%', height: '75%',
+          background: 'radial-gradient(circle, rgba(120,72,32,0.55) 0%, rgba(107,66,38,0.25) 40%, transparent 70%)',
+          filter: 'blur(60px)',
         }}/>
-        {/* Secondary glow — bottom left */}
-        <div className="absolute pointer-events-none" style={{
-          bottom: '-10%', left: '-5%', width: '55%', height: '55%',
-          background: 'radial-gradient(circle, rgba(80,50,28,0.3) 0%, transparent 65%)',
-          filter: 'blur(50px)',
+        {/* Orb 2 — deep amber, bottom-left */}
+        <div className="orb2 absolute pointer-events-none" style={{
+          bottom: '-25%', left: '-20%', width: '80%', height: '80%',
+          background: 'radial-gradient(circle, rgba(90,52,20,0.5) 0%, rgba(70,40,15,0.2) 45%, transparent 68%)',
+          filter: 'blur(70px)',
         }}/>
-        {/* Diagonal light streak */}
-        <div className="absolute pointer-events-none" style={{
+        {/* Orb 3 — small bright accent, center */}
+        <div className="orb3 absolute pointer-events-none" style={{
+          top: '30%', left: '20%', width: '45%', height: '45%',
+          background: 'radial-gradient(circle, rgba(160,95,40,0.2) 0%, transparent 65%)',
+          filter: 'blur(45px)',
+        }}/>
+        {/* Shimmer streak — diagonal highlight */}
+        <div className="shimmer absolute pointer-events-none" style={{
           top: 0, left: 0, right: 0, bottom: 0,
-          background: 'linear-gradient(118deg, rgba(255,255,255,0.025) 0%, transparent 40%, rgba(107,66,38,0.06) 100%)',
+          background: 'linear-gradient(125deg, rgba(255,220,160,0.04) 0%, transparent 35%, rgba(140,80,30,0.06) 75%, transparent 100%)',
         }}/>
-        {/* Fine grain */}
-        <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+        {/* Fine grain texture */}
+        <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.72\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
           backgroundSize: '160px 160px',
         }}/>
-        {/* Bottom fade to ground */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(16,14,12,0.95), transparent)' }}/>
+        {/* Bottom vignette */}
+        <div className="absolute bottom-0 left-0 right-0 h-36 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(14,12,10,0.98), transparent)' }}/>
 
         {/* Logo */}
         <div className="relative">
