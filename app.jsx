@@ -259,7 +259,7 @@ function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 400 }}>Welcome back</h2>
+            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 500 }}>Welcome back</h2>
             <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
           </div>
 
