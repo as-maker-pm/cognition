@@ -132,10 +132,7 @@ function TopNav({ onLogo, onUserManagement }) {
   return (
     <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
       <div className="px-6 py-3 flex items-center justify-between">
-        <button onClick={onLogo} className="flex items-center gap-2.5 hover:opacity-75 transition-opacity">
-          <div className="w-7 h-7 rounded bg-[#0f172a] flex items-center justify-center text-white">
-            <Ic.scale size={14}/>
-          </div>
+        <button onClick={onLogo} className="hover:opacity-75 transition-opacity">
           <span className="brand text-[1.35rem] text-slate-900">Cognition</span>
         </button>
         <div className="flex items-center gap-3">
@@ -217,10 +214,7 @@ function LoginPage() {
         <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#0c1527] to-transparent pointer-events-none"/>
 
         {/* Logo */}
-        <div className="relative flex items-center gap-3">
-          <div className="w-9 h-9 rounded bg-white/10 flex items-center justify-center text-white/90">
-            <Ic.scale size={18}/>
-          </div>
+        <div className="relative">
           <span className="brand text-[1.6rem] text-white">Cognition</span>
         </div>
 
@@ -260,10 +254,7 @@ function LoginPage() {
       <div className="flex-1 flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2.5 mb-10">
-            <div className="w-8 h-8 rounded bg-[#0c1527] flex items-center justify-center text-white">
-              <Ic.scale size={15}/>
-            </div>
+          <div className="lg:hidden mb-10">
             <span className="brand text-[1.4rem] text-[#0c1527]">Cognition</span>
           </div>
 
