@@ -92,11 +92,11 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
   const base = 'inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors disabled:opacity-50 disabled:pointer-events-none';
   const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-9 px-4 text-sm', icon: 'h-9 w-9 p-0' };
   const variants = {
-    primary:    'bg-[#0f172a] text-white hover:bg-[#1e3a8a]',
-    secondary:  'bg-slate-100 text-slate-900 hover:bg-slate-200',
-    outline:    'border border-slate-200 bg-white text-slate-800 hover:bg-slate-50',
-    ghost:      'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-    teal:       'bg-[#0d9488] text-white hover:bg-[#0f766e]',
+    primary:    'bg-[#111111] text-white hover:bg-[#2a1a0e]',
+    secondary:  'bg-stone-100 text-stone-900 hover:bg-stone-200',
+    outline:    'border border-stone-200 bg-white text-stone-800 hover:bg-stone-50',
+    ghost:      'text-stone-600 hover:bg-stone-100 hover:text-stone-900',
+    teal:       'bg-[#6B4226] text-white hover:bg-[#5a3520]',
     destructive:'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
   };
   return <button className={cls(base, sizes[size], variants[variant], className)} {...rest}>{children}</button>;
@@ -145,7 +145,7 @@ function TopNav({ onLogo, onUserManagement }) {
             <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">3</span>
           </Button>
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#0f172a] text-white text-xs font-medium flex items-center justify-center hover:bg-[#1e3a8a] transition-colors">
+            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#111111] text-white text-xs font-medium flex items-center justify-center hover:bg-[#2a1a0e] transition-colors">
               {initials || <Ic.user size={14}/>}
             </button>
             {menuOpen && (
@@ -228,33 +228,34 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left — Carousel */}
-      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #0c1527 0%, #0f2040 40%, #0a1a35 70%, #111827 100%)',
-      }}>
-        {/* Background texture layers */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(14,165,233,0.08) 0%, transparent 50%)',
+      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-14 relative overflow-hidden" style={{ background: '#0f0e0d' }}>
+        {/* Subtle warm vignette */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse at 30% 60%, rgba(107,66,38,0.18) 0%, transparent 65%), radial-gradient(ellipse at 80% 10%, rgba(80,50,30,0.1) 0%, transparent 50%)',
         }}/>
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+        {/* Fine grain texture */}
+        <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '128px 128px',
         }}/>
-        <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(12,21,39,0.9), transparent)' }}/>
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none" style={{ background: 'linear-gradient(to top, #0f0e0d, transparent)' }}/>
 
         {/* Logo */}
         <div className="relative">
-          <span className="brand text-[1.6rem] text-white">Cognition</span>
+          <span className="brand text-[1.6rem] text-white/90">Cognition</span>
         </div>
 
         {/* Slide content */}
-        <div className="relative flex-1 flex flex-col justify-center">
+        <div className="relative flex-1 flex flex-col justify-center py-12">
           {slides.map((s, i) => (
             <div key={i} className="absolute inset-0 flex flex-col justify-center transition-all duration-700"
-              style={{ opacity: slide === i ? 1 : 0, transform: slide === i ? 'translateY(0)' : 'translateY(16px)', pointerEvents: slide === i ? 'auto' : 'none' }}>
-              <h1 className="brand text-white mb-5 leading-[1.15]" style={{ fontSize: '2.6rem', fontWeight: 400 }}>
+              style={{ opacity: slide === i ? 1 : 0, transform: slide === i ? 'translateY(0)' : 'translateY(14px)', pointerEvents: slide === i ? 'auto' : 'none' }}>
+              <h1 className="brand text-white leading-[1.12] mb-6" style={{ fontSize: '3.4rem', fontWeight: 400 }}>
                 {s.heading}
               </h1>
-              <p className="text-white/45 leading-relaxed max-w-sm" style={{ fontSize: '1rem' }}>
+              <p className="text-white/40 leading-relaxed" style={{ fontSize: '1.05rem', maxWidth: '38ch' }}>
                 {s.sub}
               </p>
             </div>
@@ -266,7 +267,7 @@ function LoginPage() {
           {slides.map((_, i) => (
             <button key={i} onClick={() => setSlide(i)}
               className="transition-all duration-300 rounded-full"
-              style={{ width: slide === i ? '24px' : '6px', height: '6px', background: slide === i ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)' }}
+              style={{ width: slide === i ? '20px' : '5px', height: '5px', background: slide === i ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.18)' }}
             />
           ))}
         </div>
@@ -277,7 +278,7 @@ function LoginPage() {
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
-            <span className="brand text-[1.4rem] text-[#0c1527]">Cognition</span>
+            <span className="brand text-[1.4rem] text-[#111111]">Cognition</span>
           </div>
 
           <div className="mb-8">
@@ -294,7 +295,7 @@ function LoginPage() {
               <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Password</label>
               <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
             </div>
-            <Button type="submit" className="w-full h-10 !bg-[#0c1527] hover:!bg-[#1e3a8a] !rounded-md" disabled={busy}>
+            <Button type="submit" className="w-full h-10 !bg-[#111111] hover:!bg-[#2a1a0e] !rounded-md" disabled={busy}>
               {busy ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
@@ -319,7 +320,7 @@ function LoginPage() {
 
           <p className="mt-6 text-sm text-slate-500 text-center">
             New to Cognition?{' '}
-            <button className="text-[#1e3a8a] hover:text-[#1e40af] font-medium transition-colors">Create your organization</button>
+            <button className="text-[#111111] hover:text-[#2a1a0e] font-medium transition-colors">Create your organization</button>
           </p>
         </div>
       </div>
@@ -363,7 +364,7 @@ function CaseLibrary({ onSelect }) {
                 <div className="p-5 flex flex-col gap-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-12 h-12 rounded-lg bg-[#1e3a8a]/10 flex items-center justify-center shrink-0 text-[#1e3a8a]"><Ic.folder size={22}/></div>
+                      <div className="w-12 h-12 rounded-lg bg-[#111111]/10 flex items-center justify-center shrink-0 text-[#111111]"><Ic.folder size={22}/></div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-medium text-slate-900 leading-snug line-clamp-2">{c.caseName}</h3>
                         <p className="text-xs text-slate-500 mt-0.5">ID: {c.caseNumber}</p>
@@ -385,7 +386,7 @@ function CaseLibrary({ onSelect }) {
             {list.map((c) => (
               <Card key={c.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onSelect(c.id)}>
                 <div className="p-4 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-lg bg-[#1e3a8a]/10 flex items-center justify-center shrink-0 text-[#1e3a8a]"><Ic.folder size={26}/></div>
+                  <div className="w-14 h-14 rounded-lg bg-[#111111]/10 flex items-center justify-center shrink-0 text-[#111111]"><Ic.folder size={26}/></div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-slate-900 mb-1">{c.caseName}</h3>
                     <div className="flex items-center gap-3 text-xs text-slate-500">
@@ -553,7 +554,7 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
       <div className="bg-slate-900 rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"/>
         <div className="relative z-10 text-center">
-          <div className={cls('w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto transition-all', playing ? 'bg-teal-500/30 animate-pulse' : 'bg-[#1e3a8a]/30')}>
+          <div className={cls('w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto transition-all', playing ? 'bg-teal-500/30 animate-pulse' : 'bg-[#111111]/30')}>
             {playing ? <Ic.pause size={32}/> : <Ic.play size={32}/>}
           </div>
           <p className="text-white/60 text-sm">Deposition Video</p>
@@ -565,7 +566,7 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <span className="text-slate-500 text-xs min-w-[36px]">{fmt(currentTime)}</span>
-          <input type="range" min="0" max={duration} value={currentTime} onChange={(e) => setCurrentTime(Number(e.target.value))} className="flex-1 accent-[#0d9488]"/>
+          <input type="range" min="0" max={duration} value={currentTime} onChange={(e) => setCurrentTime(Number(e.target.value))} className="flex-1 accent-[#6B4226]"/>
           <span className="text-slate-500 text-xs min-w-[36px]">{fmt(duration)}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -604,7 +605,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
               const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
               const isW = s.speaker === 'Witness';
               return (
-                <button key={s.id} onClick={() => setCurrentTime(s.timestamp)} className={cls('text-left rounded-lg border p-3 transition-all', active ? 'border-[#0d9488] bg-teal-50' : 'border-slate-200 bg-white hover:border-slate-300')}>
+                <button key={s.id} onClick={() => setCurrentTime(s.timestamp)} className={cls('text-left rounded-lg border p-3 transition-all', active ? 'border-[#6B4226] bg-[#fdf6f0]' : 'border-slate-200 bg-white hover:border-slate-300')}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <Badge variant={isW ? 'amber' : 'blue'}>{s.speaker}</Badge>
@@ -697,10 +698,10 @@ function SentimentTab({ data }) {
           <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#cbd5e1" strokeDasharray="3 3"/>
           <line x1={pad} y1={pad} x2={pad} y2={h - pad} stroke="#e2e8f0"/>
           <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#e2e8f0"/>
-          <path d={area} fill="#0d9488" opacity="0.12"/>
-          <path d={path} fill="none" stroke="#0d9488" strokeWidth="2"/>
+          <path d={area} fill="#6B4226" opacity="0.12"/>
+          <path d={path} fill="none" stroke="#6B4226" strokeWidth="2"/>
           {data.map((d, i) => (
-            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="3" fill={d.v < 0 ? '#e11d48' : '#0d9488'}/>
+            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="3" fill={d.v < 0 ? '#e11d48' : '#6B4226'}/>
           ))}
           <text x={pad} y={pad - 6} className="text-[9px] fill-slate-400">+1 positive</text>
           <text x={pad} y={h - 4} className="text-[9px] fill-slate-400">-1 negative</text>
@@ -791,7 +792,7 @@ function ChatTab() {
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
         {messages.map((m, i) => (
-          <div key={i} className={cls('rounded-lg px-3 py-2 text-sm leading-relaxed max-w-[90%]', m.role === 'ai' ? 'bg-slate-100 text-slate-800 self-start' : 'bg-[#1e3a8a] text-white self-end')}>{m.text}</div>
+          <div key={i} className={cls('rounded-lg px-3 py-2 text-sm leading-relaxed max-w-[90%]', m.role === 'ai' ? 'bg-slate-100 text-slate-800 self-start' : 'bg-[#111111] text-white self-end')}>{m.text}</div>
         ))}
         {busy && <div className="bg-slate-100 text-slate-500 text-sm rounded-lg px-3 py-2 self-start">Thinking…</div>}
       </div>
@@ -864,10 +865,10 @@ function DepositionDetail({ id, onBack }) {
         <div className="col-span-4 flex flex-col bg-slate-50 border-l-2 border-slate-200 overflow-hidden -my-6 -mr-6 px-4 py-4">
           <div className="flex items-center gap-1 border-b-2 border-slate-200 -mx-4 px-4 mb-3 overflow-x-auto">
             {tabs.map((t) => (
-              <button key={t.id} onClick={() => setTab(t.id)} className={cls('relative px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors', tab === t.id ? 'text-[#1e3a8a]' : 'text-slate-500 hover:text-slate-800')}>
+              <button key={t.id} onClick={() => setTab(t.id)} className={cls('relative px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors', tab === t.id ? 'text-[#111111]' : 'text-slate-500 hover:text-slate-800')}>
                 {t.label}
                 {t.count > 0 && <Badge variant="destructive" className="ml-1.5">{t.count}</Badge>}
-                {tab === t.id && <span className="absolute bottom-[-2px] left-0 right-0 h-0.5 bg-[#1e3a8a]"/>}
+                {tab === t.id && <span className="absolute bottom-[-2px] left-0 right-0 h-0.5 bg-[#111111]"/>}
               </button>
             ))}
           </div>
