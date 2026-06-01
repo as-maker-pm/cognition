@@ -123,20 +123,53 @@ const Card = ({ className = '', children, ...rest }) => (
 );
 
 // ---------- Top Nav ----------
-function TopNav({ onLogo, onUserManagement }) {
+function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const initials = user ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '';
   const RoleIcon = { admin: Ic.shield, editor: Ic.edit, reader: Ic.eye }[user?.role] || (() => null);
 
   return (
-    <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
-      <div className="px-6 py-3 flex items-center justify-between">
-        <button onClick={onLogo} className="hover:opacity-75 transition-opacity">
+    <header className="border-b border-slate-200 bg-white sticky top-0 z-40 h-14">
+      <div className="px-6 h-full flex items-center gap-3">
+        {/* Logo */}
+        <button onClick={onLogo} className="hover:opacity-75 transition-opacity shrink-0">
           <span className="brand text-[1.35rem] text-slate-900">Cognition</span>
         </button>
-        <div className="flex items-center gap-3">
-          <div className="relative w-72">
+
+        {/* Divider + Breadcrumb */}
+        {breadcrumb.length > 0 && (
+          <>
+            <div className="w-px h-5 bg-slate-200 shrink-0"/>
+            <nav className="flex items-center gap-1.5 min-w-0">
+              {breadcrumb.map((item, idx) => {
+                const isLast = idx === breadcrumb.length - 1;
+                return (
+                  <React.Fragment key={idx}>
+                    {idx > 0 && <span className="text-slate-300 text-sm shrink-0">›</span>}
+                    {isLast ? (
+                      <span className="text-sm font-medium text-slate-900 truncate max-w-[200px]">{item.label}</span>
+                    ) : (
+                      <button
+                        onClick={item.onClick}
+                        className="text-sm text-slate-500 hover:text-slate-900 transition-colors truncate max-w-[200px]"
+                      >
+                        {item.label}
+                      </button>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </nav>
+          </>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1"/>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="relative w-64">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
             <Input placeholder="Search depositions..." className="pl-9 h-8 text-sm"/>
           </div>
@@ -354,19 +387,20 @@ function CaseLibrary({ onSelect }) {
 
   return (
     <div className="flex-1 flex flex-col bg-slate-50">
-      <div className="border-b bg-white px-6 py-6 flex items-center justify-between">
+      {/* Header */}
+      <div className="border-b bg-white px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-900">Cases</h1>
-          <Badge>{MOCK_CASES.length}</Badge>
+          <h1 className="text-xl font-semibold text-slate-900">Cases</h1>
+          <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">{MOCK_CASES.length}</span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative w-80">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search/></span>
-            <Input placeholder="Search cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10"/>
+          <div className="relative w-72">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+            <Input placeholder="Search cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9"/>
           </div>
-          <div className="flex items-center gap-1 border rounded-md p-1">
-            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={14}/></Button>
-            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={14}/></Button>
+          <div className="flex items-center gap-1 border border-slate-200 rounded-md p-1 bg-white">
+            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
+            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
           </div>
           {canEdit && <Button><Ic.plus size={14}/> New Case</Button>}
         </div>
@@ -376,44 +410,62 @@ function CaseLibrary({ onSelect }) {
         {view === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {list.map((c) => (
-              <Card key={c.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onSelect(c.id)}>
-                <div className="p-5 flex flex-col gap-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="w-12 h-12 rounded-lg bg-[#111111]/10 flex items-center justify-center shrink-0 text-[#111111]"><Ic.folder size={22}/></div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-slate-900 leading-snug line-clamp-2">{c.caseName}</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">ID: {c.caseNumber}</p>
-                      </div>
-                    </div>
-                    <button className="text-slate-400 hover:text-slate-700 p-1" onClick={(e) => e.stopPropagation()}><Ic.more size={16}/></button>
+              <div
+                key={c.id}
+                onClick={() => onSelect(c.id)}
+                className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-150"
+              >
+                <div className="p-4 flex flex-col gap-3">
+                  {/* Top row: case type label + deposition count badge */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase tracking-wide font-medium text-slate-400">{c.type || 'Civil'}</span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600">
+                      <Ic.fileText size={10}/>{c.depositionCount}
+                    </span>
                   </div>
-                  <div className="space-y-2 text-sm pt-3 border-t border-slate-100">
-                    <div className="flex gap-2"><span className="text-slate-500 w-16 shrink-0">Client:</span><span className="truncate">{c.client}</span></div>
-                    <div className="flex gap-2"><span className="text-slate-500 w-16 shrink-0">Updated:</span><span>{c.lastActivity}</span></div>
-                    <div className="flex items-center gap-2 text-slate-700"><Ic.fileText size={14}/><span>{c.depositionCount} {c.depositionCount === 1 ? 'Deposition' : 'Depositions'}</span></div>
+                  {/* Case name */}
+                  <h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-2">{c.caseName}</h3>
+                  {/* Divider */}
+                  <div className="h-px bg-slate-100"/>
+                  {/* Meta */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <Ic.user size={11}/>
+                      <span className="truncate">{c.client}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <Ic.clock size={11}/>
+                      <span>Updated {c.lastActivity}</span>
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             {list.map((c) => (
-              <Card key={c.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onSelect(c.id)}>
-                <div className="p-4 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-lg bg-[#111111]/10 flex items-center justify-center shrink-0 text-[#111111]"><Ic.folder size={26}/></div>
+              <div
+                key={c.id}
+                onClick={() => onSelect(c.id)}
+                className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all duration-150"
+              >
+                <div className="px-4 py-3 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-slate-900 mb-1">{c.caseName}</h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
-                      <span>ID: {c.caseNumber}</span><span>•</span>
-                      <span>Client: {c.client}</span><span>•</span>
-                      <span className="flex items-center gap-1"><Ic.fileText size={12}/>{c.depositionCount} Depositions</span>
+                    <h3 className="text-sm font-semibold text-slate-900 truncate">{c.caseName}</h3>
+                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
+                      <span className="uppercase tracking-wide text-slate-400">{c.type || 'Civil'}</span>
+                      <span className="text-slate-300">·</span>
+                      <span>{c.client}</span>
+                      <span className="text-slate-300">·</span>
+                      <span className="flex items-center gap-1"><Ic.fileText size={11}/>{c.depositionCount} depositions</span>
+                      <span className="text-slate-300">·</span>
+                      <span>Updated {c.lastActivity}</span>
                     </div>
                   </div>
-                  <div className="text-xs text-slate-500 flex items-center gap-1 shrink-0"><Ic.calendar size={12}/>Updated {c.lastActivity}</div>
+                  <Ic.chevR size={14} className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"/>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}
@@ -441,30 +493,57 @@ function DepositionLibrary({ caseId, onSelect, onBack }) {
       ? <Badge variant="amber"><Ic.alert size={10}/> Mixed</Badge>
       : <Badge variant="blue"><Ic.sparkles size={10}/> AI Generated</Badge>;
 
+  const statusPills = ['all', 'ready', 'processing', 'draft'];
+  const statusLabels = { all: 'All', ready: 'Ready', processing: 'Processing', draft: 'Draft' };
+
+  // Derive witness initials from witness name
+  const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
+
   return (
     <div className="flex-1 flex flex-col bg-slate-50">
-      <div className="border-b bg-white px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}><Ic.arrowL size={18}/></Button>
+      {/* Header — no back button, breadcrumb handles navigation */}
+      <div className="border-b bg-white px-6 py-4">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Depositions — {selectedCase?.caseNumber}</h1>
-            <p className="text-sm text-slate-500">{selectedCase?.caseName}</p>
+            <h1 className="text-xl font-semibold text-slate-900">{selectedCase?.caseName || 'Depositions'}</h1>
+            {selectedCase && <p className="text-sm text-slate-500 mt-0.5">{selectedCase.caseNumber}</p>}
           </div>
-          <Badge>{all.length}</Badge>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button variant="outline"><Ic.upload size={14}/> Upload New</Button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative w-80">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search/></span>
-            <Input placeholder="Search depositions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10"/>
+
+        {/* Filter bar */}
+        <div className="flex items-center justify-between gap-4 mt-4">
+          {/* Status pills */}
+          <div className="flex items-center gap-1.5">
+            {statusPills.map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={cls(
+                  'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+                  status === s
+                    ? 'bg-[#111111] text-white'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                )}
+              >
+                {statusLabels[s]}
+                {s === 'all' && <span className="ml-1.5 text-[10px] opacity-70">{all.length}</span>}
+              </button>
+            ))}
           </div>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm">
-            <option value="all">All Status</option><option value="ready">Ready</option><option value="processing">Processing</option><option value="draft">Draft</option>
-          </select>
-          <div className="flex items-center gap-1 border rounded-md p-1">
-            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={14}/></Button>
-            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={14}/></Button>
+          {/* Right: search + view toggle */}
+          <div className="flex items-center gap-2">
+            <div className="relative w-64">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+              <Input placeholder="Search depositions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-8 text-sm"/>
+            </div>
+            <div className="flex items-center gap-1 border border-slate-200 rounded-md p-1 bg-white">
+              <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
+              <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
+            </div>
           </div>
-          <Button><Ic.plus size={14}/> Upload New</Button>
         </div>
       </div>
 
@@ -472,62 +551,85 @@ function DepositionLibrary({ caseId, onSelect, onBack }) {
         {view === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {list.map((d) => (
-              <Card key={d.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onSelect(d.id)}>
-                <div className="aspect-video relative bg-slate-200 overflow-hidden">
-                  <div className="absolute inset-0" style={{
-                    background: 'repeating-linear-gradient(135deg, #cbd5e1 0 12px, #e2e8f0 12px 24px)'
-                  }}/>
-                  <div className="absolute inset-0 flex items-center justify-center text-slate-500">
-                    <div className="bg-white/85 rounded-full w-12 h-12 flex items-center justify-center"><Ic.play size={20}/></div>
+              <div key={d.id} className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-150 overflow-hidden" onClick={() => onSelect(d.id)}>
+                {/* Clean dark top section with initials */}
+                <div className="bg-stone-900 h-24 relative flex items-center justify-center">
+                  <span className="brand text-white/80 select-none" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
+                    {witnessInitials(d.witness)}
+                  </span>
+                  {/* Status badge top-left */}
+                  <div className="absolute top-2 left-2">
+                    <span className={cls(
+                      'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
+                      d.status === 'ready' ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/50' :
+                      d.status === 'processing' ? 'bg-amber-900/60 text-amber-300 border border-amber-700/50' :
+                      'bg-stone-700 text-stone-300 border border-stone-600'
+                    )}>
+                      {d.status}
+                    </span>
                   </div>
-                  <div className="absolute top-2 left-2"><Badge variant="outline" className="bg-white/90">{d.status}</Badge></div>
-                  <div className="absolute top-2 right-2">{tBadge(d.transcriptSource)}</div>
+                  {/* Transcript source badge top-right */}
+                  <div className="absolute top-2 right-2">
+                    {d.transcriptSource === 'verified'
+                      ? <span className="inline-flex items-center gap-1 rounded-md bg-emerald-900/60 border border-emerald-700/50 text-emerald-300 px-2 py-0.5 text-xs font-medium"><Ic.checkC size={10}/> Verified</span>
+                      : d.transcriptSource === 'mixed'
+                        ? <span className="inline-flex items-center gap-1 rounded-md bg-amber-900/60 border border-amber-700/50 text-amber-300 px-2 py-0.5 text-xs font-medium"><Ic.alert size={10}/> Mixed</span>
+                        : <span className="inline-flex items-center gap-1 rounded-md bg-blue-900/60 border border-blue-700/50 text-blue-300 px-2 py-0.5 text-xs font-medium"><Ic.sparkles size={10}/> AI</span>
+                    }
+                  </div>
                 </div>
-                <div className="p-4 flex flex-col gap-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-slate-900 truncate">{d.title}</h3>
-                      <p className="text-xs text-slate-500 truncate">{d.witness}</p>
-                    </div>
+                {/* Card body */}
+                <div className="p-4 flex flex-col gap-2.5">
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-900 truncate">{d.witness}</h3>
+                    <p className="text-xs text-slate-500 truncate mt-0.5">{d.title}</p>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-slate-500">
-                    <span className="flex items-center gap-1"><Ic.calendar size={12}/>{d.date}</span>
-                    <span className="flex items-center gap-1"><Ic.clock size={12}/>{fmt(d.duration)}</span>
+                    <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
+                    <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
                   </div>
-                  <div className="text-xs pt-2 border-t border-slate-100"><span className="text-slate-500">Case: </span><span className="text-slate-700">{d.caseNumber}</span></div>
-                  {d.tags && (
-                    <div className="flex flex-wrap gap-1">
+                  {d.tags && d.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-1 border-t border-slate-100">
                       {d.tags.slice(0,2).map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
                       {d.tags.length > 2 && <Badge variant="outline">+{d.tags.length - 2}</Badge>}
                     </div>
                   )}
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             {list.map((d) => (
-              <Card key={d.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onSelect(d.id)}>
-                <div className="p-4 flex items-center gap-4">
-                  <div className="w-32 h-20 rounded-md bg-slate-200 shrink-0 relative overflow-hidden" style={{ background: 'repeating-linear-gradient(135deg, #cbd5e1 0 8px, #e2e8f0 8px 16px)' }}>
-                    <div className="absolute inset-0 flex items-center justify-center text-slate-600"><Ic.play size={18}/></div>
-                  </div>
+              <div key={d.id} className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all duration-150 overflow-hidden flex" onClick={() => onSelect(d.id)}>
+                {/* Dark left strip */}
+                <div className="w-2 bg-stone-800 shrink-0"/>
+                <div className="flex-1 px-4 py-3 flex items-center gap-4 min-w-0">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-slate-900 mb-1 truncate">{d.title}</h3>
-                    <p className="text-sm text-slate-500 mb-1">{d.witness}</p>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
-                      <span>Case: {d.caseNumber}</span>
-                      <span className="flex items-center gap-1"><Ic.calendar size={12}/>{d.date}</span>
-                      <span className="flex items-center gap-1"><Ic.clock size={12}/>{fmt(d.duration)}</span>
+                    <h3 className="text-sm font-semibold text-slate-900 truncate">{d.witness}</h3>
+                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5 flex-wrap">
+                      <span className="uppercase tracking-wide text-xs text-slate-400">{d.title}</span>
+                      <span className="text-slate-300">·</span>
+                      <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
+                      <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
+                      <span className="text-slate-300">·</span>
+                      <span>Case {d.caseNumber}</span>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1 max-w-xs justify-end">
+                  <div className="flex items-center gap-2 shrink-0">
                     {tBadge(d.transcriptSource)}
-                    {d.tags?.slice(0,2).map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
+                    <span className={cls(
+                      'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border',
+                      d.status === 'ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                      d.status === 'processing' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                      'bg-slate-50 text-slate-600 border-slate-200'
+                    )}>
+                      {d.status}
+                    </span>
+                    <Ic.chevR size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors"/>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}
@@ -831,28 +933,30 @@ function DepositionDetail({ id, onBack }) {
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
   const tabs = [
-    { id: 'goals',     label: 'Goals' },
-    { id: 'flagged',   label: 'Flagged', count: MOCK_DETAIL.flaggedItems.length },
-    { id: 'sentiment', label: 'Sentiment' },
-    { id: 'timeline',  label: 'Timeline' },
-    { id: 'summaries', label: 'Summaries' },
-    { id: 'chat',      label: 'AI Chat' },
+    { id: 'goals',     label: 'Goals',     icon: Ic.checkC },
+    { id: 'flagged',   label: 'Flagged',   icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.length },
+    { id: 'sentiment', label: 'Sentiment', icon: Ic.sparkles },
+    { id: 'timeline',  label: 'Timeline',  icon: Ic.calendar },
+    { id: 'summaries', label: 'Summaries', icon: Ic.fileText },
+    { id: 'chat',      label: 'AI Chat',   icon: Ic.msg },
   ];
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      {/* Header — no back button, breadcrumb handles navigation */}
       <header className="border-b bg-white px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}><Ic.arrowL size={18}/></Button>
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">{depo.title}</h2>
-            <div className="flex items-center gap-2 flex-wrap text-sm text-slate-500">
-              <span>{depo.date} · Case {depo.caseNumber}</span>
-              {depo.tags?.map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
-            </div>
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">{depo.title}</h2>
+          <div className="flex items-center gap-2 flex-wrap text-sm text-slate-500 mt-0.5">
+            <span>{depo.witness}</span>
+            <span className="text-slate-300">·</span>
+            <span>{depo.date}</span>
+            <span className="text-slate-300">·</span>
+            <span>Case {depo.caseNumber}</span>
+            {depo.tags?.map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {canEdit && <Button variant="outline"><Ic.upload size={14}/> Upload Verified Transcript</Button>}
           <Button variant="outline"><Ic.fileText size={14}/> Export Report</Button>
         </div>
@@ -878,15 +982,34 @@ function DepositionDetail({ id, onBack }) {
           </div>
         </div>
 
-        <div className="col-span-4 flex flex-col bg-slate-50 border-l-2 border-slate-200 overflow-hidden -my-6 -mr-6 px-4 py-4">
-          <div className="flex items-center gap-1 border-b-2 border-slate-200 -mx-4 px-4 mb-3 overflow-x-auto">
-            {tabs.map((t) => (
-              <button key={t.id} onClick={() => setTab(t.id)} className={cls('relative px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors', tab === t.id ? 'text-[#111111]' : 'text-slate-500 hover:text-slate-800')}>
-                {t.label}
-                {t.count > 0 && <Badge variant="destructive" className="ml-1.5">{t.count}</Badge>}
-                {tab === t.id && <span className="absolute bottom-[-2px] left-0 right-0 h-0.5 bg-[#111111]"/>}
-              </button>
-            ))}
+        {/* Right panel — white background, pill-shaped icon+label tabs */}
+        <div className="col-span-4 flex flex-col bg-white border-l border-slate-200 overflow-hidden -my-6 -mr-6 px-4 py-4">
+          {/* Tab bar */}
+          <div className="flex items-center gap-1 flex-wrap mb-3 pb-3 border-b border-slate-200">
+            {tabs.map((t) => {
+              const TabIcon = t.icon;
+              const isActive = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={cls(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
+                    isActive
+                      ? 'bg-stone-100 text-stone-900'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                  )}
+                >
+                  <TabIcon size={13}/>
+                  {t.label}
+                  {t.count > 0 && (
+                    <span className="ml-0.5 inline-flex items-center justify-center rounded-full bg-rose-600 text-white text-[10px] font-medium w-4 h-4">
+                      {t.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
           <div className="flex-1 overflow-y-auto pr-1">
             {tab === 'goals'     && <GoalsTab goals={MOCK_DETAIL.goals}/>}
@@ -911,12 +1034,47 @@ function AppContent() {
 
   if (!user) return <LoginPage/>;
 
+  // Compute breadcrumb based on current view
+  const selectedCase = caseId ? MOCK_CASES.find((c) => c.id === caseId) : null;
+  const selectedDepo = depoId ? MOCK_DEPOSITIONS.find((d) => d.id === depoId) : null;
+
+  let breadcrumb = [];
+  if (view === 'depositions' && selectedCase) {
+    breadcrumb = [
+      { label: selectedCase.caseName, onClick: () => { setView('cases'); setCaseId(null); } },
+    ];
+  } else if (view === 'detail' && selectedCase) {
+    breadcrumb = [
+      { label: selectedCase.caseName, onClick: () => { setView('cases'); setCaseId(null); setDepoId(null); } },
+      { label: selectedDepo ? selectedDepo.witness : 'Deposition' },
+    ];
+    // Second breadcrumb item (caseName) should navigate to depositions, not cases
+    breadcrumb[0].onClick = () => { setView('depositions'); setDepoId(null); };
+  }
+
   return (
     <div className="h-full flex flex-col bg-slate-50" data-screen-label={view}>
-      <TopNav onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }} onUserManagement={() => {}}/>
-      {view === 'cases' && <CaseLibrary onSelect={(id) => { setCaseId(id); setView('depositions'); }}/>}
-      {view === 'depositions' && <DepositionLibrary caseId={caseId} onSelect={(id) => { setDepoId(id); setView('detail'); }} onBack={() => { setView('cases'); setCaseId(null); }}/>}
-      {view === 'detail' && <DepositionDetail id={depoId} onBack={() => { setView('depositions'); setDepoId(null); }}/>}
+      <TopNav
+        onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
+        onUserManagement={() => {}}
+        breadcrumb={breadcrumb}
+      />
+      {view === 'cases' && (
+        <CaseLibrary onSelect={(id) => { setCaseId(id); setView('depositions'); }}/>
+      )}
+      {view === 'depositions' && (
+        <DepositionLibrary
+          caseId={caseId}
+          onSelect={(id) => { setDepoId(id); setView('detail'); }}
+          onBack={() => { setView('cases'); setCaseId(null); }}
+        />
+      )}
+      {view === 'detail' && (
+        <DepositionDetail
+          id={depoId}
+          onBack={() => { setView('depositions'); setDepoId(null); }}
+        />
+      )}
     </div>
   );
 }
