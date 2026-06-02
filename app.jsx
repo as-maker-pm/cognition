@@ -688,10 +688,12 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
           <Button size="sm" variant={playing ? 'secondary' : 'primary'} onClick={() => setPlaying(!playing)} className="flex-1">
             {playing ? <Ic.pause size={13}/> : <Ic.play size={13}/>} {playing ? 'Pause' : 'Play'}
           </Button>
-          <Button size="sm" variant="outline" onClick={() => { setCurrentTime(0); setPlaying(true); }}><Ic.skipBack size={13}/></Button>
+          <Button size="sm" variant="outline" onClick={() => { setCurrentTime(0); setPlaying(false); }}>
+            <Ic.skipBack size={13}/> Restart
+          </Button>
           {(depo.videos?.length || 0) > 1 && <>
-            <Button size="sm" variant="outline" disabled={videoIdx === 0} onClick={() => { setVideoIdx(videoIdx - 1); setCurrentTime(0); }}><Ic.chevL size={13}/></Button>
-            <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}><Ic.chevR size={13}/></Button>
+            <Button size="sm" variant="outline" disabled={videoIdx === 0} onClick={() => { setVideoIdx(videoIdx - 1); setCurrentTime(0); }}><Ic.chevL size={13}/> Prev</Button>
+            <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}>Next <Ic.chevR size={13}/></Button>
           </>}
         </div>
       </div>
@@ -1337,27 +1339,24 @@ function DepositionDetail({ id, onBack }) {
 
         {/* Right panel: tabs */}
         <div className="col-span-4 flex flex-col bg-[#FBF8F1] overflow-hidden">
-          {/* Icon-only tab rail */}
-          <div className="flex items-center border-b border-[#E4DCC9] shrink-0 px-2 pt-2 pb-0 gap-0.5">
+          {/* Text tab bar */}
+          <div className="flex flex-wrap gap-0.5 border-b border-[#E4DCC9] shrink-0 px-2 pt-2 pb-0">
             {tabs.map((t) => {
-              const TabIcon = t.icon;
               const isActive = tab === t.id;
               return (
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  title={t.label}
                   className={cls(
-                    'relative flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-t-md text-[11px] font-medium transition-colors',
+                    'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t-md text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
                       ? 'text-[#14110D] bg-[#F7F2EA] border border-b-0 border-[#E4DCC9]'
                       : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#E4DCC9]/20'
                   )}
                 >
-                  <TabIcon size={14}/>
-                  {isActive && <span className="text-[9px] leading-none">{t.label}</span>}
-                  {t.count > 0 && !isActive && (
-                    <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[8px] font-bold flex items-center justify-center">
+                  {t.label}
+                  {t.count > 0 && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white text-[9px] font-bold w-3.5 h-3.5">
                       {t.count}
                     </span>
                   )}
