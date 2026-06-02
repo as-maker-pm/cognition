@@ -659,51 +659,51 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
   const fmt = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-3 h-full">
       {depo.videos?.length > 1 && (
-        <Card className="p-3 bg-teal-50 border-teal-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-teal-900 text-sm font-medium"><Ic.film size={14}/>Video {videoIdx + 1} of {depo.videos.length}</div>
-            <Badge variant="outline" className="bg-white border-teal-300 text-teal-700">Part {v.part}</Badge>
-          </div>
-        </Card>
+        <div className="flex items-center justify-between text-xs text-[#6B5744]">
+          <span className="flex items-center gap-1.5"><Ic.film size={12}/>Video {videoIdx + 1} of {depo.videos.length}</span>
+          <Badge variant="outline">Part {v.part}</Badge>
+        </div>
       )}
 
       <div className="bg-[#2C2316] rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#2C2316] to-[#14110D]"/>
         <div className="relative z-10 text-center">
-          <div className={cls('w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto transition-all', playing ? 'bg-[#7A2E20]/30 animate-pulse' : 'bg-white/10')}>
-            {playing ? <Ic.pause size={32}/> : <Ic.play size={32}/>}
+          <div className={cls('w-16 h-16 rounded-full flex items-center justify-center mb-3 mx-auto transition-all', playing ? 'bg-[#7A2E20]/30 animate-pulse' : 'bg-white/10')}>
+            {playing ? <Ic.pause size={26}/> : <Ic.play size={26}/>}
           </div>
-          <p className="text-white/60 text-sm">Deposition Video</p>
-          <p className="text-white/40 text-xs mt-1">{depo.witness} — {depo.date}</p>
-          {playing && <p className="text-white/80 mt-2 text-xs">▶ Playing...</p>}
+          <p className="text-white/50 text-xs">{depo.witness}</p>
+          {playing && <p className="text-white/70 mt-1 text-xs">▶ Playing</p>}
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-[#6B5744] text-xs min-w-[36px]">{fmt(currentTime)}</span>
+          <span className="text-[#9A8573] text-xs font-mono w-9 shrink-0">{fmt(currentTime)}</span>
           <input type="range" min="0" max={duration} value={currentTime} onChange={(e) => setCurrentTime(Number(e.target.value))} className="flex-1 accent-[#7A2E20]"/>
-          <span className="text-[#6B5744] text-xs min-w-[36px]">{fmt(duration)}</span>
+          <span className="text-[#9A8573] text-xs font-mono w-9 shrink-0 text-right">{fmt(duration)}</span>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" variant={playing ? 'secondary' : 'primary'} onClick={() => setPlaying(!playing)}>
-            {playing ? <Ic.pause size={14}/> : <Ic.play size={14}/>} {playing ? 'Pause' : 'Play'}
+        <div className="flex items-center gap-1.5">
+          <Button size="sm" variant={playing ? 'secondary' : 'primary'} onClick={() => setPlaying(!playing)} className="flex-1">
+            {playing ? <Ic.pause size={13}/> : <Ic.play size={13}/>} {playing ? 'Pause' : 'Play'}
           </Button>
-          <Button size="sm" variant="outline" onClick={() => { setCurrentTime(0); setPlaying(true); }}><Ic.skipBack size={14}/> Restart</Button>
-          <Button size="sm" variant="outline" disabled={videoIdx === 0} onClick={() => { setVideoIdx(videoIdx - 1); setCurrentTime(0); }}><Ic.chevL size={14}/> Prev</Button>
-          <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}>Next <Ic.chevR size={14}/></Button>
+          <Button size="sm" variant="outline" onClick={() => { setCurrentTime(0); setPlaying(true); }}><Ic.skipBack size={13}/></Button>
+          {(depo.videos?.length || 0) > 1 && <>
+            <Button size="sm" variant="outline" disabled={videoIdx === 0} onClick={() => { setVideoIdx(videoIdx - 1); setCurrentTime(0); }}><Ic.chevL size={13}/></Button>
+            <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}><Ic.chevR size={13}/></Button>
+          </>}
         </div>
       </div>
 
-      <Card>
-        <button onClick={() => setSummaryOpen((o) => !o)} className="w-full p-4 flex items-center justify-between hover:bg-[#E4DCC9]/20 rounded-lg transition-colors">
-          <div className="flex items-center gap-2 text-[#14110D] font-medium text-sm"><Ic.fileText size={16}/>Deposition Summary</div>
-          {summaryOpen ? <Ic.chevU size={14}/> : <Ic.chevD size={14}/>}
+      <div className="border-t border-[#E4DCC9]/60 pt-3">
+        <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider mb-2">Summary</p>
+        <p className="text-xs text-[#3D2E1E] leading-relaxed line-clamp-6">{MOCK_DETAIL.summary}</p>
+        <button onClick={() => setSummaryOpen((o) => !o)} className="text-[11px] text-[#7A2E20] mt-1.5 hover:underline">
+          {summaryOpen ? 'Show less' : 'Read more'}
         </button>
-        {summaryOpen && <div className="px-4 pb-4 text-sm text-[#3D2E1E] leading-relaxed">{MOCK_DETAIL.summary}</div>}
-      </Card>
+        {summaryOpen && <p className="text-xs text-[#3D2E1E] leading-relaxed mt-2">{MOCK_DETAIL.summary}</p>}
+      </div>
     </div>
   );
 }
@@ -1275,34 +1275,35 @@ function DepositionDetail({ id, onBack }) {
 
   return (
     <div className="flex-1 flex flex-col bg-[#F7F2EA] overflow-hidden">
-      {/* Header — no back button, breadcrumb handles navigation */}
-      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-[#14110D]">{depo.title}</h2>
-          <div className="flex items-center gap-2 flex-wrap text-sm text-[#6B5744] mt-0.5">
-            <span>{depo.witness}</span>
-            <span className="text-[#C4B5A2]">·</span>
-            <span>{depo.date}</span>
-            <span className="text-[#C4B5A2]">·</span>
-            <span>Case {depo.caseNumber}</span>
-            {depo.tags?.map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
+      {/* Header */}
+      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold text-[#14110D] truncate">{depo.title}</h2>
+            <div className="flex items-center gap-1.5 text-xs text-[#9A8573] mt-0.5">
+              <span>{depo.witness}</span>
+              <span className="text-[#E4DCC9]">·</span>
+              <span>{depo.date}</span>
+              <span className="text-[#E4DCC9]">·</span>
+              <span>Case {depo.caseNumber}</span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {canEdit && <Button variant="outline"><Ic.upload size={14}/> Upload Verified Transcript</Button>}
+          {canEdit && <Button variant="ghost" size="sm"><Ic.upload size={13}/> Upload transcript</Button>}
           <div className="relative">
-            <Button variant="outline" onClick={() => setExportOpen((o) => !o)}>
-              <Ic.fileText size={14}/> Export Report <Ic.chevD size={12}/>
+            <Button variant="outline" size="sm" onClick={() => setExportOpen((o) => !o)}>
+              <Ic.fileText size={13}/> Export <Ic.chevD size={11}/>
             </Button>
             {exportOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-xl shadow-[#E4DCC9]/60 p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
+              <div className="absolute right-0 mt-2 w-72 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-lg p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
                 <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest px-3 py-2">Choose audience</p>
                 {exportOptions.map(({ icon: Icon, title, sub, bg, fg }) => (
-                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-3 rounded-lg hover:bg-[#F0EAE0] transition-colors flex items-start gap-3">
-                    <div className={cls('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', bg, fg)}><Icon size={18}/></div>
+                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-2.5 rounded-lg hover:bg-[#F0EAE0] transition-colors flex items-center gap-3">
+                    <div className={cls('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', bg, fg)}><Icon size={15}/></div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold text-[#14110D] mb-0.5">{title}</div>
-                      <div className="text-xs text-[#6B5744] leading-snug">{sub}</div>
+                      <div className="text-sm font-medium text-[#14110D]">{title}</div>
+                      <div className="text-xs text-[#9A8573] truncate">{sub.split('·')[0].trim()}</div>
                     </div>
                   </button>
                 ))}
@@ -1312,74 +1313,32 @@ function DepositionDetail({ id, onBack }) {
         </div>
       </header>
 
-      <div className="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden">
-        <div className="col-span-3 overflow-y-auto pr-1">
-          <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+      <div className="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
+        {/* Left: video + controls */}
+        <div className="col-span-3 border-r border-[#E4DCC9] overflow-y-auto">
+          <div className="p-4">
+            <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+          </div>
         </div>
 
-        <div className="col-span-5 flex flex-col overflow-hidden">
-          <div className="mb-4 flex items-start justify-between gap-4 shrink-0">
-            <div>
-              <h2 className="text-lg font-semibold text-[#14110D]">Organized Transcript</h2>
-              <p className="text-sm text-[#6B5744]">Auto-transcribed and organized by topic</p>
-            </div>
-            <Button variant="destructive" onClick={() => setTab('flagged')}>
-              <Ic.alert size={14}/> {MOCK_DETAIL.flaggedItems.length} Flagged Items
-            </Button>
+        {/* Middle: transcript */}
+        <div className="col-span-5 border-r border-[#E4DCC9] flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E4DCC9]/60 shrink-0">
+            <span className="text-xs font-medium text-[#9A8573] uppercase tracking-wider">Transcript</span>
+            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1.5 text-xs text-rose-600 hover:text-rose-700 transition-colors">
+              <Ic.flag size={11}/>
+              {MOCK_DETAIL.flaggedItems.length} flagged
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto pr-2">
+          <div className="flex-1 overflow-y-auto px-5 py-4">
             <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime}/>
           </div>
         </div>
 
-        {/* Right panel */}
-        <div className="col-span-4 flex flex-col bg-[#FBF8F1] border-l border-[#E4DCC9] overflow-hidden -my-6 -mr-6">
-          {/* Quick stats strip */}
-          <div className="grid grid-cols-4 border-b border-[#E4DCC9] shrink-0">
-            {[
-              {
-                label: 'Goals',
-                value: `${MOCK_DETAIL.goals.filter((g) => g.covered).length}/${MOCK_DETAIL.goals.length}`,
-                sub: `${Math.round((MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length) * 100)}% covered`,
-                color: 'text-emerald-600',
-                onClick: () => setTab('goals'),
-              },
-              {
-                label: 'Flagged',
-                value: MOCK_DETAIL.flaggedItems.length,
-                sub: `${MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length} high severity`,
-                color: 'text-rose-600',
-                onClick: () => setTab('flagged'),
-              },
-              {
-                label: 'Contradictions',
-                value: MOCK_DETAIL.contradictions?.length || 0,
-                sub: 'in testimony',
-                color: 'text-rose-700',
-                onClick: () => setTab('contradictions'),
-              },
-              {
-                label: 'Sentiment',
-                value: 'Mixed',
-                sub: 'Negative at peaks',
-                color: 'text-amber-600',
-                onClick: () => setTab('sentiment'),
-              },
-            ].map((stat) => (
-              <button
-                key={stat.label}
-                onClick={stat.onClick}
-                className="flex flex-col gap-0.5 px-3 py-3 hover:bg-[#F0EAE0] transition-colors text-left border-r border-[#E4DCC9] last:border-r-0"
-              >
-                <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider">{stat.label}</span>
-                <span className={cls('text-base font-bold', stat.color)}>{stat.value}</span>
-                <span className="text-[10px] text-[#9A8573] leading-tight">{stat.sub}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Tab bar */}
-          <div className="flex items-center gap-0.5 px-3 pt-3 pb-2 border-b border-[#E4DCC9] shrink-0 flex-wrap">
+        {/* Right panel: tabs */}
+        <div className="col-span-4 flex flex-col bg-[#FBF8F1] overflow-hidden">
+          {/* Icon-only tab rail */}
+          <div className="flex items-center border-b border-[#E4DCC9] shrink-0 px-2 pt-2 pb-0 gap-0.5">
             {tabs.map((t) => {
               const TabIcon = t.icon;
               const isActive = tab === t.id;
@@ -1387,17 +1346,18 @@ function DepositionDetail({ id, onBack }) {
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
+                  title={t.label}
                   className={cls(
-                    'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
+                    'relative flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-t-md text-[11px] font-medium transition-colors',
                     isActive
-                      ? 'bg-[#E4DCC9]/60 text-[#14110D]'
-                      : 'text-[#6B5744] hover:text-[#14110D] hover:bg-[#E4DCC9]/30'
+                      ? 'text-[#14110D] bg-[#F7F2EA] border border-b-0 border-[#E4DCC9]'
+                      : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#E4DCC9]/20'
                   )}
                 >
-                  <TabIcon size={12}/>
-                  {t.label}
-                  {t.count > 0 && (
-                    <span className="ml-0.5 inline-flex items-center justify-center rounded-full bg-rose-600 text-white text-[10px] font-medium w-4 h-4">
+                  <TabIcon size={14}/>
+                  {isActive && <span className="text-[9px] leading-none">{t.label}</span>}
+                  {t.count > 0 && !isActive && (
+                    <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[8px] font-bold flex items-center justify-center">
                       {t.count}
                     </span>
                   )}
