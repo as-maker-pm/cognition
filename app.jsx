@@ -57,9 +57,9 @@ function ToastProvider({ children }) {
       {children}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2">
         {toasts.map((t) => (
-          <div key={t.id} className={`min-w-[280px] max-w-sm rounded-lg border bg-white shadow-lg px-4 py-3 ${t.kind === 'err' ? 'border-rose-200' : 'border-slate-200'}`}>
-            <div className={`text-sm font-medium ${t.kind === 'err' ? 'text-rose-700' : 'text-slate-900'}`}>{t.title}</div>
-            {t.desc && <div className="text-xs text-slate-500 mt-0.5">{t.desc}</div>}
+          <div key={t.id} className={`min-w-[280px] max-w-sm rounded-lg border bg-[#FBF8F1] shadow-lg px-4 py-3 ${t.kind === 'err' ? 'border-rose-200' : 'border-[#E4DCC9]'}`}>
+            <div className={`text-sm font-medium ${t.kind === 'err' ? 'text-rose-700' : 'text-[#14110D]'}`}>{t.title}</div>
+            {t.desc && <div className="text-xs text-[#6B5744] mt-0.5">{t.desc}</div>}
           </div>
         ))}
       </div>
@@ -92,24 +92,24 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
   const base = 'inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors disabled:opacity-50 disabled:pointer-events-none';
   const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-9 px-4 text-sm', icon: 'h-9 w-9 p-0' };
   const variants = {
-    primary:    'bg-[#111111] text-white hover:bg-[#2a1a0e]',
-    secondary:  'bg-stone-100 text-stone-900 hover:bg-stone-200',
-    outline:    'border border-stone-200 bg-white text-stone-800 hover:bg-stone-50',
-    ghost:      'text-stone-600 hover:bg-stone-100 hover:text-stone-900',
-    teal:       'bg-[#6B4226] text-white hover:bg-[#5a3520]',
+    primary:    'bg-[#14110D] text-white hover:bg-[#2C2316]',
+    secondary:  'bg-[#E4DCC9]/50 text-[#14110D] hover:bg-[#E4DCC9]',
+    outline:    'border border-[#E4DCC9] bg-[#FBF8F1] text-[#3D2E1E] hover:bg-[#F0EAE0]',
+    ghost:      'text-[#6B5744] hover:bg-[#E4DCC9]/40 hover:text-[#14110D]',
+    teal:       'bg-[#7A2E20] text-white hover:bg-[#5A1F14]',
     destructive:'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
   };
   return <button className={cls(base, sizes[size], variants[variant], className)} {...rest}>{children}</button>;
 };
 
 const Input = ({ className = '', ...rest }) => (
-  <input className={cls('h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-900/5 transition-colors', className)} {...rest}/>
+  <input className={cls('h-9 w-full rounded-md border border-[#E4DCC9] bg-[#FBF8F1] px-3 text-sm outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors text-[#14110D] placeholder:text-[#9A8573]', className)} {...rest}/>
 );
 
 const Badge = ({ variant = 'secondary', className = '', children }) => {
   const v = {
-    secondary:   'bg-slate-100 text-slate-700 border border-slate-200',
-    outline:     'bg-white border border-slate-200 text-slate-700',
+    secondary:   'bg-[#E4DCC9]/50 text-[#3D2E1E] border border-[#E4DCC9]',
+    outline:     'bg-[#FBF8F1] border border-[#E4DCC9] text-[#3D2E1E]',
     destructive: 'bg-rose-600 text-white',
     green:       'bg-emerald-50 border border-emerald-300 text-emerald-700',
     amber:       'bg-amber-50 border border-amber-300 text-amber-700',
@@ -119,7 +119,7 @@ const Badge = ({ variant = 'secondary', className = '', children }) => {
 };
 
 const Card = ({ className = '', children, ...rest }) => (
-  <div className={cls('rounded-xl border border-slate-200 bg-white', className)} {...rest}>{children}</div>
+  <div className={cls('rounded-xl border border-[#E4DCC9] bg-[#FBF8F1]', className)} {...rest}>{children}</div>
 );
 
 // ---------- Top Nav ----------
@@ -130,29 +130,29 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
   const RoleIcon = { admin: Ic.shield, editor: Ic.edit, reader: Ic.eye }[user?.role] || (() => null);
 
   return (
-    <header className="border-b border-slate-200 bg-white sticky top-0 z-40 h-14">
+    <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] sticky top-0 z-40 h-14">
       <div className="px-6 h-full flex items-center gap-3">
         {/* Logo */}
         <button onClick={onLogo} className="hover:opacity-75 transition-opacity shrink-0">
-          <span className="brand text-[1.35rem] text-slate-900">Cognition</span>
+          <span className="brand text-[1.35rem] text-[#14110D]">Cognition</span>
         </button>
 
         {/* Divider + Breadcrumb */}
         {breadcrumb.length > 0 && (
           <>
-            <div className="w-px h-5 bg-slate-200 shrink-0"/>
+            <div className="w-px h-5 bg-[#E4DCC9] shrink-0"/>
             <nav className="flex items-center gap-1.5 min-w-0">
               {breadcrumb.map((item, idx) => {
                 const isLast = idx === breadcrumb.length - 1;
                 return (
                   <React.Fragment key={idx}>
-                    {idx > 0 && <span className="text-slate-300 text-sm shrink-0">›</span>}
+                    {idx > 0 && <span className="text-[#C4B5A2] text-sm shrink-0">›</span>}
                     {isLast ? (
-                      <span className="text-sm font-medium text-slate-900 truncate max-w-[200px]">{item.label}</span>
+                      <span className="text-sm font-medium text-[#14110D] truncate max-w-[200px]">{item.label}</span>
                     ) : (
                       <button
                         onClick={item.onClick}
-                        className="text-sm text-slate-500 hover:text-slate-900 transition-colors truncate max-w-[200px]"
+                        className="text-sm text-[#6B5744] hover:text-[#14110D] transition-colors truncate max-w-[200px]"
                       >
                         {item.label}
                       </button>
@@ -170,7 +170,7 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
         {/* Right actions */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="relative w-64">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
             <Input placeholder="Search depositions..." className="pl-9 h-8 text-sm"/>
           </div>
           <Button variant="ghost" size="icon" className="relative h-8 w-8">
@@ -178,24 +178,24 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
             <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">3</span>
           </Button>
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#111111] text-white text-xs font-medium flex items-center justify-center hover:bg-[#2a1a0e] transition-colors">
+            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center hover:bg-[#2C2316] transition-colors">
               {initials || <Ic.user size={14}/>}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white border border-slate-200 rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
+              <div className="absolute right-0 mt-2 w-60 bg-[#FBF8F1] border border-[#E4DCC9] rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
                 <div className="px-3 py-2.5">
-                  <div className="text-sm font-medium text-slate-900">{user?.name}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{user?.email}</div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                  <div className="text-sm font-medium text-[#14110D]">{user?.name}</div>
+                  <div className="text-xs text-[#6B5744] mt-0.5">{user?.email}</div>
+                  <div className="flex items-center gap-1.5 text-xs text-[#9A8573] mt-1">
                     <RoleIcon size={11}/>
                     <span className="capitalize">{user?.role}</span>
                     <span>·</span>
                     <span>{user?.organization.name}</span>
                   </div>
                 </div>
-                <div className="h-px bg-slate-100 my-1"/>
+                <div className="h-px bg-[#E4DCC9]/60 my-1"/>
                 {user?.role === 'admin' && (
-                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-slate-50 flex items-center gap-2 text-slate-700">
+                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#E4DCC9]/40 flex items-center gap-2 text-[#3D2E1E]">
                     <Ic.user size={13}/> User Management
                   </button>
                 )}
@@ -323,34 +323,34 @@ function LoginPage() {
       </div>
 
       {/* Right — Auth form */}
-      <div className="flex-1 flex items-center justify-center bg-white p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#F7F2EA] p-8">
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
-            <span className="brand text-[1.4rem] text-[#111111]">Cognition</span>
+            <span className="brand text-[1.4rem] text-[#14110D]">Cognition</span>
           </div>
 
           <div className="mb-8">
-            <h2 className="brand text-[1.9rem] text-slate-900 mb-1" style={{ fontWeight: 500 }}>Welcome back</h2>
-            <p className="text-slate-500 text-sm">Sign in to your account to continue</p>
+            <h2 className="brand text-[1.9rem] text-[#14110D] mb-1" style={{ fontWeight: 500 }}>Welcome back</h2>
+            <p className="text-[#6B5744] text-sm">Sign in to your account to continue</p>
           </div>
 
           <form onSubmit={submit} className="space-y-4 mb-6">
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Email address</label>
+              <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Email address</label>
               <Input type="email" placeholder="name@organization.com" value={email} onChange={(e) => setEmail(e.target.value)} required/>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Password</label>
+              <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Password</label>
               <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
             </div>
-            <Button type="submit" className="w-full h-10 !bg-[#111111] hover:!bg-[#2a1a0e] !rounded-md" disabled={busy}>
+            <Button type="submit" className="w-full h-10 !bg-[#14110D] hover:!bg-[#2C2316] !rounded-md" disabled={busy}>
               {busy ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
 
-          <div className="border-t border-slate-100 pt-6">
-            <p className="text-xs text-slate-400 uppercase tracking-widest mb-3">Demo access</p>
+          <div className="border-t border-[#E4DCC9] pt-6">
+            <p className="text-xs text-[#9A8573] uppercase tracking-widest mb-3">Demo access</p>
             <div className="space-y-2">
               {[
                 ['admin@smithdepo.com',  'Deposition Firm — Admin',  Ic.film],
@@ -359,17 +359,17 @@ function LoginPage() {
                 ['reader@lawfirm.com',   'Law Firm — Reader',        Ic.scale],
               ].map(([em, label, Icn]) => (
                 <button key={em} onClick={() => demo(em, label)}
-                  className="w-full text-left px-3 py-2.5 text-sm text-slate-700 border border-slate-200 rounded-md hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2.5">
-                  <Icn size={13} className="text-slate-400 shrink-0"/>
+                  className="w-full text-left px-3 py-2.5 text-sm text-[#3D2E1E] border border-[#E4DCC9] rounded-md hover:bg-[#FBF8F1] hover:border-[#D0C5B0] bg-[#FBF8F1]/60 transition-colors flex items-center gap-2.5">
+                  <Icn size={13} className="text-[#9A8573] shrink-0"/>
                   <span>{label}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <p className="mt-6 text-sm text-slate-500 text-center">
+          <p className="mt-6 text-sm text-[#6B5744] text-center">
             New to Cognition?{' '}
-            <button className="text-[#111111] hover:text-[#2a1a0e] font-medium transition-colors">Create your organization</button>
+            <button className="text-[#14110D] hover:text-[#7A2E20] font-medium transition-colors">Create your organization</button>
           </p>
         </div>
       </div>
@@ -386,19 +386,19 @@ function CaseLibrary({ onSelect }) {
   const list = MOCK_CASES.filter((c) => [c.caseName, c.caseNumber, c.client, c.type].some((s) => s.toLowerCase().includes(search.toLowerCase())));
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50">
+    <div className="flex-1 flex flex-col bg-[#F7F2EA]">
       {/* Header */}
-      <div className="border-b bg-white px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold text-slate-900">Cases</h1>
-          <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">{MOCK_CASES.length}</span>
+          <h1 className="text-xl font-semibold text-[#14110D]">Cases</h1>
+          <span className="inline-flex items-center rounded-full bg-[#E4DCC9]/50 border border-[#E4DCC9] px-2.5 py-0.5 text-xs font-medium text-[#6B5744]">{MOCK_CASES.length}</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative w-72">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
             <Input placeholder="Search cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9"/>
           </div>
-          <div className="flex items-center gap-1 border border-slate-200 rounded-md p-1 bg-white">
+          <div className="flex items-center gap-1 border border-[#E4DCC9] rounded-md p-1 bg-[#FBF8F1]">
             <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
             <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
           </div>
@@ -413,27 +413,27 @@ function CaseLibrary({ onSelect }) {
               <div
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-150"
+                className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150"
               >
                 <div className="p-4 flex flex-col gap-3">
                   {/* Top row: case type label + deposition count badge */}
                   <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wide font-medium text-slate-400">{c.type || 'Civil'}</span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600">
+                    <span className="text-xs uppercase tracking-wide font-medium text-[#9A8573]">{c.type || 'Civil'}</span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#E4DCC9]/40 border border-[#E4DCC9] px-2 py-0.5 text-xs font-medium text-[#6B5744]">
                       <Ic.fileText size={10}/>{c.depositionCount}
                     </span>
                   </div>
                   {/* Case name */}
-                  <h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-2">{c.caseName}</h3>
+                  <h3 className="text-base font-semibold text-[#14110D] leading-snug line-clamp-2">{c.caseName}</h3>
                   {/* Divider */}
-                  <div className="h-px bg-slate-100"/>
+                  <div className="h-px bg-[#E4DCC9]/60"/>
                   {/* Meta */}
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                    <div className="flex items-center gap-1.5 text-xs text-[#6B5744]">
                       <Ic.user size={11}/>
                       <span className="truncate">{c.client}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                    <div className="flex items-center gap-1.5 text-xs text-[#9A8573]">
                       <Ic.clock size={11}/>
                       <span>Updated {c.lastActivity}</span>
                     </div>
@@ -448,22 +448,22 @@ function CaseLibrary({ onSelect }) {
               <div
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all duration-150"
+                className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150"
               >
                 <div className="px-4 py-3 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-slate-900 truncate">{c.caseName}</h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5">
-                      <span className="uppercase tracking-wide text-slate-400">{c.type || 'Civil'}</span>
-                      <span className="text-slate-300">·</span>
+                    <h3 className="text-sm font-semibold text-[#14110D] truncate">{c.caseName}</h3>
+                    <div className="flex items-center gap-3 text-xs text-[#6B5744] mt-0.5">
+                      <span className="uppercase tracking-wide text-[#9A8573]">{c.type || 'Civil'}</span>
+                      <span className="text-[#C4B5A2]">·</span>
                       <span>{c.client}</span>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-[#C4B5A2]">·</span>
                       <span className="flex items-center gap-1"><Ic.fileText size={11}/>{c.depositionCount} depositions</span>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-[#C4B5A2]">·</span>
                       <span>Updated {c.lastActivity}</span>
                     </div>
                   </div>
-                  <Ic.chevR size={14} className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"/>
+                  <Ic.chevR size={14} className="text-[#C4B5A2] group-hover:text-[#6B5744] shrink-0 transition-colors"/>
                 </div>
               </div>
             ))}
@@ -500,13 +500,13 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50">
+    <div className="flex-1 flex flex-col bg-[#F7F2EA]">
       {/* Header — no back button, breadcrumb handles navigation */}
-      <div className="border-b bg-white px-6 py-4">
+      <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">{selectedCase?.caseName || 'Depositions'}</h1>
-            {selectedCase && <p className="text-sm text-slate-500 mt-0.5">{selectedCase.caseNumber}</p>}
+            <h1 className="text-xl font-semibold text-[#14110D]">{selectedCase?.caseName || 'Depositions'}</h1>
+            {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseNumber}</p>}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
@@ -524,8 +524,8 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                 className={cls(
                   'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                   status === s
-                    ? 'bg-[#111111] text-white'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'bg-[#14110D] text-white'
+                    : 'bg-[#FBF8F1] border border-[#E4DCC9] text-[#6B5744] hover:border-[#D0C5B0] hover:bg-[#F0EAE0]'
                 )}
               >
                 {statusLabels[s]}
@@ -536,10 +536,10 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
           {/* Right: search + view toggle */}
           <div className="flex items-center gap-2">
             <div className="relative w-64">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Ic.search size={14}/></span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
               <Input placeholder="Search depositions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-8 text-sm"/>
             </div>
-            <div className="flex items-center gap-1 border border-slate-200 rounded-md p-1 bg-white">
+            <div className="flex items-center gap-1 border border-[#E4DCC9] rounded-md p-1 bg-[#FBF8F1]">
               <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
               <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
             </div>
@@ -551,9 +551,9 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
         {view === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {list.map((d) => (
-              <div key={d.id} className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-md transition-all duration-150 overflow-hidden" onClick={() => onSelect(d.id)}>
-                {/* Clean dark top section with initials */}
-                <div className="bg-stone-900 h-24 relative flex items-center justify-center">
+              <div key={d.id} className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden" onClick={() => onSelect(d.id)}>
+                {/* Dark top section with initials */}
+                <div className="bg-[#2C2316] h-24 relative flex items-center justify-center">
                   <span className="brand text-white/80 select-none" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
                     {witnessInitials(d.witness)}
                   </span>
@@ -581,15 +581,15 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                 {/* Card body */}
                 <div className="p-4 flex flex-col gap-2.5">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 truncate">{d.witness}</h3>
-                    <p className="text-xs text-slate-500 truncate mt-0.5">{d.title}</p>
+                    <h3 className="text-sm font-semibold text-[#14110D] truncate">{d.witness}</h3>
+                    <p className="text-xs text-[#6B5744] truncate mt-0.5">{d.title}</p>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <div className="flex items-center gap-3 text-xs text-[#6B5744]">
                     <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
                     <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
                   </div>
                   {d.tags && d.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1 border-t border-slate-100">
+                    <div className="flex flex-wrap gap-1 pt-1 border-t border-[#E4DCC9]/60">
                       {d.tags.slice(0,2).map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
                       {d.tags.length > 2 && <Badge variant="outline">+{d.tags.length - 2}</Badge>}
                     </div>
@@ -601,18 +601,18 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
         ) : (
           <div className="flex flex-col gap-1.5">
             {list.map((d) => (
-              <div key={d.id} className="group rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all duration-150 overflow-hidden flex" onClick={() => onSelect(d.id)}>
-                {/* Dark left strip */}
-                <div className="w-2 bg-stone-800 shrink-0"/>
+              <div key={d.id} className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150 overflow-hidden flex" onClick={() => onSelect(d.id)}>
+                {/* Oxblood left strip */}
+                <div className="w-2 bg-[#7A2E20]/30 shrink-0"/>
                 <div className="flex-1 px-4 py-3 flex items-center gap-4 min-w-0">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-slate-900 truncate">{d.witness}</h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-0.5 flex-wrap">
-                      <span className="uppercase tracking-wide text-xs text-slate-400">{d.title}</span>
-                      <span className="text-slate-300">·</span>
+                    <h3 className="text-sm font-semibold text-[#14110D] truncate">{d.witness}</h3>
+                    <div className="flex items-center gap-3 text-xs text-[#6B5744] mt-0.5 flex-wrap">
+                      <span className="uppercase tracking-wide text-xs text-[#9A8573]">{d.title}</span>
+                      <span className="text-[#C4B5A2]">·</span>
                       <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
                       <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
-                      <span className="text-slate-300">·</span>
+                      <span className="text-[#C4B5A2]">·</span>
                       <span>Case {d.caseNumber}</span>
                     </div>
                   </div>
@@ -622,11 +622,11 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                       'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border',
                       d.status === 'ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                       d.status === 'processing' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      'bg-slate-50 text-slate-600 border-slate-200'
+                      'bg-[#E4DCC9]/40 text-[#6B5744] border-[#E4DCC9]'
                     )}>
                       {d.status}
                     </span>
-                    <Ic.chevR size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors"/>
+                    <Ic.chevR size={14} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                   </div>
                 </div>
               </div>
@@ -669,10 +669,10 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
         </Card>
       )}
 
-      <div className="bg-slate-900 rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"/>
+      <div className="bg-[#2C2316] rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2C2316] to-[#14110D]"/>
         <div className="relative z-10 text-center">
-          <div className={cls('w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto transition-all', playing ? 'bg-teal-500/30 animate-pulse' : 'bg-[#111111]/30')}>
+          <div className={cls('w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto transition-all', playing ? 'bg-[#7A2E20]/30 animate-pulse' : 'bg-white/10')}>
             {playing ? <Ic.pause size={32}/> : <Ic.play size={32}/>}
           </div>
           <p className="text-white/60 text-sm">Deposition Video</p>
@@ -683,9 +683,9 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-slate-500 text-xs min-w-[36px]">{fmt(currentTime)}</span>
-          <input type="range" min="0" max={duration} value={currentTime} onChange={(e) => setCurrentTime(Number(e.target.value))} className="flex-1 accent-[#6B4226]"/>
-          <span className="text-slate-500 text-xs min-w-[36px]">{fmt(duration)}</span>
+          <span className="text-[#6B5744] text-xs min-w-[36px]">{fmt(currentTime)}</span>
+          <input type="range" min="0" max={duration} value={currentTime} onChange={(e) => setCurrentTime(Number(e.target.value))} className="flex-1 accent-[#7A2E20]"/>
+          <span className="text-[#6B5744] text-xs min-w-[36px]">{fmt(duration)}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant={playing ? 'secondary' : 'primary'} onClick={() => setPlaying(!playing)}>
@@ -698,11 +698,11 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
       </div>
 
       <Card>
-        <button onClick={() => setSummaryOpen((o) => !o)} className="w-full p-4 flex items-center justify-between hover:bg-slate-50 rounded-lg">
-          <div className="flex items-center gap-2 text-slate-900 font-medium text-sm"><Ic.fileText size={16}/>Deposition Summary</div>
+        <button onClick={() => setSummaryOpen((o) => !o)} className="w-full p-4 flex items-center justify-between hover:bg-[#E4DCC9]/20 rounded-lg transition-colors">
+          <div className="flex items-center gap-2 text-[#14110D] font-medium text-sm"><Ic.fileText size={16}/>Deposition Summary</div>
           {summaryOpen ? <Ic.chevU size={14}/> : <Ic.chevD size={14}/>}
         </button>
-        {summaryOpen && <div className="px-4 pb-4 text-sm text-slate-600 leading-relaxed">{MOCK_DETAIL.summary}</div>}
+        {summaryOpen && <div className="px-4 pb-4 text-sm text-[#3D2E1E] leading-relaxed">{MOCK_DETAIL.summary}</div>}
       </Card>
     </div>
   );
@@ -714,27 +714,27 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
       {topics.map((topic) => (
         <div key={topic.id}>
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-sm font-semibold text-slate-900">{topic.title}</h3>
+            <h3 className="text-sm font-semibold text-[#14110D]">{topic.title}</h3>
             <Badge variant="outline">{topic.segments.length} segments</Badge>
           </div>
-          {topic.summary && <p className="text-xs text-slate-500 mb-3 leading-relaxed">{topic.summary}</p>}
+          {topic.summary && <p className="text-xs text-[#6B5744] mb-3 leading-relaxed">{topic.summary}</p>}
           <div className="flex flex-col gap-2">
             {topic.segments.map((s) => {
               const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
               const isW = s.speaker === 'Witness';
               return (
-                <button key={s.id} onClick={() => setCurrentTime(s.timestamp)} className={cls('text-left rounded-lg border p-3 transition-all', active ? 'border-[#6B4226] bg-[#fdf6f0]' : 'border-slate-200 bg-white hover:border-slate-300')}>
+                <button key={s.id} onClick={() => setCurrentTime(s.timestamp)} className={cls('text-left rounded-lg border p-3 transition-all', active ? 'border-[#7A2E20] bg-[#FBF8F1]' : 'border-[#E4DCC9] bg-[#FBF8F1]/60 hover:border-[#D0C5B0]')}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <Badge variant={isW ? 'amber' : 'blue'}>{s.speaker}</Badge>
-                      <span className="text-xs text-slate-400">p.{s.page} · l.{s.line}</span>
+                      <span className="text-xs text-[#9A8573]">p.{s.page} · l.{s.line}</span>
                       {s.source === 'verified'
                         ? <Badge variant="green"><Ic.checkC size={10}/>Verified</Badge>
                         : <Badge variant="blue"><Ic.sparkles size={10}/>AI</Badge>}
                     </div>
-                    <span className="text-xs text-slate-400 tabular-nums">{Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}</span>
+                    <span className="text-xs text-[#9A8573] tabular-nums font-mono">{Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}</span>
                   </div>
-                  <p className="text-sm text-slate-800 leading-relaxed">{s.text}</p>
+                  <p className="text-sm text-[#14110D] leading-relaxed">{s.text}</p>
                   {s.cues?.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {s.cues.map((c, i) => (
@@ -760,28 +760,28 @@ function GoalsTab({ goals }) {
   return (
     <div className="flex flex-col gap-3">
       {/* Progress summary */}
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Goal Coverage</span>
-          <span className="text-sm font-semibold text-slate-900">{covered}/{goals.length}</span>
+          <span className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider">Goal Coverage</span>
+          <span className="text-sm font-semibold text-[#14110D]">{covered}/{goals.length}</span>
         </div>
-        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-[#E4DCC9]/60 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-700"
-            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#111111' }}
+            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#14110D' }}
           />
         </div>
-        <p className="text-xs text-slate-400 mt-1.5">{pct}% of deposition goals addressed</p>
+        <p className="text-xs text-[#9A8573] mt-1.5">{pct}% of deposition goals addressed</p>
       </div>
       {goals.map((g) => (
         <Card key={g.id} className="p-3">
           <div className="flex items-start gap-3">
-            <div className={cls('w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5', g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-slate-300')}>
+            <div className={cls('w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5', g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#E4DCC9]')}>
               {g.covered && <Ic.check size={12}/>}
             </div>
             <div className="flex-1 min-w-0">
-              <div className={cls('text-sm font-medium', g.covered ? 'text-slate-900' : 'text-slate-600')}>{g.title}</div>
-              {g.notes && <div className={cls('text-xs mt-1', g.covered ? 'text-slate-500' : 'text-amber-600')}>{g.notes}</div>}
+              <div className={cls('text-sm font-medium', g.covered ? 'text-[#14110D]' : 'text-[#6B5744]')}>{g.title}</div>
+              {g.notes && <div className={cls('text-xs mt-1', g.covered ? 'text-[#6B5744]' : 'text-amber-600')}>{g.notes}</div>}
             </div>
           </div>
         </Card>
@@ -791,7 +791,7 @@ function GoalsTab({ goals }) {
 }
 
 function FlaggedTab({ items, jump }) {
-  const sevColor = { high: 'bg-rose-50 border-rose-200 text-rose-700', medium: 'bg-amber-50 border-amber-200 text-amber-700', low: 'bg-slate-50 border-slate-200 text-slate-700' };
+  const sevColor = { high: 'bg-rose-50 border-rose-200 text-rose-700', medium: 'bg-amber-50 border-amber-200 text-amber-700', low: 'bg-[#F7F2EA] border-[#E4DCC9] text-[#6B5744]' };
   return (
     <div className="flex flex-col gap-2">
       {items.map((f) => (
@@ -840,11 +840,11 @@ function SentimentTab({ data }) {
         {[
           { label: 'Baseline', value: sentLabel(avgSentiment), color: sentColor(avgSentiment) },
           { label: 'Negative moments', value: negCount, color: '#be123c' },
-          { label: 'Sentiment range', value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} → +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, color: '#111111' },
-          { label: 'Key shifts', value: shifts.length, color: '#6B4226' },
+          { label: 'Sentiment range', value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} → +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, color: '#14110D' },
+          { label: 'Key shifts', value: shifts.length, color: '#7A2E20' },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-            <div className="text-[10px] text-slate-400 mb-1 uppercase tracking-wider">{s.label}</div>
+          <div key={s.label} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] px-3 py-2.5">
+            <div className="text-[10px] text-[#9A8573] mb-1 uppercase tracking-wider">{s.label}</div>
             <div className="text-base font-bold" style={{ color: s.color }}>{s.value}</div>
           </div>
         ))}
@@ -852,8 +852,8 @@ function SentimentTab({ data }) {
 
       {/* Timeline ribbon */}
       <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sentiment Timeline</p>
-        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#f1f5f9' }}>
+        <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Sentiment Timeline</p>
+        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#E4DCC9' }}>
           {data.map((d, i) => {
             const next = data[i + 1];
             const width = next ? ((next.t - d.t) / xMax * 100) : (5);
@@ -861,12 +861,12 @@ function SentimentTab({ data }) {
             return <div key={i} style={{ width: `${width}%`, background: bg, minWidth: 2 }}/>;
           })}
         </div>
-        <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+        <div className="flex justify-between text-[10px] text-[#9A8573] font-mono mt-1">
           <span>0:00</span><span>{Math.floor(xMax/60)}:{String(xMax%60).padStart(2,'0')}</span>
         </div>
         <div className="flex items-center gap-3 mt-2">
           {[['#6ee7b7', 'Positive'], ['#fde68a', 'Neutral'], ['#fca5a5', 'Negative']].map(([c, l]) => (
-            <span key={l} className="flex items-center gap-1 text-[10px] text-slate-500">
+            <span key={l} className="flex items-center gap-1 text-[10px] text-[#6B5744]">
               <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: c }}/>
               {l}
             </span>
@@ -876,29 +876,29 @@ function SentimentTab({ data }) {
 
       {/* Trendline chart */}
       <Card className="p-3">
-        <p className="text-xs font-semibold text-slate-500 mb-2">Emotional Curve</p>
+        <p className="text-xs font-semibold text-[#6B5744] mb-2">Emotional Curve</p>
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#e2e8f0" strokeDasharray="3 3"/>
-          <path d={area} fill="#6B4226" opacity="0.1"/>
-          <path d={path} fill="none" stroke="#6B4226" strokeWidth="1.5"/>
+          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#E4DCC9" strokeDasharray="3 3"/>
+          <path d={area} fill="#7A2E20" opacity="0.1"/>
+          <path d={path} fill="none" stroke="#7A2E20" strokeWidth="1.5"/>
           {data.map((d, i) => (
             <circle key={i} cx={x(d.t)} cy={y(d.v)} r="2.5" fill={sentColor(d.v)}/>
           ))}
-          <text x={pad} y={pad - 4} fontSize="8" fill="#94a3b8">+1</text>
-          <text x={pad} y={h - 6} fontSize="8" fill="#94a3b8">−1</text>
+          <text x={pad} y={pad - 4} fontSize="8" fill="#9A8573">+1</text>
+          <text x={pad} y={h - 6} fontSize="8" fill="#9A8573">−1</text>
         </svg>
       </Card>
 
       {/* Key moments */}
       <div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Key Moments</p>
+        <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Key Moments</p>
         <div className="flex flex-col gap-1.5">
           {labeled.map((d, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs bg-white border border-slate-200 rounded-lg px-3 py-2">
+            <div key={i} className="flex items-center gap-2 text-xs bg-[#FBF8F1] border border-[#E4DCC9] rounded-lg px-3 py-2">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sentColor(d.v) }}/>
-              <span className="text-slate-500 font-mono tabular-nums shrink-0">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
-              <span className="text-slate-700 flex-1">{d.label}</span>
-              <span className="text-[10px] font-mono text-slate-400">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</span>
+              <span className="text-[#9A8573] font-mono tabular-nums shrink-0">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
+              <span className="text-[#3D2E1E] flex-1">{d.label}</span>
+              <span className="text-[10px] font-mono text-[#9A8573]">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -913,17 +913,17 @@ function TimelineTab({ events, jump }) {
       {events.map((e) => (
         <Card key={e.id} className={cls('p-3', e.contradiction && 'border-rose-300 bg-rose-50/50')}>
           <div className="flex items-start gap-3">
-            <div className="text-xs text-slate-500 shrink-0 w-24">
-              <div className="font-medium text-slate-700">{e.date}</div>
+            <div className="text-xs text-[#6B5744] shrink-0 w-24">
+              <div className="font-medium text-[#3D2E1E]">{e.date}</div>
               {e.time && <div>{e.time}</div>}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-slate-900">{e.title}</span>
+                <span className="text-sm font-medium text-[#14110D]">{e.title}</span>
                 <Badge variant="outline" className="capitalize">{e.category}</Badge>
                 {e.contradiction && <Badge variant="destructive"><Ic.alert size={10}/> Contradiction</Badge>}
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">{e.description}</p>
+              <p className="text-xs text-[#6B5744] leading-relaxed">{e.description}</p>
               {e.contradiction && <p className="text-xs text-rose-700 mt-2 leading-relaxed">{e.contradictionDetails}</p>}
             </div>
           </div>
@@ -938,11 +938,11 @@ function SummariesTab({ topics }) {
     <div className="flex flex-col gap-3">
       {topics.map((t) => (
         <Card key={t.id} className="p-4">
-          <h4 className="text-sm font-semibold text-slate-900 mb-1">{t.title}</h4>
-          <p className="text-xs text-slate-600 leading-relaxed">{t.summary}</p>
+          <h4 className="text-sm font-semibold text-[#14110D] mb-1">{t.title}</h4>
+          <p className="text-xs text-[#6B5744] leading-relaxed">{t.summary}</p>
           <div className="flex items-center gap-2 mt-2">
             <Badge variant="outline">{t.segments.length} segments</Badge>
-            <span className="text-xs text-slate-400 tabular-nums">{Math.floor(t.segments[0].timestamp/60)}:{String(t.segments[0].timestamp%60).padStart(2,'0')}</span>
+            <span className="text-xs text-[#9A8573] tabular-nums font-mono">{Math.floor(t.segments[0].timestamp/60)}:{String(t.segments[0].timestamp%60).padStart(2,'0')}</span>
           </div>
         </Card>
       ))}
@@ -1002,22 +1002,22 @@ function ChatTab({ depo }) {
         {isEmpty ? (
           <div className="p-3">
             <div className="flex items-start gap-2.5 mb-5">
-              <div className="w-7 h-7 rounded-full bg-[#111111] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-full bg-[#14110D] flex items-center justify-center shrink-0 mt-0.5">
                 <Ic.sparkles size={12} className="text-white"/>
               </div>
-              <div className="bg-slate-100 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm text-slate-700 leading-relaxed">
+              <div className="bg-[#E4DCC9]/40 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm text-[#3D2E1E] leading-relaxed">
                 Ask me anything about this deposition — I can surface contradictions, assess goal coverage, and explain behavioral patterns in the testimony.
               </div>
             </div>
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 pl-9">Suggested questions</p>
+            <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-widest mb-2 pl-9">Suggested questions</p>
             <div className="pl-9 flex flex-col gap-1.5">
               {suggestions.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
                   onClick={() => send(label)}
-                  className="text-left flex items-center gap-2.5 text-sm px-3 py-2.5 rounded-lg border border-slate-200 text-slate-600 hover:border-stone-300 hover:bg-stone-50 hover:text-slate-900 transition-colors group"
+                  className="text-left flex items-center gap-2.5 text-sm px-3 py-2.5 rounded-lg border border-[#E4DCC9] text-[#3D2E1E] bg-[#FBF8F1]/60 hover:border-[#D0C5B0] hover:bg-[#FBF8F1] hover:text-[#14110D] transition-colors group"
                 >
-                  <Icon size={13} className="text-slate-400 group-hover:text-stone-500 shrink-0"/>
+                  <Icon size={13} className="text-[#9A8573] group-hover:text-[#7A2E20] shrink-0"/>
                   {label}
                 </button>
               ))}
@@ -1029,17 +1029,17 @@ function ChatTab({ depo }) {
               <div key={i} className={cls('flex gap-2 items-end', m.role !== 'ai' && 'flex-row-reverse')}>
                 <div className={cls(
                   'w-6 h-6 rounded-full flex items-center justify-center shrink-0 mb-0.5',
-                  m.role === 'ai' ? 'bg-[#111111]' : 'bg-slate-200'
+                  m.role === 'ai' ? 'bg-[#14110D]' : 'bg-[#E4DCC9]'
                 )}>
                   {m.role === 'ai'
                     ? <Ic.sparkles size={11} className="text-white"/>
-                    : <span className="text-[10px] font-semibold text-slate-600">U</span>}
+                    : <span className="text-[10px] font-semibold text-[#6B5744]">U</span>}
                 </div>
                 <div className={cls(
                   'rounded-xl px-3 py-2 text-sm leading-relaxed',
                   m.role === 'ai'
-                    ? 'bg-slate-100 text-slate-800 rounded-bl-sm max-w-[88%]'
-                    : 'bg-[#111111] text-white rounded-br-sm max-w-[88%]'
+                    ? 'bg-[#E4DCC9]/40 text-[#14110D] rounded-bl-sm max-w-[88%]'
+                    : 'bg-[#14110D] text-white rounded-br-sm max-w-[88%]'
                 )}>
                   {m.text}
                 </div>
@@ -1047,13 +1047,13 @@ function ChatTab({ depo }) {
             ))}
             {busy && (
               <div className="flex items-end gap-2">
-                <div className="w-6 h-6 rounded-full bg-[#111111] flex items-center justify-center shrink-0 mb-0.5">
+                <div className="w-6 h-6 rounded-full bg-[#14110D] flex items-center justify-center shrink-0 mb-0.5">
                   <Ic.sparkles size={11} className="text-white"/>
                 </div>
-                <div className="bg-slate-100 rounded-xl rounded-bl-sm px-3 py-3">
+                <div className="bg-[#E4DCC9]/40 rounded-xl rounded-bl-sm px-3 py-3">
                   <div className="flex gap-1 items-center">
                     {[0,1,2].map((i) => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-400" style={{ animation: 'bounce 1s ease-in-out infinite', animationDelay: `${i * 0.18}s` }}/>
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#9A8573]" style={{ animation: 'bounce 1s ease-in-out infinite', animationDelay: `${i * 0.18}s` }}/>
                     ))}
                   </div>
                 </div>
@@ -1064,14 +1064,14 @@ function ChatTab({ depo }) {
         )}
       </div>
 
-      <div className="border-t border-slate-100 p-2.5 flex items-center gap-2 shrink-0">
+      <div className="border-t border-[#E4DCC9]/60 p-2.5 flex items-center gap-2 shrink-0">
         <input
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
           placeholder="Ask about this deposition…"
-          className="flex-1 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-900/5 transition-colors"
+          className="flex-1 h-9 rounded-lg border border-[#E4DCC9] bg-[#FBF8F1] px-3 text-sm text-[#14110D] placeholder:text-[#9A8573] outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors"
         />
         <Button size="icon" onClick={() => send()} disabled={busy || !input.trim()} className="shrink-0 h-9 w-9">
           <Ic.send size={14}/>
@@ -1114,62 +1114,62 @@ function ContradictionsTab({ jump }) {
         {[['all', 'All'], ['self', 'Self'], ['record', 'vs. Record']].map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)} className={cls(
             'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
-            filter === key ? 'bg-[#111111] text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            filter === key ? 'bg-[#14110D] text-white' : 'bg-[#FBF8F1] border border-[#E4DCC9] text-[#6B5744] hover:bg-[#F0EAE0]'
           )}>
             {label}
-            <span className={cls('font-mono text-[10px]', filter === key ? 'opacity-70' : 'text-slate-400')}>{counts[key]}</span>
+            <span className={cls('font-mono text-[10px]', filter === key ? 'opacity-70' : 'text-[#9A8573]')}>{counts[key]}</span>
           </button>
         ))}
       </div>
 
       {list.map((c, idx) => (
-        <div key={c.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div key={c.id} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] overflow-hidden">
           <div className="flex">
             <div className={cls('w-1 shrink-0', c.type === 'record' ? 'bg-rose-500' : 'bg-amber-500')}/>
             <div className="flex-1 p-3.5 min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                <span className="font-mono text-[10px] font-bold text-slate-300">{String(idx+1).padStart(2,'0')}</span>
+                <span className="font-mono text-[10px] font-bold text-[#C4B5A2]">{String(idx+1).padStart(2,'0')}</span>
                 {typePill(c.type)}
-                <span className="text-xs font-medium text-slate-500">{c.category}</span>
+                <span className="text-xs font-medium text-[#6B5744]">{c.category}</span>
                 {statusBadge(c.status)}
               </div>
-              <p className="text-xs font-semibold text-slate-800 mb-3 leading-snug">{c.title}</p>
+              <p className="text-xs font-semibold text-[#14110D] mb-3 leading-snug">{c.title}</p>
 
               <div className="grid grid-cols-[1fr_auto_1fr] gap-2 mb-3 items-stretch">
-                <div className="rounded-lg bg-slate-50 border border-slate-200 border-l-2 border-l-slate-400 p-2.5">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">{c.stmtA.label}</p>
-                  {c.stmtA.page && <p className="font-mono text-[9px] text-slate-400 mb-1">p.{c.stmtA.page} · l.{c.stmtA.line}</p>}
-                  <p className="text-xs text-slate-700 italic leading-relaxed">"{c.stmtA.quote}"</p>
+                <div className="rounded-lg bg-[#F7F2EA] border border-[#E4DCC9] border-l-2 border-l-[#9A8573] p-2.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtA.label}</p>
+                  {c.stmtA.page && <p className="font-mono text-[9px] text-[#9A8573] mb-1">p.{c.stmtA.page} · l.{c.stmtA.line}</p>}
+                  <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtA.quote}"</p>
                   {c.stmtA.timestamp && (
-                    <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#6B4226] mt-1.5 font-mono hover:underline block">{fmt(c.stmtA.timestamp)}</button>
+                    <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#7A2E20] mt-1.5 font-mono hover:underline block">{fmt(c.stmtA.timestamp)}</button>
                   )}
                 </div>
                 <div className="flex items-center self-center shrink-0">
-                  <span className="font-mono text-[9px] font-bold text-slate-300 uppercase tracking-wider">vs</span>
+                  <span className="font-mono text-[9px] font-bold text-[#C4B5A2] uppercase tracking-wider">vs</span>
                 </div>
-                <div className="rounded-lg bg-slate-50 border border-slate-200 border-l-2 border-l-rose-400 p-2.5">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">{c.stmtB.label}</p>
-                  <p className="text-xs text-slate-700 italic leading-relaxed">"{c.stmtB.quote}"</p>
+                <div className="rounded-lg bg-[#F7F2EA] border border-[#E4DCC9] border-l-2 border-l-rose-400 p-2.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtB.label}</p>
+                  <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtB.quote}"</p>
                 </div>
               </div>
 
               <div className="text-xs text-amber-800 bg-amber-50 border-l-2 border-amber-400 px-3 py-2 rounded-r-lg mb-3 leading-relaxed">{c.why}</div>
 
-              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-slate-100 pt-2.5">
+              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-[#E4DCC9] pt-2.5">
                 {c.crosslinks?.map((link) => (
-                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">{link}</span>
+                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-[#9A8573] bg-[#F7F2EA] border border-[#E4DCC9] rounded-full px-2 py-0.5">{link}</span>
                 ))}
                 <div className="flex items-center gap-1.5 ml-auto">
-                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Dismiss</button>
-                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#111111] text-white hover:bg-[#2a1a0e] transition-colors">Add to Brief</button>
+                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E4DCC9]/50 text-[#6B5744] hover:bg-[#E4DCC9] transition-colors">Dismiss</button>
+                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#14110D] text-white hover:bg-[#2C2316] transition-colors">Add to Brief</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       ))}
-      {list.length === 0 && <div className="text-center py-8 text-sm text-slate-400">No contradictions match this filter.</div>}
-      <p className="text-xs text-slate-400 bg-slate-50 border border-dashed border-slate-200 rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
+      {list.length === 0 && <div className="text-center py-8 text-sm text-[#9A8573]">No contradictions match this filter.</div>}
+      <p className="text-xs text-[#9A8573] bg-[#F7F2EA] border border-dashed border-[#E4DCC9] rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
     </div>
   );
 }
@@ -1181,7 +1181,7 @@ function ExhibitsTab({ jump }) {
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
   const categoryColors = {
-    Contract: 'bg-slate-100 text-slate-600',
+    Contract: 'bg-[#E4DCC9]/50 text-[#6B5744]',
     Calendar: 'bg-blue-50 text-blue-700',
     Document: 'bg-amber-50 text-amber-700',
     Email:    'bg-emerald-50 text-emerald-700',
@@ -1190,15 +1190,15 @@ function ExhibitsTab({ jump }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-4">
         <div className="flex items-center justify-between mb-2.5">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Documentary Record</span>
-          <span className="text-sm font-semibold text-slate-900">{exhibits.length} exhibits</span>
+          <span className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider">Documentary Record</span>
+          <span className="text-sm font-semibold text-[#14110D]">{exhibits.length} exhibits</span>
         </div>
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="rounded-lg bg-slate-50 px-3 py-2">
-            <div className="text-lg font-bold text-slate-900">{exhibits.length}</div>
-            <div className="text-[11px] text-slate-500">Total exhibits</div>
+          <div className="rounded-lg bg-[#F7F2EA] px-3 py-2">
+            <div className="text-lg font-bold text-[#14110D]">{exhibits.length}</div>
+            <div className="text-[11px] text-[#6B5744]">Total exhibits</div>
           </div>
           <div className="rounded-lg bg-rose-50 px-3 py-2">
             <div className="text-lg font-bold text-rose-700">{contradictionCount}</div>
@@ -1207,37 +1207,37 @@ function ExhibitsTab({ jump }) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           {[...new Set(exhibits.map((e) => e.category))].map((cat) => (
-            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-slate-100 text-slate-600')}>{cat}</span>
+            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-[#E4DCC9]/50 text-[#6B5744]')}>{cat}</span>
           ))}
         </div>
       </div>
 
       {exhibits.map((e) => (
-        <div key={e.id} className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2">
+        <div key={e.id} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-3 flex flex-col gap-2">
           <div className="flex items-start gap-2">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-              <Ic.fileText size={14} className="text-slate-500"/>
+            <div className="w-8 h-8 rounded-lg bg-[#E4DCC9]/40 flex items-center justify-center shrink-0 mt-0.5">
+              <Ic.fileText size={14} className="text-[#6B5744]"/>
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-mono text-[10px] font-bold text-slate-400 shrink-0">{e.label}</span>
-                <span className="text-sm font-semibold text-slate-900 truncate">{e.title}</span>
+                <span className="font-mono text-[10px] font-bold text-[#9A8573] shrink-0">{e.label}</span>
+                <span className="text-sm font-semibold text-[#14110D] truncate">{e.title}</span>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">{e.desc}</p>
+              <p className="text-xs text-[#6B5744] leading-relaxed">{e.desc}</p>
             </div>
             {e.timestamp && (
-              <button onClick={() => jump(e.timestamp)} className="font-mono text-[11px] text-[#6B4226] hover:underline shrink-0 mt-0.5">{fmt(e.timestamp)}</button>
+              <button onClick={() => jump(e.timestamp)} className="font-mono text-[11px] text-[#7A2E20] hover:underline shrink-0 mt-0.5">{fmt(e.timestamp)}</button>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-slate-100">
-            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-slate-100 text-slate-600')}>{e.category}</span>
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[#E4DCC9]/60">
+            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-[#E4DCC9]/50 text-[#6B5744]')}>{e.category}</span>
             {e.contradictions > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"/>
                 {e.contradictions} contradiction{e.contradictions > 1 ? 's' : ''}
               </span>
             )}
-            <span className="text-[11px] text-slate-400 ml-auto">{e.references} references in transcript</span>
+            <span className="text-[11px] text-[#9A8573] ml-auto">{e.references} references in transcript</span>
           </div>
         </div>
       ))}
@@ -1268,22 +1268,22 @@ function DepositionDetail({ id, onBack }) {
   ];
 
   const exportOptions = [
-    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations, sentiment, contradictions, annotated transcript', bg: 'bg-slate-100', fg: 'text-slate-600' },
+    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations, sentiment, contradictions, annotated transcript', bg: 'bg-[#E4DCC9]/50', fg: 'text-[#6B5744]' },
     { icon: Ic.msg,      title: 'Case Update',       sub: 'For the client · 2-page executive summary, plain language, key findings', bg: 'bg-emerald-50', fg: 'text-emerald-700' },
     { icon: Ic.edit,     title: 'Discovery Memo',    sub: 'For opposing counsel · contradictions cited to transcript, no AI methodology disclosed', bg: 'bg-rose-50', fg: 'text-rose-600' },
   ];
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[#F7F2EA] overflow-hidden">
       {/* Header — no back button, breadcrumb handles navigation */}
-      <header className="border-b bg-white px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{depo.title}</h2>
-          <div className="flex items-center gap-2 flex-wrap text-sm text-slate-500 mt-0.5">
+          <h2 className="text-lg font-semibold text-[#14110D]">{depo.title}</h2>
+          <div className="flex items-center gap-2 flex-wrap text-sm text-[#6B5744] mt-0.5">
             <span>{depo.witness}</span>
-            <span className="text-slate-300">·</span>
+            <span className="text-[#C4B5A2]">·</span>
             <span>{depo.date}</span>
-            <span className="text-slate-300">·</span>
+            <span className="text-[#C4B5A2]">·</span>
             <span>Case {depo.caseNumber}</span>
             {depo.tags?.map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
           </div>
@@ -1295,14 +1295,14 @@ function DepositionDetail({ id, onBack }) {
               <Ic.fileText size={14}/> Export Report <Ic.chevD size={12}/>
             </Button>
             {exportOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl shadow-slate-200/60 p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 py-2">Choose audience</p>
+              <div className="absolute right-0 mt-2 w-80 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-xl shadow-[#E4DCC9]/60 p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
+                <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest px-3 py-2">Choose audience</p>
                 {exportOptions.map(({ icon: Icon, title, sub, bg, fg }) => (
-                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-3 rounded-lg hover:bg-slate-50 transition-colors flex items-start gap-3">
+                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-3 rounded-lg hover:bg-[#F0EAE0] transition-colors flex items-start gap-3">
                     <div className={cls('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', bg, fg)}><Icon size={18}/></div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold text-slate-900 mb-0.5">{title}</div>
-                      <div className="text-xs text-slate-500 leading-snug">{sub}</div>
+                      <div className="text-sm font-semibold text-[#14110D] mb-0.5">{title}</div>
+                      <div className="text-xs text-[#6B5744] leading-snug">{sub}</div>
                     </div>
                   </button>
                 ))}
@@ -1320,8 +1320,8 @@ function DepositionDetail({ id, onBack }) {
         <div className="col-span-5 flex flex-col overflow-hidden">
           <div className="mb-4 flex items-start justify-between gap-4 shrink-0">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Organized Transcript</h2>
-              <p className="text-sm text-slate-500">Auto-transcribed and organized by topic</p>
+              <h2 className="text-lg font-semibold text-[#14110D]">Organized Transcript</h2>
+              <p className="text-sm text-[#6B5744]">Auto-transcribed and organized by topic</p>
             </div>
             <Button variant="destructive" onClick={() => setTab('flagged')}>
               <Ic.alert size={14}/> {MOCK_DETAIL.flaggedItems.length} Flagged Items
@@ -1333,9 +1333,9 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* Right panel */}
-        <div className="col-span-4 flex flex-col bg-white border-l border-slate-200 overflow-hidden -my-6 -mr-6">
+        <div className="col-span-4 flex flex-col bg-[#FBF8F1] border-l border-[#E4DCC9] overflow-hidden -my-6 -mr-6">
           {/* Quick stats strip */}
-          <div className="grid grid-cols-4 border-b border-slate-200 shrink-0">
+          <div className="grid grid-cols-4 border-b border-[#E4DCC9] shrink-0">
             {[
               {
                 label: 'Goals',
@@ -1369,17 +1369,17 @@ function DepositionDetail({ id, onBack }) {
               <button
                 key={stat.label}
                 onClick={stat.onClick}
-                className="flex flex-col gap-0.5 px-3 py-3 hover:bg-slate-50 transition-colors text-left border-r border-slate-200 last:border-r-0"
+                className="flex flex-col gap-0.5 px-3 py-3 hover:bg-[#F0EAE0] transition-colors text-left border-r border-[#E4DCC9] last:border-r-0"
               >
-                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</span>
+                <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider">{stat.label}</span>
                 <span className={cls('text-base font-bold', stat.color)}>{stat.value}</span>
-                <span className="text-[10px] text-slate-400 leading-tight">{stat.sub}</span>
+                <span className="text-[10px] text-[#9A8573] leading-tight">{stat.sub}</span>
               </button>
             ))}
           </div>
 
           {/* Tab bar */}
-          <div className="flex items-center gap-0.5 px-3 pt-3 pb-2 border-b border-slate-200 shrink-0 flex-wrap">
+          <div className="flex items-center gap-0.5 px-3 pt-3 pb-2 border-b border-[#E4DCC9] shrink-0 flex-wrap">
             {tabs.map((t) => {
               const TabIcon = t.icon;
               const isActive = tab === t.id;
@@ -1390,8 +1390,8 @@ function DepositionDetail({ id, onBack }) {
                   className={cls(
                     'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
-                      ? 'bg-stone-100 text-stone-900'
-                      : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                      ? 'bg-[#E4DCC9]/60 text-[#14110D]'
+                      : 'text-[#6B5744] hover:text-[#14110D] hover:bg-[#E4DCC9]/30'
                   )}
                 >
                   <TabIcon size={12}/>
@@ -1465,31 +1465,31 @@ function AddDepositionFlow({ caseId, onBack }) {
   /* ── Phase 1: Upload form ── */
   if (phase === 'upload') {
     return (
-      <div className="flex-1 flex flex-col bg-slate-50">
-        <div className="border-b bg-white px-6 py-4">
-          <h2 className="text-lg font-semibold text-slate-900">Add Deposition</h2>
-          {selectedCase && <p className="text-sm text-slate-500 mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
+      <div className="flex-1 flex flex-col bg-[#F7F2EA]">
+        <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4">
+          <h2 className="text-lg font-semibold text-[#14110D]">Add Deposition</h2>
+          {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
         </div>
-        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto">
+        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F7F2EA]">
           <div className="w-full max-w-xl space-y-5">
             {/* Witness details */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Witness Details</p>
+            <div className="bg-[#FBF8F1] rounded-xl border border-[#E4DCC9] p-6 space-y-4">
+              <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest">Witness Details</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Witness Name <span className="text-rose-400">*</span></label>
+                  <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Witness Name <span className="text-rose-400">*</span></label>
                   <Input placeholder="e.g. Sarah Chen" value={witnessName} onChange={(e) => setWitnessName(e.target.value)}/>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Deposition Date</label>
+                  <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Deposition Date</label>
                   <Input type="date" value={depositionDate} onChange={(e) => setDepositionDate(e.target.value)}/>
                 </div>
               </div>
             </div>
 
             {/* File drop zone */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Upload File <span className="text-rose-400">*</span></p>
+            <div className="bg-[#FBF8F1] rounded-xl border border-[#E4DCC9] p-6">
+              <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Upload File <span className="text-rose-400">*</span></p>
               <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
@@ -1497,9 +1497,9 @@ function AddDepositionFlow({ caseId, onBack }) {
                 onClick={() => fileRef.current?.click()}
                 className={cls(
                   'border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all',
-                  dragOver       ? 'border-stone-400 bg-stone-50' :
+                  dragOver       ? 'border-[#D0C5B0] bg-[#F0EAE0]' :
                   file           ? 'border-emerald-300 bg-emerald-50/60' :
-                                   'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                   'border-[#E4DCC9] hover:border-[#D0C5B0] hover:bg-[#F0EAE0]/50'
                 )}
               >
                 <input ref={fileRef} type="file" className="hidden" accept="video/*,audio/*,.pdf,.doc,.docx" onChange={(e) => setFile(e.target.files[0])}/>
@@ -1507,16 +1507,16 @@ function AddDepositionFlow({ caseId, onBack }) {
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><Ic.fileText size={20}/></div>
                     <div className="text-left">
-                      <div className="text-sm font-medium text-slate-900">{file.name}</div>
-                      <div className="text-xs text-slate-500 mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</div>
+                      <div className="text-sm font-medium text-[#14110D]">{file.name}</div>
+                      <div className="text-xs text-[#6B5744] mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</div>
                     </div>
                     <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white ml-2"><Ic.check size={12}/></div>
                   </div>
                 ) : (
                   <>
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-3"><Ic.upload size={22}/></div>
-                    <p className="text-sm font-medium text-slate-700 mb-1">Drop your file here, or <span className="text-[#6B4226]">click to browse</span></p>
-                    <p className="text-xs text-slate-400">MP4, MOV, WAV, MP3, PDF, DOCX</p>
+                    <div className="w-12 h-12 rounded-xl bg-[#E4DCC9]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3"><Ic.upload size={22}/></div>
+                    <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your file here, or <span className="text-[#7A2E20]">click to browse</span></p>
+                    <p className="text-xs text-[#9A8573]">MP4, MOV, WAV, MP3, PDF, DOCX</p>
                   </>
                 )}
               </div>
@@ -1537,51 +1537,51 @@ function AddDepositionFlow({ caseId, onBack }) {
 
   /* ── Phase 2: Processing view ── */
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
-      <header className="border-b bg-white px-6 py-4 flex items-center justify-between shrink-0">
+    <div className="flex-1 flex flex-col bg-[#FBF8F1] overflow-hidden">
+      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between shrink-0">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{witnessName} Deposition</h2>
-          <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5 flex-wrap">
-            {depositionDate && <><span>{depositionDate}</span><span className="text-slate-300">·</span></>}
+          <h2 className="text-lg font-semibold text-[#14110D]">{witnessName} Deposition</h2>
+          <div className="flex items-center gap-2 text-sm text-[#6B5744] mt-0.5 flex-wrap">
+            {depositionDate && <><span>{depositionDate}</span><span className="text-[#C4B5A2]">·</span></>}
             <span>Case {selectedCase?.caseNumber}</span>
-            {selectedCase?.type && <><span className="text-slate-300">·</span><Badge variant="outline">{selectedCase.type}</Badge></>}
+            {selectedCase?.type && <><span className="text-[#C4B5A2]">·</span><Badge variant="outline">{selectedCase.type}</Badge></>}
           </div>
         </div>
       </header>
 
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* Left: video preview + summary */}
-        <div className="col-span-3 border-r border-slate-200 flex flex-col overflow-y-auto">
-          <div className="bg-stone-900 aspect-video relative flex items-center justify-center shrink-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-stone-800 to-stone-900"/>
+        <div className="col-span-3 border-r border-[#E4DCC9] flex flex-col overflow-y-auto">
+          <div className="bg-[#2C2316] aspect-video relative flex items-center justify-center shrink-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2C2316] to-[#14110D]"/>
             <div className="relative w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
               <Ic.play size={22} className="text-white/60"/>
             </div>
           </div>
-          <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-3 text-xs shrink-0">
-            <span className="flex items-center gap-1.5 font-medium text-slate-600"><Ic.play size={12}/> Play</span>
-            <span className="text-slate-200">|</span>
-            <span className="flex items-center gap-1.5 text-slate-400"><Ic.skipBack size={12}/> Restart</span>
-            <span className="text-slate-400 ml-auto">0:00 / –:––</span>
+          <div className="px-4 py-2.5 border-b border-[#E4DCC9]/60 flex items-center gap-3 text-xs shrink-0">
+            <span className="flex items-center gap-1.5 font-medium text-[#3D2E1E]"><Ic.play size={12}/> Play</span>
+            <span className="text-[#E4DCC9]">|</span>
+            <span className="flex items-center gap-1.5 text-[#9A8573]"><Ic.skipBack size={12}/> Restart</span>
+            <span className="text-[#9A8573] ml-auto">0:00 / –:––</span>
           </div>
           <div className="p-4 flex-1">
-            <p className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-3">Summary</p>
+            <p className="text-xs font-semibold text-[#14110D] uppercase tracking-wider mb-3">Summary</p>
             <div className="text-center py-8">
-              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2 text-slate-400"><Ic.fileText size={14}/></div>
-              <p className="text-sm text-slate-500 font-medium">Summary not available</p>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">Summary will be available after processing is complete.</p>
+              <div className="w-8 h-8 rounded-full bg-[#E4DCC9]/40 flex items-center justify-center mx-auto mb-2 text-[#9A8573]"><Ic.fileText size={14}/></div>
+              <p className="text-sm text-[#6B5744] font-medium">Summary not available</p>
+              <p className="text-xs text-[#9A8573] mt-1 leading-relaxed">Summary will be available after processing is complete.</p>
             </div>
           </div>
         </div>
 
         {/* Right: processing timeline */}
-        <div className="col-span-9 overflow-y-auto p-10">
+        <div className="col-span-9 overflow-y-auto p-10 bg-[#F7F2EA]">
           <div className="max-w-lg">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Processing Timeline</p>
-            <h2 className="brand text-slate-900 mb-2 leading-tight" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
+            <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Processing Timeline</p>
+            <h2 className="brand text-[#14110D] mb-2 leading-tight" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
               {isComplete ? 'Processing complete.' : 'Processing deposition...'}
             </h2>
-            <p className="text-slate-500 text-sm mb-10 leading-relaxed">
+            <p className="text-[#6B5744] text-sm mb-10 leading-relaxed">
               {isComplete
                 ? 'Your deposition has been fully analyzed and is ready for review.'
                 : 'Cognition is analyzing your deposition. This typically takes a few minutes.'}
@@ -1598,26 +1598,26 @@ function AddDepositionFlow({ caseId, onBack }) {
                       <div className={cls(
                         'w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 mt-0.5',
                         done   ? 'bg-emerald-500 text-white' :
-                        active ? 'bg-[#111111] text-white' :
-                                 'bg-slate-100 border border-slate-200'
+                        active ? 'bg-[#14110D] text-white' :
+                                 'bg-[#E4DCC9]/40 border border-[#E4DCC9]'
                       )}>
                         {done   ? <Ic.check size={11}/> :
                          active ? (
                            <svg className="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                            </svg>
-                         ) : <span className="w-1.5 h-1.5 rounded-full bg-slate-300 block"/>}
+                         ) : <span className="w-1.5 h-1.5 rounded-full bg-[#C4B5A2] block"/>}
                       </div>
                       {i < steps.length - 1 && (
-                        <div className={cls('w-px flex-1 my-1 transition-colors duration-500', done ? 'bg-emerald-200' : 'bg-slate-200')}/>
+                        <div className={cls('w-px flex-1 my-1 transition-colors duration-500', done ? 'bg-emerald-200' : 'bg-[#E4DCC9]')}/>
                       )}
                     </div>
                     {/* Content */}
                     <div className="pb-7 flex-1 min-w-0">
-                      <p className={cls('text-sm font-medium mb-0.5 transition-colors', done || active ? 'text-slate-900' : 'text-slate-400')}>
+                      <p className={cls('text-sm font-medium mb-0.5 transition-colors', done || active ? 'text-[#14110D]' : 'text-[#C4B5A2]')}>
                         {step.label}
                       </p>
-                      <p className={cls('text-xs leading-relaxed transition-colors', done || active ? 'text-slate-500' : 'text-slate-300')}>
+                      <p className={cls('text-xs leading-relaxed transition-colors', done || active ? 'text-[#6B5744]' : 'text-[#C4B5A2]')}>
                         {step.desc}
                       </p>
                       {i === 0 && done && (
@@ -1627,12 +1627,12 @@ function AddDepositionFlow({ caseId, onBack }) {
                           </div>
                           {file && (
                             <div className="flex items-center gap-2.5 px-1">
-                              <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[9px] font-bold uppercase shrink-0">
+                              <div className="w-7 h-7 rounded bg-[#E4DCC9]/40 flex items-center justify-center text-[#6B5744] text-[9px] font-bold uppercase shrink-0">
                                 {file.name.split('.').pop()}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium text-slate-700 truncate">{file.name}</div>
-                                <div className="text-[10px] text-slate-400">{(file.size / 1024 / 1024).toFixed(1)} MB · Video deposition</div>
+                                <div className="text-xs font-medium text-[#3D2E1E] truncate">{file.name}</div>
+                                <div className="text-[10px] text-[#9A8573]">{(file.size / 1024 / 1024).toFixed(1)} MB · Video deposition</div>
                               </div>
                               <Ic.checkC size={14} className="text-emerald-500 shrink-0"/>
                             </div>
@@ -1688,7 +1688,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50" data-screen-label={view}>
+    <div className="h-full flex flex-col bg-[#F7F2EA]" data-screen-label={view}>
       <TopNav
         onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
         onUserManagement={() => {}}
