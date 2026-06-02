@@ -755,8 +755,24 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
 }
 
 function GoalsTab({ goals }) {
+  const covered = goals.filter((g) => g.covered).length;
+  const pct = Math.round((covered / goals.length) * 100);
   return (
     <div className="flex flex-col gap-3">
+      {/* Progress summary */}
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Goal Coverage</span>
+          <span className="text-sm font-semibold text-slate-900">{covered}/{goals.length}</span>
+        </div>
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#111111' }}
+          />
+        </div>
+        <p className="text-xs text-slate-400 mt-1.5">{pct}% of deposition goals addressed</p>
+      </div>
       {goals.map((g) => (
         <Card key={g.id} className="p-3">
           <div className="flex items-start gap-3">
@@ -764,8 +780,8 @@ function GoalsTab({ goals }) {
               {g.covered && <Ic.check size={12}/>}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-slate-900">{g.title}</div>
-              {g.notes && <div className="text-xs text-slate-500 mt-1">{g.notes}</div>}
+              <div className={cls('text-sm font-medium', g.covered ? 'text-slate-900' : 'text-slate-600')}>{g.title}</div>
+              {g.notes && <div className={cls('text-xs mt-1', g.covered ? 'text-slate-500' : 'text-amber-600')}>{g.notes}</div>}
             </div>
           </div>
         </Card>
@@ -882,41 +898,132 @@ function SummariesTab({ topics }) {
   );
 }
 
-function ChatTab() {
-  const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hi — ask me anything about this deposition. I can summarize topics, find moments, and surface contradictions.' },
-  ]);
+function ChatTab({ depo }) {
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
-  const send = async () => {
-    if (!input.trim()) return;
-    const q = input.trim();
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const flagCount  = MOCK_DETAIL.flaggedItems.length;
+  const highFlags  = MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length;
+  const goalsTotal = MOCK_DETAIL.goals.length;
+  const goalsDone  = MOCK_DETAIL.goals.filter((g) => g.covered).length;
+
+  const suggestions = [
+    { icon: Ic.flag,     label: 'What were the most concerning moments?' },
+    { icon: Ic.alert,    label: `Were all ${goalsTotal} deposition goals achieved?` },
+    { icon: Ic.sparkles, label: 'Summarize the contract knowledge section' },
+    { icon: Ic.checkC,   label: 'What contradictions were found?' },
+  ];
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, busy]);
+
+  const send = async (text) => {
+    const q = (text !== undefined ? text : input).trim();
+    if (!q || busy) return;
     setInput('');
     setMessages((m) => [...m, { role: 'user', text: q }]);
     setBusy(true);
     try {
       const reply = await window.claude.complete({
-        messages: [
-          { role: 'user', content: `You are an AI legal analyst reviewing a deposition. The witness is Sarah Chen, Senior Project Manager at TechCorp. Notable flagged items: defensive responses about contract terms, pause before answering about 2PM meeting, contradiction about arrival time. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone.` },
-        ],
+        messages: [{
+          role: 'user',
+          content: `You are an AI legal analyst reviewing a deposition of ${depo.witness}. Context: ${MOCK_DETAIL.summary} There are ${flagCount} flagged items (${highFlags} high severity). Goals: ${goalsDone}/${goalsTotal} covered. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Be specific and reference actual details from the deposition.`,
+        }],
       });
       setMessages((m) => [...m, { role: 'ai', text: reply }]);
     } catch {
       setMessages((m) => [...m, { role: 'ai', text: 'Sorry, I had trouble responding. Try again.' }]);
     }
     setBusy(false);
+    inputRef.current?.focus();
   };
+
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
-        {messages.map((m, i) => (
-          <div key={i} className={cls('rounded-lg px-3 py-2 text-sm leading-relaxed max-w-[90%]', m.role === 'ai' ? 'bg-slate-100 text-slate-800 self-start' : 'bg-[#111111] text-white self-end')}>{m.text}</div>
-        ))}
-        {busy && <div className="bg-slate-100 text-slate-500 text-sm rounded-lg px-3 py-2 self-start">Thinking…</div>}
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0">
+        {isEmpty ? (
+          <div className="p-3">
+            <div className="flex items-start gap-2.5 mb-5">
+              <div className="w-7 h-7 rounded-full bg-[#111111] flex items-center justify-center shrink-0 mt-0.5">
+                <Ic.sparkles size={12} className="text-white"/>
+              </div>
+              <div className="bg-slate-100 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm text-slate-700 leading-relaxed">
+                Ask me anything about this deposition — I can surface contradictions, assess goal coverage, and explain behavioral patterns in the testimony.
+              </div>
+            </div>
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 pl-9">Suggested questions</p>
+            <div className="pl-9 flex flex-col gap-1.5">
+              {suggestions.map(({ icon: Icon, label }) => (
+                <button
+                  key={label}
+                  onClick={() => send(label)}
+                  className="text-left flex items-center gap-2.5 text-sm px-3 py-2.5 rounded-lg border border-slate-200 text-slate-600 hover:border-stone-300 hover:bg-stone-50 hover:text-slate-900 transition-colors group"
+                >
+                  <Icon size={13} className="text-slate-400 group-hover:text-stone-500 shrink-0"/>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-3 flex flex-col gap-3">
+            {messages.map((m, i) => (
+              <div key={i} className={cls('flex gap-2 items-end', m.role !== 'ai' && 'flex-row-reverse')}>
+                <div className={cls(
+                  'w-6 h-6 rounded-full flex items-center justify-center shrink-0 mb-0.5',
+                  m.role === 'ai' ? 'bg-[#111111]' : 'bg-slate-200'
+                )}>
+                  {m.role === 'ai'
+                    ? <Ic.sparkles size={11} className="text-white"/>
+                    : <span className="text-[10px] font-semibold text-slate-600">U</span>}
+                </div>
+                <div className={cls(
+                  'rounded-xl px-3 py-2 text-sm leading-relaxed',
+                  m.role === 'ai'
+                    ? 'bg-slate-100 text-slate-800 rounded-bl-sm max-w-[88%]'
+                    : 'bg-[#111111] text-white rounded-br-sm max-w-[88%]'
+                )}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {busy && (
+              <div className="flex items-end gap-2">
+                <div className="w-6 h-6 rounded-full bg-[#111111] flex items-center justify-center shrink-0 mb-0.5">
+                  <Ic.sparkles size={11} className="text-white"/>
+                </div>
+                <div className="bg-slate-100 rounded-xl rounded-bl-sm px-3 py-3">
+                  <div className="flex gap-1 items-center">
+                    {[0,1,2].map((i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-400" style={{ animation: 'bounce 1s ease-in-out infinite', animationDelay: `${i * 0.18}s` }}/>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={scrollRef}/>
+          </div>
+        )}
       </div>
-      <div className="mt-3 flex items-center gap-2">
-        <Input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Ask about this deposition..." />
-        <Button onClick={send} disabled={busy || !input.trim()}><Ic.send size={14}/></Button>
+
+      <div className="border-t border-slate-100 p-2.5 flex items-center gap-2 shrink-0">
+        <input
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
+          placeholder="Ask about this deposition…"
+          className="flex-1 h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-900/5 transition-colors"
+        />
+        <Button size="icon" onClick={() => send()} disabled={busy || !input.trim()} className="shrink-0 h-9 w-9">
+          <Ic.send size={14}/>
+        </Button>
       </div>
     </div>
   );
@@ -926,19 +1033,19 @@ function DepositionDetail({ id, onBack }) {
   const depo = MOCK_DEPOSITIONS.find((d) => d.id === id);
   const { user } = useAuth();
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
-  const [tab, setTab] = useState('goals');
+  const [tab, setTab] = useState('chat');
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
 
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
   const tabs = [
+    { id: 'chat',      label: 'AI Chat',   icon: Ic.msg },
     { id: 'goals',     label: 'Goals',     icon: Ic.checkC },
-    { id: 'flagged',   label: 'Flagged',   icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.length },
+    { id: 'flagged',   label: 'Flagged',   icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
     { id: 'sentiment', label: 'Sentiment', icon: Ic.sparkles },
     { id: 'timeline',  label: 'Timeline',  icon: Ic.calendar },
     { id: 'summaries', label: 'Summaries', icon: Ic.fileText },
-    { id: 'chat',      label: 'AI Chat',   icon: Ic.msg },
   ];
 
   return (
@@ -982,10 +1089,47 @@ function DepositionDetail({ id, onBack }) {
           </div>
         </div>
 
-        {/* Right panel — white background, pill-shaped icon+label tabs */}
-        <div className="col-span-4 flex flex-col bg-white border-l border-slate-200 overflow-hidden -my-6 -mr-6 px-4 py-4">
+        {/* Right panel */}
+        <div className="col-span-4 flex flex-col bg-white border-l border-slate-200 overflow-hidden -my-6 -mr-6">
+          {/* Quick stats strip */}
+          <div className="grid grid-cols-3 border-b border-slate-200 shrink-0">
+            {[
+              {
+                label: 'Goals Covered',
+                value: `${MOCK_DETAIL.goals.filter((g) => g.covered).length}/${MOCK_DETAIL.goals.length}`,
+                sub: `${Math.round((MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length) * 100)}% complete`,
+                color: 'text-emerald-600',
+                onClick: () => setTab('goals'),
+              },
+              {
+                label: 'Flagged Items',
+                value: MOCK_DETAIL.flaggedItems.length,
+                sub: `${MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length} high severity`,
+                color: 'text-rose-600',
+                onClick: () => setTab('flagged'),
+              },
+              {
+                label: 'Avg. Sentiment',
+                value: 'Mixed',
+                sub: 'Negative at key moments',
+                color: 'text-amber-600',
+                onClick: () => setTab('sentiment'),
+              },
+            ].map((stat) => (
+              <button
+                key={stat.label}
+                onClick={stat.onClick}
+                className="flex flex-col gap-0.5 px-3 py-3 hover:bg-slate-50 transition-colors text-left border-r border-slate-200 last:border-r-0"
+              >
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</span>
+                <span className={cls('text-base font-bold', stat.color)}>{stat.value}</span>
+                <span className="text-[10px] text-slate-400 leading-tight">{stat.sub}</span>
+              </button>
+            ))}
+          </div>
+
           {/* Tab bar */}
-          <div className="flex items-center gap-1 flex-wrap mb-3 pb-3 border-b border-slate-200">
+          <div className="flex items-center gap-0.5 px-3 pt-3 pb-2 border-b border-slate-200 shrink-0 flex-wrap">
             {tabs.map((t) => {
               const TabIcon = t.icon;
               const isActive = tab === t.id;
@@ -994,13 +1138,13 @@ function DepositionDetail({ id, onBack }) {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   className={cls(
-                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
+                    'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
                       ? 'bg-stone-100 text-stone-900'
                       : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                   )}
                 >
-                  <TabIcon size={13}/>
+                  <TabIcon size={12}/>
                   {t.label}
                   {t.count > 0 && (
                     <span className="ml-0.5 inline-flex items-center justify-center rounded-full bg-rose-600 text-white text-[10px] font-medium w-4 h-4">
@@ -1011,13 +1155,14 @@ function DepositionDetail({ id, onBack }) {
               );
             })}
           </div>
-          <div className="flex-1 overflow-y-auto pr-1">
+
+          <div className={cls('flex-1 min-h-0', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
+            {tab === 'chat'      && <ChatTab depo={depo}/>}
             {tab === 'goals'     && <GoalsTab goals={MOCK_DETAIL.goals}/>}
             {tab === 'flagged'   && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
             {tab === 'sentiment' && <SentimentTab data={MOCK_DETAIL.sentiment}/>}
             {tab === 'timeline'  && <TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/>}
             {tab === 'summaries' && <SummariesTab topics={MOCK_DETAIL.topics}/>}
-            {tab === 'chat'      && <ChatTab/>}
           </div>
         </div>
       </div>
