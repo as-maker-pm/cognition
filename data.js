@@ -94,4 +94,57 @@ window.MOCK_DETAIL = {
     { id: 'ev6', date: '2024-06-03', time: '2:15 PM',           title: 'Meeting Actually Started',   description: 'Witness testified meeting started late, around 2:15 PM',                            category: 'meeting',  contradiction: false },
     { id: 'ev7', date: '2024-01-01', time: undefined,           title: '2024 Compensation Year',     description: '$185,000 base salary for calendar year 2024',                                       category: 'document', contradiction: false },
   ],
+  contradictions: [
+    {
+      id: 'ctr-001', type: 'record', category: 'Exhibit in the Room', status: 'verified', severity: 'high',
+      title: 'Contract Section 7 — Claimed Ignorance vs. Signed Document',
+      stmtA: { label: 'Testimony', quote: "I... I don't recall the specific details of Section 7.", timestamp: 325, page: 8, line: 6 },
+      stmtB: { label: 'Employment Contract (Exh. A)', quote: 'Witness signature appears on page 12 directly below the non-compete clause in Section 7, dated January 15, 2023.' },
+      why: 'Witness claimed limited knowledge of Section 7 while her signature appears on the same page directly below the clause. The document was retrieved from her own personnel file.',
+      crosslinks: ['Timeline · Contract Signed', 'Flagged · Flag #002'],
+    },
+    {
+      id: 'ctr-002', type: 'self', category: 'Recall Inconsistency', status: 'verified', severity: 'high',
+      title: 'Arrival Time — June 3rd Timeline',
+      stmtA: { label: 'p. 3, early testimony', quote: 'I arrived at the office around 9 AM. I had a team standup at 9:30...', timestamp: 130, page: 3, line: 16 },
+      stmtB: { label: 'p. 9, later testimony', quote: "I remember now I was actually running late that day — I think I came in closer to 9:15.", timestamp: 365, page: 9, line: 4 },
+      why: 'Witness stated a precise 9 AM arrival time early in the deposition, then revised this to "closer to 9:15" during cross. Badge records (Exh. E) show entry at 9:03 AM.',
+      crosslinks: ['Timeline · Arrived at Office', 'Exhibits · Exh. E'],
+    },
+    {
+      id: 'ctr-003', type: 'record', category: 'Meeting Time', status: 'probable', severity: 'medium',
+      title: '2PM Meeting — Start Time Discrepancy',
+      stmtA: { label: 'Testimony', quote: 'The meeting started a bit late, around 2:15.', timestamp: 152, page: 3, line: 19 },
+      stmtB: { label: 'Calendar Records (Exh. B)', quote: 'Digital calendar and join-time logs confirm all attendees entered the meeting room at 2:02 PM.' },
+      why: 'Witness testified the meeting started at 2:15 PM but calendar and attendance records show a 2:02 PM start. A 13-minute discrepancy may affect timeline claims.',
+      crosslinks: ['Timeline · 2PM Meeting', 'Exhibits · Exh. B'],
+    },
+  ],
+  exhibits: [
+    {
+      id: 'exh-001', label: 'Exh. A', title: 'Employment Contract — Full Agreement', timestamp: 320,
+      category: 'Contract', contradictions: 2, references: 7,
+      desc: 'Original employment agreement including non-compete clause in Section 7. Witness signature present on page 12 directly below the clause in question.',
+    },
+    {
+      id: 'exh-002', label: 'Exh. B', title: 'Calendar Records — June 3, 2024', timestamp: 145,
+      category: 'Calendar', contradictions: 1, references: 4,
+      desc: 'Digital calendar showing 2PM meeting invitation, confirmations, and join-time logs for all attendees. Conflicts with witness testimony on start time.',
+    },
+    {
+      id: 'exh-003', label: 'Exh. C', title: 'Q2 2024 Project Report (Draft)', timestamp: 130,
+      category: 'Document', contradictions: 0, references: 3,
+      desc: 'The quarterly report witness claims to have worked on from 9:45 AM to noon on June 3rd. Version history shows last edit at 11:47 AM.',
+    },
+    {
+      id: 'exh-004', label: 'Exh. D', title: 'Email Thread — Contract Review', timestamp: 335,
+      category: 'Email', contradictions: 1, references: 5,
+      desc: 'Internal email thread from January 2023 showing witness acknowledged receipt of contract amendment and forwarded it to legal with the note "reviewed, looks fine."',
+    },
+    {
+      id: 'exh-005', label: 'Exh. E', title: 'Office Badge Access Log — June 3', timestamp: 365,
+      category: 'Records', contradictions: 1, references: 2,
+      desc: 'Electronic badge scan records showing witness entry at 9:03 AM on June 3rd, 2024. Contradicts revised testimony claiming arrival "closer to 9:15."',
+    },
+  ],
 };

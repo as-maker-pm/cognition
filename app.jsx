@@ -814,42 +814,94 @@ function FlaggedTab({ items, jump }) {
 }
 
 function SentimentTab({ data }) {
-  const w = 360, h = 160, pad = 20;
+  const w = 360, h = 120, pad = 20;
   const xMax = data[data.length - 1].t;
   const x = (t) => pad + (t / xMax) * (w - pad * 2);
   const y = (v) => pad + ((1 - v) / 2) * (h - pad * 2);
   const path = data.map((d, i) => `${i ? 'L' : 'M'}${x(d.t).toFixed(1)},${y(d.v).toFixed(1)}`).join(' ');
   const area = `${path} L${x(xMax).toFixed(1)},${y(0).toFixed(1)} L${x(0).toFixed(1)},${y(0).toFixed(1)} Z`;
 
+  const labeled = data.filter((d) => d.label);
+  const sentColor = (v) => v < -0.2 ? '#be123c' : v > 0.2 ? '#10b981' : '#fbbf24';
+  const sentLabel = (v) => v < -0.2 ? 'Negative' : v > 0.2 ? 'Positive' : 'Neutral';
+
+  const avgSentiment = data.reduce((s, d) => s + d.v, 0) / data.length;
+  const shifts = labeled.filter((d, i) => {
+    if (i === 0) return false;
+    const prev = labeled[i - 1];
+    return Math.abs(d.v - prev.v) > 0.2;
+  });
+  const negCount = data.filter((d) => d.v < -0.2).length;
+
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-900">Sentiment Over Time</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Emotional tone tracked across the deposition</p>
-      </div>
-      <Card className="p-4">
-        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#cbd5e1" strokeDasharray="3 3"/>
-          <line x1={pad} y1={pad} x2={pad} y2={h - pad} stroke="#e2e8f0"/>
-          <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke="#e2e8f0"/>
-          <path d={area} fill="#6B4226" opacity="0.12"/>
-          <path d={path} fill="none" stroke="#6B4226" strokeWidth="2"/>
-          {data.map((d, i) => (
-            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="3" fill={d.v < 0 ? '#e11d48' : '#6B4226'}/>
-          ))}
-          <text x={pad} y={pad - 6} className="text-[9px] fill-slate-400">+1 positive</text>
-          <text x={pad} y={h - 4} className="text-[9px] fill-slate-400">-1 negative</text>
-        </svg>
-      </Card>
-      <div className="flex flex-col gap-1.5">
-        {data.filter((d) => d.label).map((d, i) => (
-          <div key={i} className="flex items-center gap-2 text-xs">
-            <span className={cls('w-2 h-2 rounded-full', d.v < -0.2 ? 'bg-rose-500' : d.v > 0.2 ? 'bg-emerald-500' : 'bg-slate-400')}/>
-            <span className="text-slate-500 tabular-nums">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
-            <span className="text-slate-700">{d.label}</span>
-            <span className="text-slate-400 ml-auto">{d.v.toFixed(2)}</span>
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-2">
+        {[
+          { label: 'Baseline', value: sentLabel(avgSentiment), color: sentColor(avgSentiment) },
+          { label: 'Negative moments', value: negCount, color: '#be123c' },
+          { label: 'Sentiment range', value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} → +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, color: '#111111' },
+          { label: 'Key shifts', value: shifts.length, color: '#6B4226' },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <div className="text-[10px] text-slate-400 mb-1 uppercase tracking-wider">{s.label}</div>
+            <div className="text-base font-bold" style={{ color: s.color }}>{s.value}</div>
           </div>
         ))}
+      </div>
+
+      {/* Timeline ribbon */}
+      <div>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sentiment Timeline</p>
+        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#f1f5f9' }}>
+          {data.map((d, i) => {
+            const next = data[i + 1];
+            const width = next ? ((next.t - d.t) / xMax * 100) : (5);
+            const bg = d.v < -0.2 ? '#fca5a5' : d.v > 0.2 ? '#6ee7b7' : '#fde68a';
+            return <div key={i} style={{ width: `${width}%`, background: bg, minWidth: 2 }}/>;
+          })}
+        </div>
+        <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+          <span>0:00</span><span>{Math.floor(xMax/60)}:{String(xMax%60).padStart(2,'0')}</span>
+        </div>
+        <div className="flex items-center gap-3 mt-2">
+          {[['#6ee7b7', 'Positive'], ['#fde68a', 'Neutral'], ['#fca5a5', 'Negative']].map(([c, l]) => (
+            <span key={l} className="flex items-center gap-1 text-[10px] text-slate-500">
+              <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: c }}/>
+              {l}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Trendline chart */}
+      <Card className="p-3">
+        <p className="text-xs font-semibold text-slate-500 mb-2">Emotional Curve</p>
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
+          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#e2e8f0" strokeDasharray="3 3"/>
+          <path d={area} fill="#6B4226" opacity="0.1"/>
+          <path d={path} fill="none" stroke="#6B4226" strokeWidth="1.5"/>
+          {data.map((d, i) => (
+            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="2.5" fill={sentColor(d.v)}/>
+          ))}
+          <text x={pad} y={pad - 4} fontSize="8" fill="#94a3b8">+1</text>
+          <text x={pad} y={h - 6} fontSize="8" fill="#94a3b8">−1</text>
+        </svg>
+      </Card>
+
+      {/* Key moments */}
+      <div>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Key Moments</p>
+        <div className="flex flex-col gap-1.5">
+          {labeled.map((d, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs bg-white border border-slate-200 rounded-lg px-3 py-2">
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sentColor(d.v) }}/>
+              <span className="text-slate-500 font-mono tabular-nums shrink-0">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
+              <span className="text-slate-700 flex-1">{d.label}</span>
+              <span className="text-[10px] font-mono text-slate-400">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -1029,6 +1081,170 @@ function ChatTab({ depo }) {
   );
 }
 
+// ---------- Contradictions Tab ----------
+function ContradictionsTab({ jump }) {
+  const [filter, setFilter] = useState('all');
+  const all = MOCK_DETAIL.contradictions || [];
+  const list = filter === 'all' ? all : all.filter((c) => c.type === filter);
+  const counts = { all: all.length, self: all.filter((c) => c.type === 'self').length, record: all.filter((c) => c.type === 'record').length };
+
+  const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+  const typePill = (type) => ({
+    record:        <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-rose-50 text-rose-700">vs. Record</span>,
+    self:          <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700">Self</span>,
+    'cross-witness': <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700">Cross</span>,
+  }[type]);
+
+  const statusBadge = (s) => s === 'verified'
+    ? <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700"><Ic.checkC size={9}/>Verified</span>
+    : <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-700"><Ic.alert size={9}/>Probable</span>;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+        <div className="flex items-center gap-2 mb-1">
+          <Ic.alert size={13} className="text-rose-600"/>
+          <span className="text-sm font-semibold text-rose-800">{all.length} Contradictions Detected</span>
+        </div>
+        <p className="text-xs text-rose-600 leading-relaxed">AI identified statements that conflict with prior testimony or documentary evidence. Review and add key items to your brief.</p>
+      </div>
+
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {[['all', 'All'], ['self', 'Self'], ['record', 'vs. Record']].map(([key, label]) => (
+          <button key={key} onClick={() => setFilter(key)} className={cls(
+            'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
+            filter === key ? 'bg-[#111111] text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+          )}>
+            {label}
+            <span className={cls('font-mono text-[10px]', filter === key ? 'opacity-70' : 'text-slate-400')}>{counts[key]}</span>
+          </button>
+        ))}
+      </div>
+
+      {list.map((c, idx) => (
+        <div key={c.id} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+          <div className="flex">
+            <div className={cls('w-1 shrink-0', c.type === 'record' ? 'bg-rose-500' : 'bg-amber-500')}/>
+            <div className="flex-1 p-3.5 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                <span className="font-mono text-[10px] font-bold text-slate-300">{String(idx+1).padStart(2,'0')}</span>
+                {typePill(c.type)}
+                <span className="text-xs font-medium text-slate-500">{c.category}</span>
+                {statusBadge(c.status)}
+              </div>
+              <p className="text-xs font-semibold text-slate-800 mb-3 leading-snug">{c.title}</p>
+
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-2 mb-3 items-stretch">
+                <div className="rounded-lg bg-slate-50 border border-slate-200 border-l-2 border-l-slate-400 p-2.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">{c.stmtA.label}</p>
+                  {c.stmtA.page && <p className="font-mono text-[9px] text-slate-400 mb-1">p.{c.stmtA.page} · l.{c.stmtA.line}</p>}
+                  <p className="text-xs text-slate-700 italic leading-relaxed">"{c.stmtA.quote}"</p>
+                  {c.stmtA.timestamp && (
+                    <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#6B4226] mt-1.5 font-mono hover:underline block">{fmt(c.stmtA.timestamp)}</button>
+                  )}
+                </div>
+                <div className="flex items-center self-center shrink-0">
+                  <span className="font-mono text-[9px] font-bold text-slate-300 uppercase tracking-wider">vs</span>
+                </div>
+                <div className="rounded-lg bg-slate-50 border border-slate-200 border-l-2 border-l-rose-400 p-2.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">{c.stmtB.label}</p>
+                  <p className="text-xs text-slate-700 italic leading-relaxed">"{c.stmtB.quote}"</p>
+                </div>
+              </div>
+
+              <div className="text-xs text-amber-800 bg-amber-50 border-l-2 border-amber-400 px-3 py-2 rounded-r-lg mb-3 leading-relaxed">{c.why}</div>
+
+              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-slate-100 pt-2.5">
+                {c.crosslinks?.map((link) => (
+                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-slate-400 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">{link}</span>
+                ))}
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Dismiss</button>
+                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#111111] text-white hover:bg-[#2a1a0e] transition-colors">Add to Brief</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      {list.length === 0 && <div className="text-center py-8 text-sm text-slate-400">No contradictions match this filter.</div>}
+      <p className="text-xs text-slate-400 bg-slate-50 border border-dashed border-slate-200 rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
+    </div>
+  );
+}
+
+// ---------- Exhibits Tab ----------
+function ExhibitsTab({ jump }) {
+  const exhibits = MOCK_DETAIL.exhibits || [];
+  const contradictionCount = exhibits.reduce((s, e) => s + e.contradictions, 0);
+  const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+  const categoryColors = {
+    Contract: 'bg-slate-100 text-slate-600',
+    Calendar: 'bg-blue-50 text-blue-700',
+    Document: 'bg-amber-50 text-amber-700',
+    Email:    'bg-emerald-50 text-emerald-700',
+    Records:  'bg-purple-50 text-purple-700',
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Documentary Record</span>
+          <span className="text-sm font-semibold text-slate-900">{exhibits.length} exhibits</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="rounded-lg bg-slate-50 px-3 py-2">
+            <div className="text-lg font-bold text-slate-900">{exhibits.length}</div>
+            <div className="text-[11px] text-slate-500">Total exhibits</div>
+          </div>
+          <div className="rounded-lg bg-rose-50 px-3 py-2">
+            <div className="text-lg font-bold text-rose-700">{contradictionCount}</div>
+            <div className="text-[11px] text-rose-500">Contradiction refs</div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {[...new Set(exhibits.map((e) => e.category))].map((cat) => (
+            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-slate-100 text-slate-600')}>{cat}</span>
+          ))}
+        </div>
+      </div>
+
+      {exhibits.map((e) => (
+        <div key={e.id} className="rounded-xl border border-slate-200 bg-white p-3 flex flex-col gap-2">
+          <div className="flex items-start gap-2">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+              <Ic.fileText size={14} className="text-slate-500"/>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="font-mono text-[10px] font-bold text-slate-400 shrink-0">{e.label}</span>
+                <span className="text-sm font-semibold text-slate-900 truncate">{e.title}</span>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">{e.desc}</p>
+            </div>
+            {e.timestamp && (
+              <button onClick={() => jump(e.timestamp)} className="font-mono text-[11px] text-[#6B4226] hover:underline shrink-0 mt-0.5">{fmt(e.timestamp)}</button>
+            )}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-slate-100">
+            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-slate-100 text-slate-600')}>{e.category}</span>
+            {e.contradictions > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"/>
+                {e.contradictions} contradiction{e.contradictions > 1 ? 's' : ''}
+              </span>
+            )}
+            <span className="text-[11px] text-slate-400 ml-auto">{e.references} references in transcript</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function DepositionDetail({ id, onBack }) {
   const depo = MOCK_DEPOSITIONS.find((d) => d.id === id);
   const { user } = useAuth();
@@ -1036,16 +1252,25 @@ function DepositionDetail({ id, onBack }) {
   const [tab, setTab] = useState('chat');
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
   const tabs = [
-    { id: 'chat',      label: 'AI Chat',   icon: Ic.msg },
-    { id: 'goals',     label: 'Goals',     icon: Ic.checkC },
-    { id: 'flagged',   label: 'Flagged',   icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
-    { id: 'sentiment', label: 'Sentiment', icon: Ic.sparkles },
-    { id: 'timeline',  label: 'Timeline',  icon: Ic.calendar },
-    { id: 'summaries', label: 'Summaries', icon: Ic.fileText },
+    { id: 'chat',           label: 'AI Chat',       icon: Ic.msg },
+    { id: 'goals',          label: 'Goals',         icon: Ic.checkC },
+    { id: 'flagged',        label: 'Flagged',       icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
+    { id: 'contradictions', label: 'Contradictions',icon: Ic.alert, count: MOCK_DETAIL.contradictions?.length },
+    { id: 'exhibits',       label: 'Exhibits',      icon: Ic.fileText },
+    { id: 'sentiment',      label: 'Sentiment',     icon: Ic.sparkles },
+    { id: 'timeline',       label: 'Timeline',      icon: Ic.calendar },
+    { id: 'summaries',      label: 'Summaries',     icon: Ic.list },
+  ];
+
+  const exportOptions = [
+    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations, sentiment, contradictions, annotated transcript', bg: 'bg-slate-100', fg: 'text-slate-600' },
+    { icon: Ic.msg,      title: 'Case Update',       sub: 'For the client · 2-page executive summary, plain language, key findings', bg: 'bg-emerald-50', fg: 'text-emerald-700' },
+    { icon: Ic.edit,     title: 'Discovery Memo',    sub: 'For opposing counsel · contradictions cited to transcript, no AI methodology disclosed', bg: 'bg-rose-50', fg: 'text-rose-600' },
   ];
 
   return (
@@ -1065,7 +1290,25 @@ function DepositionDetail({ id, onBack }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {canEdit && <Button variant="outline"><Ic.upload size={14}/> Upload Verified Transcript</Button>}
-          <Button variant="outline"><Ic.fileText size={14}/> Export Report</Button>
+          <div className="relative">
+            <Button variant="outline" onClick={() => setExportOpen((o) => !o)}>
+              <Ic.fileText size={14}/> Export Report <Ic.chevD size={12}/>
+            </Button>
+            {exportOpen && (
+              <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl shadow-slate-200/60 p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 py-2">Choose audience</p>
+                {exportOptions.map(({ icon: Icon, title, sub, bg, fg }) => (
+                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-3 rounded-lg hover:bg-slate-50 transition-colors flex items-start gap-3">
+                    <div className={cls('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', bg, fg)}><Icon size={18}/></div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-slate-900 mb-0.5">{title}</div>
+                      <div className="text-xs text-slate-500 leading-snug">{sub}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -1092,26 +1335,33 @@ function DepositionDetail({ id, onBack }) {
         {/* Right panel */}
         <div className="col-span-4 flex flex-col bg-white border-l border-slate-200 overflow-hidden -my-6 -mr-6">
           {/* Quick stats strip */}
-          <div className="grid grid-cols-3 border-b border-slate-200 shrink-0">
+          <div className="grid grid-cols-4 border-b border-slate-200 shrink-0">
             {[
               {
-                label: 'Goals Covered',
+                label: 'Goals',
                 value: `${MOCK_DETAIL.goals.filter((g) => g.covered).length}/${MOCK_DETAIL.goals.length}`,
-                sub: `${Math.round((MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length) * 100)}% complete`,
+                sub: `${Math.round((MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length) * 100)}% covered`,
                 color: 'text-emerald-600',
                 onClick: () => setTab('goals'),
               },
               {
-                label: 'Flagged Items',
+                label: 'Flagged',
                 value: MOCK_DETAIL.flaggedItems.length,
                 sub: `${MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length} high severity`,
                 color: 'text-rose-600',
                 onClick: () => setTab('flagged'),
               },
               {
-                label: 'Avg. Sentiment',
+                label: 'Contradictions',
+                value: MOCK_DETAIL.contradictions?.length || 0,
+                sub: 'in testimony',
+                color: 'text-rose-700',
+                onClick: () => setTab('contradictions'),
+              },
+              {
+                label: 'Sentiment',
                 value: 'Mixed',
-                sub: 'Negative at key moments',
+                sub: 'Negative at peaks',
                 color: 'text-amber-600',
                 onClick: () => setTab('sentiment'),
               },
@@ -1157,12 +1407,14 @@ function DepositionDetail({ id, onBack }) {
           </div>
 
           <div className={cls('flex-1 min-h-0', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
-            {tab === 'chat'      && <ChatTab depo={depo}/>}
-            {tab === 'goals'     && <GoalsTab goals={MOCK_DETAIL.goals}/>}
-            {tab === 'flagged'   && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
-            {tab === 'sentiment' && <SentimentTab data={MOCK_DETAIL.sentiment}/>}
-            {tab === 'timeline'  && <TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/>}
-            {tab === 'summaries' && <SummariesTab topics={MOCK_DETAIL.topics}/>}
+            {tab === 'chat'           && <ChatTab depo={depo}/>}
+            {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals}/>}
+            {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
+            {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
+            {tab === 'exhibits'       && <ExhibitsTab jump={jump}/>}
+            {tab === 'sentiment'      && <SentimentTab data={MOCK_DETAIL.sentiment}/>}
+            {tab === 'timeline'       && <TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/>}
+            {tab === 'summaries'      && <SummariesTab topics={MOCK_DETAIL.topics}/>}
           </div>
         </div>
       </div>
