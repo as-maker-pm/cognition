@@ -1670,6 +1670,17 @@ function DepositionDetail({ id, onBack }) {
                     <div className="flex-1 min-w-0">
                       <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
                       {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
+                      {g.citations?.length > 0 && (
+                        <div className="mt-1.5 flex flex-col gap-1">
+                          {g.citations.map((c, i) => (
+                            <button key={i} onClick={() => jump(c.timestamp)}
+                              className="flex items-start gap-1.5 text-left group/cit hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors">
+                              <span className="text-[9px] font-mono text-[#B5A899] shrink-0 mt-0.5 whitespace-nowrap">p.{c.page} l.{c.line}</span>
+                              <span className="text-[10px] text-[#9A8573] italic leading-snug line-clamp-1 group-hover/cit:text-[#4A3828]">"{c.quote}"</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
