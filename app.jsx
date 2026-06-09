@@ -1017,7 +1017,7 @@ function FlaggedTab({ items, jump }) {
                   const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
                   return (
                     <button key={f.id} onClick={() => jump(f.timestamp)}
-                      className="w-full text-left rounded-lg bg-white overflow-hidden hover:shadow-sm transition-all"
+                      className="w-full text-left rounded-lg bg-[#FFFEFB] overflow-hidden hover:shadow-sm transition-all"
                       style={{ border: `1px solid ${cfg.color}22` }}>
                       <div className="flex items-stretch">
                         {/* Colored left strip */}
