@@ -1608,68 +1608,155 @@ function ExhibitsTab({ jump }) {
   const exhibits = MOCK_DETAIL.exhibits || [];
   const contradictionCount = exhibits.reduce((s, e) => s + e.contradictions, 0);
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  const [variant, setVariant] = useState('A');
 
-  const categoryColors = {
-    Contract: 'bg-[#E2E1DF]/50 text-[#6B5744]',
-    Calendar: 'bg-blue-50 text-blue-700',
-    Document: 'bg-amber-50 text-amber-700',
-    Email:    'bg-emerald-50 text-emerald-700',
-    Records:  'bg-purple-50 text-purple-700',
+  const CAT = {
+    Contract: { pill: 'bg-amber-50 text-amber-700',   strip: '#F59E0B' },
+    Calendar: { pill: 'bg-blue-50 text-blue-700',     strip: '#3B82F6' },
+    Document: { pill: 'bg-violet-50 text-violet-700', strip: '#8B5CF6' },
+    Email:    { pill: 'bg-emerald-50 text-emerald-700', strip: '#10B981' },
+    Records:  { pill: 'bg-rose-50 text-rose-700',     strip: '#F43F5E' },
   };
+  const cat = (e) => CAT[e.category] || { pill: 'bg-[#F0F0EE] text-[#6B5744]', strip: '#C5BEB5' };
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] p-4">
-        <div className="flex items-center justify-between mb-2.5">
-          <span className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider">Documentary Record</span>
-          <span className="text-sm font-semibold text-[#14110D]">{exhibits.length} exhibits</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="rounded-lg bg-[#F0F0EE] px-3 py-2">
-            <div className="text-lg font-bold text-[#14110D]">{exhibits.length}</div>
-            <div className="text-[11px] text-[#6B5744]">Total exhibits</div>
-          </div>
-          <div className="rounded-lg bg-rose-50 px-3 py-2">
-            <div className="text-lg font-bold text-rose-700">{contradictionCount}</div>
-            <div className="text-[11px] text-rose-500">Contradiction refs</div>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {[...new Set(exhibits.map((e) => e.category))].map((cat) => (
-            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-[#E2E1DF]/50 text-[#6B5744]')}>{cat}</span>
-          ))}
-        </div>
+    <div className="flex flex-col gap-4">
+      {/* Variant picker */}
+      <div className="flex items-center gap-1.5 p-1 bg-[#F0F0EE] rounded-lg self-start">
+        {['A','B','C'].map(v => (
+          <button key={v} onClick={() => setVariant(v)}
+            className={cls('px-3 py-1 rounded-md text-[11px] font-bold transition-colors', variant === v ? 'bg-white text-[#14110D] shadow-sm' : 'text-[#9A8573] hover:text-[#14110D]')}>
+            Option {v}
+          </button>
+        ))}
       </div>
 
-      {exhibits.map((e) => (
-        <div key={e.id} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] p-3 flex flex-col gap-2">
-          <div className="flex items-start gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#E2E1DF]/40 flex items-center justify-center shrink-0 mt-0.5">
-              <Ic.fileText size={14} className="text-[#6B5744]"/>
+      {/* ── Option A: Document Index (clean rows) ── */}
+      {variant === 'A' && (
+        <div className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF]">
+            <span className="text-[12px] font-semibold text-[#14110D]">Documentary Record</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] text-[#9A8573]">{exhibits.length} exhibits</span>
+              {contradictionCount > 0 && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 rounded-full px-2 py-0.5">
+                  <Ic.alert size={9}/> {contradictionCount} conflicts
+                </span>
+              )}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-mono text-[10px] font-bold text-[#9A8573] shrink-0">{e.label}</span>
-                <span className="text-sm font-semibold text-[#14110D] truncate">{e.title}</span>
-              </div>
-              <p className="text-xs text-[#6B5744] leading-relaxed">{e.desc}</p>
-            </div>
-            {e.timestamp && (
-              <button onClick={() => jump(e.timestamp)} className="font-mono text-[11px] text-[#7A2E20] hover:underline shrink-0 mt-0.5">{fmt(e.timestamp)}</button>
-            )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[#E2E1DF]/60">
-            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-[#E2E1DF]/50 text-[#6B5744]')}>{e.category}</span>
-            {e.contradictions > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"/>
-                {e.contradictions} contradiction{e.contradictions > 1 ? 's' : ''}
-              </span>
-            )}
-            <span className="text-[11px] text-[#9A8573] ml-auto">{e.references} references in transcript</span>
+          {/* Rows */}
+          {exhibits.map((e, i) => (
+            <div key={e.id} className={cls('flex items-center gap-3 px-4 py-3 hover:bg-[#F0F0EE] transition-colors cursor-default', i < exhibits.length - 1 && 'border-b border-[#F0F0EE]')}>
+              {/* Label badge */}
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-white text-[11px] font-bold"
+                style={{ background: cat(e).strip }}>
+                {e.label.replace('Exh. ','')}
+              </div>
+              {/* Title + desc */}
+              <div className="flex-1 min-w-0">
+                <div className="text-[12px] font-semibold text-[#14110D] leading-snug">{e.title}</div>
+                <div className="text-[11px] text-[#9A8573] truncate mt-0.5">{e.desc}</div>
+              </div>
+              {/* Right meta */}
+              <div className="flex items-center gap-2 shrink-0">
+                {e.contradictions > 0 && (
+                  <span className="text-[10px] font-mono text-rose-500 bg-rose-50 rounded-full px-1.5 py-0.5">{e.contradictions}×</span>
+                )}
+                <span className="text-[10px] text-[#9A8573]">{e.references} refs</span>
+                {e.timestamp && (
+                  <button onClick={() => jump(e.timestamp)}
+                    className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                    <span>{fmt(e.timestamp)}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Option B: File Cards with left accent strip ── */}
+      {variant === 'B' && (
+        <div className="flex flex-col gap-2">
+          {exhibits.map((e) => (
+            <div key={e.id} className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden hover:bg-[#F0F0EE] transition-colors flex">
+              {/* Color strip */}
+              <div className="w-1 shrink-0" style={{ background: cat(e).strip }}/>
+              <div className="flex-1 px-4 py-3">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono font-bold text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5">{e.label}</span>
+                    <span className="text-[12px] font-semibold text-[#14110D]">{e.title}</span>
+                  </div>
+                  {e.timestamp && (
+                    <button onClick={() => jump(e.timestamp)}
+                      className="shrink-0 inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                      {fmt(e.timestamp)}
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#6B5744] leading-relaxed mb-2">{e.desc}</p>
+                <div className="flex items-center gap-2">
+                  <span className={cls('text-[9px] font-medium rounded-full px-2 py-0.5', cat(e).pill)}>{e.category}</span>
+                  {e.contradictions > 0 && (
+                    <span className="inline-flex items-center gap-1 text-[9px] text-rose-600 bg-rose-50 rounded-full px-1.5 py-0.5">
+                      <Ic.alert size={8}/> {e.contradictions} conflict{e.contradictions > 1 ? 's' : ''}
+                    </span>
+                  )}
+                  <span className="text-[10px] text-[#9A8573] ml-auto">{e.references} transcript refs</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Option C: Two-column grid with watermark letter ── */}
+      {variant === 'C' && (
+        <div>
+          <div className="flex items-center gap-4 mb-3 px-1">
+            <div className="text-center">
+              <div className="text-[22px] font-bold text-[#14110D]">{exhibits.length}</div>
+              <div className="text-[10px] text-[#9A8573] uppercase tracking-wide">Exhibits</div>
+            </div>
+            <div className="w-px h-8 bg-[#E2E1DF]"/>
+            <div className="text-center">
+              <div className="text-[22px] font-bold text-rose-600">{contradictionCount}</div>
+              <div className="text-[10px] text-[#9A8573] uppercase tracking-wide">Conflicts</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {exhibits.map((e) => (
+              <div key={e.id} className="relative bg-white rounded-xl border border-[#E2E1DF] p-3 overflow-hidden hover:bg-[#F0F0EE] transition-colors">
+                {/* Watermark letter */}
+                <div className="absolute top-1 right-2 text-[40px] font-bold leading-none select-none pointer-events-none"
+                  style={{ color: cat(e).strip, opacity: 0.12 }}>
+                  {e.label.replace('Exh. ','')}
+                </div>
+                <div className="relative">
+                  <div className="text-[9px] font-mono text-[#9A8573] mb-1">{e.label}</div>
+                  <div className="text-[12px] font-semibold text-[#14110D] leading-snug mb-1.5">{e.title}</div>
+                  <p className="text-[10px] text-[#6B5744] leading-relaxed mb-2 line-clamp-2">{e.desc}</p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={cls('text-[9px] font-medium rounded-full px-1.5 py-0.5', cat(e).pill)}>{e.category}</span>
+                    {e.contradictions > 0 && (
+                      <span className="text-[9px] text-rose-500 bg-rose-50 rounded-full px-1.5 py-0.5">{e.contradictions}×</span>
+                    )}
+                    {e.timestamp && (
+                      <button onClick={() => jump(e.timestamp)}
+                        className="ml-auto inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] transition-colors">
+                        {fmt(e.timestamp)}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
