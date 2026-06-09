@@ -978,6 +978,14 @@ function GoalsTab({ goals: initialGoals, jump }) {
   );
 }
 
+const FLAG_TYPE_CONFIG = {
+  'evasive':         { color: '#F59E0B', bg: '#FFFBEB', label: 'Evasive' },
+  'defensive':       { color: '#EF4444', bg: '#FEF2F2', label: 'Defensive' },
+  'contradictory':   { color: '#DC2626', bg: '#FEF2F2', label: 'Contradictory' },
+  'emotional-spike': { color: '#8B5CF6', bg: '#F5F3FF', label: 'Emotional' },
+  'context-needed':  { color: '#3B82F6', bg: '#EFF6FF', label: 'Context' },
+};
+
 function FlaggedTab({ items, jump }) {
   const [collapsed, setCollapsed] = useState({});
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
@@ -1005,16 +1013,30 @@ function FlaggedTab({ items, jump }) {
             </button>
             {open && (
               <div className="px-4 pb-2 flex flex-col gap-1.5">
-                {groupItems.map((f) => (
-                  <button key={f.id} onClick={() => jump(f.timestamp)}
-                    className="w-full text-left px-3.5 py-2.5 rounded-lg bg-white border border-[#EFEFED] hover:border-[#D8D6D3] hover:shadow-sm transition-all">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <div className="text-[12px] font-semibold text-[#111] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
-                      <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">{fmt(f.timestamp)}</span>
-                    </div>
-                    <div className="text-[12px] text-[#6B7280] leading-relaxed line-clamp-2">{f.description}</div>
-                  </button>
-                ))}
+                {groupItems.map((f) => {
+                  const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
+                  return (
+                    <button key={f.id} onClick={() => jump(f.timestamp)}
+                      className="w-full text-left rounded-lg bg-white overflow-hidden hover:shadow-sm transition-all"
+                      style={{ border: `1px solid ${cfg.color}22` }}>
+                      <div className="flex items-stretch">
+                        {/* Colored left strip */}
+                        <div className="w-1 shrink-0 rounded-l-lg" style={{ background: cfg.color }}/>
+                        <div className="flex-1 px-3 py-2.5">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: cfg.bg, color: cfg.color }}>
+                                {f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                              </span>
+                            </div>
+                            <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">{fmt(f.timestamp)}</span>
+                          </div>
+                          <div className="text-[12px] text-[#374151] leading-relaxed">{f.description}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
