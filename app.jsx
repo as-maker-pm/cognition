@@ -405,27 +405,16 @@ const CASE_TYPE_COLOR = {
 
 function CaseLibrary({ onSelect }) {
   const { user } = useAuth();
-  const [typeFilter, setTypeFilter] = useState('all');
   const [view, setView] = useState('list');
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
-  const types = ['all', ...Array.from(new Set(MOCK_CASES.map((c) => c.type)))];
-  const list = MOCK_CASES.filter((c) => typeFilter === 'all' || c.type === typeFilter);
+  const list = MOCK_CASES;
 
   return (
     <div className="flex-1 flex flex-col bg-[#F8F8F7]">
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <h1 className="text-xl font-semibold text-[#14110D] tracking-tight shrink-0">Cases</h1>
-          <span className="text-xs text-[#9A8573] bg-[#E2E1DF]/60 rounded-full px-2 py-0.5 shrink-0">{list.length}</span>
-          <div className="flex items-center gap-1.5 overflow-x-auto">
-            {types.map((t) => (
-              <button key={t} onClick={() => setTypeFilter(t)}
-                className={cls('shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap',
-                  typeFilter === t ? 'bg-[#14110D] text-white' : 'border border-[#E2E1DF] text-[#6B5744] hover:bg-[#E9E8E7]')}>
-                {t === 'all' ? 'All types' : t}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-semibold text-[#14110D] tracking-tight">Cases</h1>
+          <span className="text-xs text-[#9A8573] bg-[#E2E1DF]/60 rounded-full px-2 py-0.5">{list.length}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-lg p-1 bg-[#F8F8F7]">
@@ -507,8 +496,13 @@ function CaseChatPanel({ selectedCase }) {
   const [busy, setBusy] = useState(false);
   const [workingStep, setWorkingStep] = useState(0);
   const [workingExpanded, setWorkingExpanded] = useState(true);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedDepos, setSelectedDepos] = useState([]);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+
+  const caseDepos = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : [];
+  const toggleDepo = (id) => setSelectedDepos((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id]);
 
   useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, busy]);
 
@@ -527,10 +521,11 @@ function CaseChatPanel({ selectedCase }) {
     if (inputRef.current) inputRef.current.style.height = 'auto';
     setMessages((m) => [...m, { role: 'user', text: q }]);
     setBusy(true);
+    const scopeDepos = selectedDepos.length > 0 ? caseDepos.filter((d) => selectedDepos.includes(d.id)) : caseDepos;
+    const scopeNames = scopeDepos.map((d) => d.witness).join(', ');
     try {
-      const depoCount = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber).length : 0;
       const reply = await window.claude.complete({
-        messages: [{ role: 'user', content: `You are an AI legal analyst for the case "${selectedCase?.caseName}" (${selectedCase?.caseNumber}). There are ${depoCount} depositions in this case. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Plain text only.` }],
+        messages: [{ role: 'user', content: `You are an AI legal analyst for the case "${selectedCase?.caseName}" (${selectedCase?.caseNumber}). Scope: depositions from ${scopeNames || 'all witnesses'}. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Plain text only.` }],
       });
       setMessages((m) => [...m, { role: 'ai', text: reply, followUps: ['What evidence supports this?', 'Which witness is most relevant?', 'What follow-up questions should we ask?'] }]);
     } catch {
@@ -543,7 +538,7 @@ function CaseChatPanel({ selectedCase }) {
   const isEmpty = messages.length === 0 && !busy;
 
   return (
-    <div className="w-96 shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
+    <div className="w-[420px] shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
       <div className="flex flex-col h-full min-h-0">
         <div className="flex-1 overflow-y-auto min-h-0">
           {isEmpty ? (
@@ -552,10 +547,8 @@ function CaseChatPanel({ selectedCase }) {
                 <span className="text-[44px] font-light text-[#D8D5D1] select-none" style={{ fontFamily: "'Source Serif 4', Georgia, serif", letterSpacing: '-0.02em' }}>Cognition</span>
               </div>
               <div className="px-5 pb-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[12px] text-[#9A8573]">Suggested</span>
-                </div>
-                <div className="flex flex-col gap-1">
+                <span className="text-[12px] text-[#9A8573]">Suggested</span>
+                <div className="flex flex-col gap-1 mt-3">
                   {CASE_WORKFLOWS.map((w) => (
                     <button key={w.title} onClick={() => send(w.title)}
                       className="flex items-start gap-3 px-3.5 py-3 rounded-xl hover:bg-[#F0F0EE] transition-colors text-left">
@@ -581,8 +574,21 @@ function CaseChatPanel({ selectedCase }) {
             </div>
           )}
         </div>
+
         <div className="px-4 pb-4 pt-2 shrink-0">
-          <div className="bg-white border border-[#E2E1DF] rounded-2xl px-4 pt-4 pb-3 focus-within:border-[#9A8573] transition-all">
+          {/* Deposition scope pills */}
+          {selectedDepos.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {caseDepos.filter((d) => selectedDepos.includes(d.id)).map((d) => (
+                <span key={d.id} className="inline-flex items-center gap-1 text-[11px] bg-[#14110D] text-white rounded-full px-2 py-0.5">
+                  {d.witness.split(' ')[0]}
+                  <button onClick={() => toggleDepo(d.id)} className="hover:text-white/60 transition-colors"><Ic.x size={10}/></button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="bg-white border border-[#E2E1DF] rounded-2xl px-4 pt-4 pb-3 focus-within:border-[#9A8573] transition-all relative">
             <textarea ref={inputRef} value={input}
               onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -590,9 +596,35 @@ function CaseChatPanel({ selectedCase }) {
               className="w-full text-[14px] text-[#14110D] placeholder:text-[#B5B0AB] outline-none resize-none bg-transparent leading-5 mb-3"
               style={{ minHeight: '44px' }}/>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 relative">
                 <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors"><Ic.plus size={15}/></button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors"><Ic.filter size={13}/></button>
+                <button
+                  onClick={() => setFilterOpen((o) => !o)}
+                  className={cls('w-7 h-7 flex items-center justify-center rounded-lg transition-colors', filterOpen ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:bg-[#E8E6E3]')}>
+                  <Ic.filter size={13}/>
+                </button>
+                {filterOpen && (
+                  <div className="absolute bottom-9 left-0 w-56 bg-white border border-[#E2E1DF] rounded-xl shadow-lg py-1.5 z-50" onMouseLeave={() => setFilterOpen(false)}>
+                    <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider px-3 py-1.5">Filter by deposition</p>
+                    {caseDepos.map((d) => (
+                      <button key={d.id} onClick={() => toggleDepo(d.id)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-[#F0F0EE] transition-colors text-left">
+                        <div className={cls('w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-colors', selectedDepos.includes(d.id) ? 'bg-[#14110D] border-[#14110D]' : 'border-[#C4B5A2]')}>
+                          {selectedDepos.includes(d.id) && <Ic.check size={10} className="text-white"/>}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[12px] font-medium text-[#14110D] truncate">{d.witness}</p>
+                          <p className="text-[10px] text-[#9A8573]">{d.date}</p>
+                        </div>
+                      </button>
+                    ))}
+                    {selectedDepos.length > 0 && (
+                      <div className="border-t border-[#E2E1DF] mt-1 pt-1 px-3 pb-1">
+                        <button onClick={() => setSelectedDepos([])} className="text-[11px] text-[#9A8573] hover:text-[#14110D] transition-colors">Clear all</button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <button onClick={() => send()} disabled={busy || !input.trim()}
                 className="w-7 h-7 rounded-lg bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-25 disabled:cursor-not-allowed transition-all">
@@ -649,7 +681,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
               <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-9 w-9 p-0"><Ic.list size={18}/></Button>
               <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-9 w-9 p-0"><Ic.grid size={18}/></Button>
             </div>
-            <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
+            <Button onClick={onAdd}><Ic.plus size={14}/> Add New</Button>
           </div>
         </div>
 
