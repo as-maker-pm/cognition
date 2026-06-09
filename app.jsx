@@ -429,8 +429,8 @@ function CaseLibrary({ onSelect }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-lg p-1 bg-[#F8F8F7]">
-            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={16}/></Button>
-            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={16}/></Button>
+            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-9 w-9 p-0"><Ic.list size={18}/></Button>
+            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-9 w-9 p-0"><Ic.grid size={18}/></Button>
           </div>
           {canEdit && <Button><Ic.plus size={14}/> Create New</Button>}
         </div>
@@ -494,61 +494,112 @@ function CaseLibrary({ onSelect }) {
 }
 
 // ---------- Case AI Chat ----------
-const CASE_SUGGESTIONS = [
-  { icon: Ic.sparkles, title: 'Summarize all depositions', desc: 'Get a high-level overview across all witnesses in this case' },
-  { icon: Ic.alert,    title: 'Find contradictions across witnesses', desc: 'Surface conflicting testimony between deponents' },
-  { icon: Ic.flag,     title: 'Identify key themes', desc: 'What topics and patterns emerge across the depositions?' },
-  { icon: Ic.fileText, title: 'Draft case timeline', desc: 'Build a chronological narrative from all testimony' },
+const CASE_WORKFLOWS = [
+  { icon: <Ic.sparkles size={15}/>, title: 'Summarize all depositions',         desc: 'High-level overview across all witnesses in this case' },
+  { icon: <Ic.alert size={15}/>,    title: 'Find cross-witness contradictions',  desc: 'Surface conflicting testimony between deponents' },
+  { icon: <Ic.flag size={15}/>,     title: 'Identify key themes',               desc: 'Topics and patterns emerging across the depositions' },
+  { icon: <Ic.fileText size={15}/>, title: 'Draft case timeline',               desc: 'Chronological narrative built from all testimony' },
 ];
 
 function CaseChatPanel({ selectedCase }) {
-  const [msgs, setMsgs] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const send = (text) => {
-    if (!text.trim()) return;
-    setMsgs((m) => [...m, { role: 'user', text }]);
+  const [busy, setBusy] = useState(false);
+  const [workingStep, setWorkingStep] = useState(0);
+  const [workingExpanded, setWorkingExpanded] = useState(true);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, busy]);
+
+  useEffect(() => {
+    if (!busy) return;
+    setWorkingStep(0);
+    setWorkingExpanded(true);
+    const iv = setInterval(() => setWorkingStep((s) => { if (s >= WORKING_STEPS.length - 1) { clearInterval(iv); return s; } return s + 1; }), 600);
+    return () => clearInterval(iv);
+  }, [busy]);
+
+  const send = async (text) => {
+    const q = (text !== undefined ? text : input).trim();
+    if (!q || busy) return;
     setInput('');
-    setTimeout(() => setMsgs((m) => [...m, { role: 'ai', text: 'This is a prototype response. In production, this would query across all depositions in this case.' }]), 600);
+    if (inputRef.current) inputRef.current.style.height = 'auto';
+    setMessages((m) => [...m, { role: 'user', text: q }]);
+    setBusy(true);
+    try {
+      const depoCount = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber).length : 0;
+      const reply = await window.claude.complete({
+        messages: [{ role: 'user', content: `You are an AI legal analyst for the case "${selectedCase?.caseName}" (${selectedCase?.caseNumber}). There are ${depoCount} depositions in this case. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Plain text only.` }],
+      });
+      setMessages((m) => [...m, { role: 'ai', text: reply, followUps: ['What evidence supports this?', 'Which witness is most relevant?', 'What follow-up questions should we ask?'] }]);
+    } catch {
+      setMessages((m) => [...m, { role: 'ai', text: 'Sorry, I had trouble responding. Try again.', followUps: [] }]);
+    }
+    setBusy(false);
+    inputRef.current?.focus();
   };
+
+  const isEmpty = messages.length === 0 && !busy;
+
   return (
     <div className="w-80 shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
-      <div className="px-4 py-3.5 border-b border-[#E2E1DF] flex items-center gap-2">
-        <Ic.sparkles size={14} className="text-[#7A2E20]"/>
-        <span className="text-sm font-semibold text-[#14110D]">Case AI</span>
-        <span className="ml-auto text-[10px] text-[#9A8573] bg-[#E2E1DF]/60 rounded-full px-2 py-0.5">All depositions</span>
-      </div>
-      <div className="flex-1 overflow-auto p-4 flex flex-col gap-3">
-        {msgs.length === 0 ? (
-          <>
-            <p className="text-xs text-[#9A8573] mb-1">Ask anything about <span className="font-medium text-[#6B5744]">{selectedCase?.caseName}</span></p>
-            {CASE_SUGGESTIONS.map(({ icon: Icon, title, desc }) => (
-              <button key={title} onClick={() => send(title)}
-                className="text-left p-3 rounded-xl border border-[#E2E1DF] bg-white hover:bg-[#F0F0EE] hover:border-[#D0C5B0] transition-all group">
-                <div className="flex items-start gap-2.5">
-                  <Icon size={13} className="text-[#7A2E20] mt-0.5 shrink-0"/>
-                  <div>
-                    <div className="text-xs font-semibold text-[#14110D]">{title}</div>
-                    <div className="text-[11px] text-[#9A8573] mt-0.5 leading-relaxed">{desc}</div>
-                  </div>
+      <div className="flex flex-col h-full min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {isEmpty ? (
+            <div className="flex flex-col h-full">
+              <div className="flex-1 flex items-center justify-center">
+                <span className="text-[44px] font-light text-[#D8D5D1] select-none" style={{ fontFamily: "'Source Serif 4', Georgia, serif", letterSpacing: '-0.02em' }}>Cognition</span>
+              </div>
+              <div className="px-5 pb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[12px] text-[#9A8573]">Suggested</span>
                 </div>
-              </button>
-            ))}
-          </>
-        ) : (
-          msgs.map((m, i) => (
-            <div key={i} className={cls('text-sm rounded-xl px-3 py-2.5 leading-relaxed', m.role === 'user' ? 'bg-[#14110D] text-white self-end max-w-[85%]' : 'bg-white border border-[#E2E1DF] text-[#14110D] self-start max-w-[95%]')}>
-              {m.text}
+                <div className="flex flex-col gap-1">
+                  {CASE_WORKFLOWS.map((w) => (
+                    <button key={w.title} onClick={() => send(w.title)}
+                      className="flex items-start gap-3 px-3.5 py-3 rounded-xl hover:bg-[#F0F0EE] transition-colors text-left">
+                      <span className="text-[#9A8573] mt-0.5 shrink-0">{w.icon}</span>
+                      <div>
+                        <p className="text-[13px] font-semibold text-[#14110D] leading-snug">{w.title}</p>
+                        <p className="text-[12px] text-[#9A8573] mt-0.5 leading-snug">{w.desc}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))
-        )}
-      </div>
-      <div className="p-3 border-t border-[#E2E1DF]">
-        <div className="flex gap-2">
-          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send(input)}
-            placeholder="Ask about this case..." className="flex-1 text-sm bg-white border border-[#E2E1DF] rounded-lg px-3 py-2 outline-none focus:border-[#9A8573] placeholder:text-[#C4B5A2]"/>
-          <button onClick={() => send(input)} className="w-8 h-8 rounded-lg bg-[#14110D] flex items-center justify-center shrink-0 hover:bg-[#2C2316] transition-colors">
-            <Ic.send size={13} className="text-white"/>
-          </button>
+          ) : (
+            <div className="px-5 pt-5 pb-2">
+              {messages.map((m, i) => (
+                m.role === 'user'
+                  ? <p key={i} className="text-[13px] text-[#9A8573] mb-3 leading-snug">{m.text}</p>
+                  : <AiMessage key={i} msg={m} onFollowUp={send}/>
+              ))}
+              {busy && <WorkingState steps={WORKING_STEPS} currentStep={workingStep} expanded={workingExpanded} onToggle={() => setWorkingExpanded((v) => !v)}/>}
+              <div ref={scrollRef}/>
+            </div>
+          )}
+        </div>
+        <div className="px-4 pb-4 pt-2 shrink-0">
+          <div className="bg-white border border-[#E2E1DF] rounded-2xl px-4 pt-4 pb-3 focus-within:border-[#9A8573] transition-all">
+            <textarea ref={inputRef} value={input}
+              onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+              placeholder="Ask Cognition anything…" rows={2}
+              className="w-full text-[14px] text-[#14110D] placeholder:text-[#B5B0AB] outline-none resize-none bg-transparent leading-5 mb-3"
+              style={{ minHeight: '44px' }}/>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors"><Ic.plus size={15}/></button>
+                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors"><Ic.filter size={13}/></button>
+              </div>
+              <button onClick={() => send()} disabled={busy || !input.trim()}
+                className="w-7 h-7 rounded-lg bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-25 disabled:cursor-not-allowed transition-all">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -595,8 +646,8 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-lg p-1 bg-[#F8F8F7]">
-              <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={16}/></Button>
-              <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={16}/></Button>
+              <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-9 w-9 p-0"><Ic.list size={18}/></Button>
+              <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-9 w-9 p-0"><Ic.grid size={18}/></Button>
             </div>
             <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
           </div>
