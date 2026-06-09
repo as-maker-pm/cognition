@@ -450,27 +450,27 @@ function CaseLibrary({ onSelect }) {
           <div className="flex flex-col divide-y divide-[#E2E1DF] bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
             {list.map((c) => (
               <button key={c.id} onClick={() => onSelect(c.id)}
-                className="group flex items-center gap-4 px-5 py-4 text-left hover:bg-[#F8F8F7] transition-colors">
-                <div className="w-1 h-10 rounded-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
+                className="group flex items-center gap-5 px-6 py-5 text-left hover:bg-[#F8F8F7] transition-colors">
+                <div className="w-1 h-12 rounded-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-[#14110D]">{c.caseName}</span>
-                    <span className="text-[11px] text-[#9A8573] font-mono">{c.caseNumber}</span>
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className="text-[15px] font-semibold text-[#14110D]">{c.caseName}</span>
+                    <span className="text-xs text-[#9A8573] font-mono">{c.caseNumber}</span>
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-[#6B5744]">
+                  <div className="flex items-center gap-2.5 mt-1 text-sm text-[#6B5744]">
                     <span>{c.client}</span>
                     <span className="text-[#C4B5A2]">·</span>
-                    <span className="text-[10px] uppercase tracking-wide text-[#9A8573]">{c.type}</span>
+                    <span className="text-xs uppercase tracking-wide text-[#9A8573]">{c.type}</span>
                     <span className="text-[#C4B5A2]">·</span>
-                    <span>Updated {c.lastActivity}</span>
+                    <span className="text-xs">Updated {c.lastActivity}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 shrink-0">
+                <div className="flex items-center gap-5 shrink-0">
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-[#14110D]">{c.depositionCount}</div>
-                    <div className="text-[10px] text-[#9A8573]">depositions</div>
+                    <div className="text-base font-semibold text-[#14110D]">{c.depositionCount}</div>
+                    <div className="text-xs text-[#9A8573]">depositions</div>
                   </div>
-                  <Ic.chevR size={14} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
+                  <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                 </div>
               </button>
             ))}
@@ -480,17 +480,17 @@ function CaseLibrary({ onSelect }) {
             {list.map((c) => (
               <button key={c.id} onClick={() => onSelect(c.id)}
                 className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
-                <div className="h-1.5 w-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
-                <div className="p-4 flex flex-col gap-3 flex-1">
+                <div className="h-2 w-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
+                <div className="p-5 flex flex-col gap-4 flex-1">
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider font-medium text-[#9A8573]">{c.type}</span>
-                    <h3 className="text-sm font-semibold text-[#14110D] mt-1 leading-snug line-clamp-2">{c.caseName}</h3>
-                    <p className="text-[11px] text-[#9A8573] font-mono mt-0.5">{c.caseNumber}</p>
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[#9A8573]">{c.type}</span>
+                    <h3 className="text-base font-semibold text-[#14110D] mt-1.5 leading-snug line-clamp-2">{c.caseName}</h3>
+                    <p className="text-xs text-[#9A8573] font-mono mt-1">{c.caseNumber}</p>
                   </div>
                   <div className="h-px bg-[#E2E1DF]/60"/>
-                  <div className="flex items-center justify-between text-xs text-[#6B5744]">
-                    <span className="truncate">{c.client}</span>
-                    <span className="shrink-0 ml-2 font-semibold text-[#14110D]">{c.depositionCount} <span className="font-normal text-[#9A8573]">dep.</span></span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[#6B5744] truncate">{c.client}</span>
+                    <span className="shrink-0 ml-2 text-base font-semibold text-[#14110D]">{c.depositionCount} <span className="text-xs font-normal text-[#9A8573]">dep.</span></span>
                   </div>
                 </div>
               </button>
@@ -547,31 +547,31 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
               <button key={d.id} onClick={() => onSelect(d.id)}
                 className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
                 {/* Thumbnail */}
-                <div className="bg-[#2C2316] h-28 relative flex items-center justify-center shrink-0 overflow-hidden">
+                <div className="bg-[#2C2316] h-36 relative flex items-center justify-center shrink-0 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3D2E18] to-[#14110D]"/>
-                  <span className="brand text-white/70 select-none relative z-10" style={{ fontSize: '2.4rem', fontWeight: 400 }}>{witnessInitials(d.witness)}</span>
+                  <span className="brand text-white/70 select-none relative z-10" style={{ fontSize: '3rem', fontWeight: 400 }}>{witnessInitials(d.witness)}</span>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                      <Ic.play size={16} className="text-white ml-0.5"/>
+                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                      <Ic.play size={18} className="text-white ml-0.5"/>
                     </div>
                   </div>
-                  <div className="absolute top-2 right-2 z-10">{srcBadge(d.transcriptSource)}</div>
-                  <div className="absolute bottom-2 left-2 z-10">
-                    <span className="text-[10px] text-white/60 font-mono bg-black/30 rounded px-1.5 py-0.5">{fmt(d.duration)}</span>
+                  <div className="absolute top-3 right-3 z-10">{srcBadge(d.transcriptSource)}</div>
+                  <div className="absolute bottom-3 left-3 z-10">
+                    <span className="text-[10px] text-white/70 font-mono bg-black/40 rounded px-2 py-0.5">{fmt(d.duration)}</span>
                   </div>
                 </div>
                 {/* Body */}
-                <div className="p-3 flex flex-col gap-2 flex-1">
+                <div className="p-4 flex flex-col gap-3 flex-1">
                   <div>
                     <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
-                    <p className="text-[11px] text-[#9A8573] mt-0.5 flex items-center gap-1"><Ic.calendar size={10}/>{d.date}</p>
+                    <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
                   </div>
                   {d.goals.total > 0 && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
                         <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
                       </div>
-                      <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total}</span>
+                      <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total} goals</span>
                     </div>
                   )}
                   {d.tags && d.tags.length > 0 && (
@@ -590,29 +590,34 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
           <div className="flex flex-col divide-y divide-[#E2E1DF] bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
             {list.map((d) => (
               <button key={d.id} onClick={() => onSelect(d.id)}
-                className="group flex items-center gap-4 px-5 py-3.5 text-left hover:bg-[#F8F8F7] transition-colors">
-                <div className="w-8 h-8 rounded-full bg-[#2C2316] flex items-center justify-center shrink-0">
-                  <span className="brand text-white/80 text-xs select-none">{witnessInitials(d.witness)}</span>
+                className="group flex items-center gap-5 px-6 py-5 text-left hover:bg-[#F8F8F7] transition-colors">
+                <div className="w-10 h-10 rounded-full bg-[#2C2316] flex items-center justify-center shrink-0">
+                  <span className="brand text-white/80 text-sm select-none">{witnessInitials(d.witness)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-[#14110D]">{d.witness}</span>
+                    <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
                     {srcBadge(d.transcriptSource)}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="text-xs text-[#6B5744] flex items-center gap-1"><Ic.calendar size={10}/>{d.date}</span>
-                    <span className="text-[#C4B5A2] text-xs">·</span>
-                    <span className="text-xs text-[#6B5744] flex items-center gap-1"><Ic.clock size={10}/>{fmt(d.duration)}</span>
+                  <div className="flex items-center gap-2.5 mt-1.5 flex-wrap">
+                    <span className="text-sm text-[#6B5744] flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
+                    <span className="text-[#C4B5A2]">·</span>
+                    <span className="text-sm text-[#6B5744] flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
                     {d.goals.total > 0 && <>
-                      <span className="text-[#C4B5A2] text-xs">·</span>
-                      <span className="text-xs text-[#6B5744]">{d.goals.covered}/{d.goals.total} goals</span>
+                      <span className="text-[#C4B5A2]">·</span>
+                      <span className="text-sm text-[#6B5744]">{d.goals.covered}/{d.goals.total} goals</span>
                     </>}
-                    {d.tags && d.tags.slice(0,2).map((t) => (
-                      <span key={t} className="text-[10px] bg-[#F0F0EE] text-[#6B5744] rounded px-1.5 py-0.5">{t}</span>
-                    ))}
                   </div>
+                  {d.tags && d.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {d.tags.slice(0,3).map((t) => (
+                        <span key={t} className="text-[11px] bg-[#F0F0EE] text-[#6B5744] rounded px-2 py-0.5">{t}</span>
+                      ))}
+                      {d.tags.length > 3 && <span className="text-[11px] text-[#9A8573]">+{d.tags.length - 3}</span>}
+                    </div>
+                  )}
                 </div>
-                <Ic.chevR size={14} className="text-[#C4B5A2] group-hover:text-[#6B5744] shrink-0 transition-colors"/>
+                <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] shrink-0 transition-colors"/>
               </button>
             ))}
           </div>
