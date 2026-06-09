@@ -750,11 +750,11 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
   const cueColor = (cue) => {
     const t = (cue.type || '').toLowerCase();
     const d = (cue.description || '').toLowerCase();
-    if (t === 'confident' || d.includes('eye contact') || d.includes('direct') || d.includes('clear') || d.includes('confirm') || d.includes('acknowledge')) return 'bg-emerald-50 border-emerald-200 text-emerald-700';
-    if (t === 'defensive' || d.includes('raised voice') || d.includes('sharp') || d.includes('hostile') || d.includes('contradict')) return 'bg-rose-50 border-rose-200 text-rose-700';
-    if (t === 'pause' || t === 'nervous' || t === 'stutter' || d.includes('hesit') || d.includes('avoid') || d.includes('shifted') || d.includes('evasive')) return 'bg-orange-50 border-orange-200 text-orange-700';
-    if (t === 'emotional' || d.includes('emotion') || d.includes('distress') || d.includes('upset')) return 'bg-purple-50 border-purple-200 text-purple-700';
-    return 'bg-amber-50 border-amber-200 text-amber-700';
+    if (t === 'confident' || d.includes('eye contact') || d.includes('direct') || d.includes('clear') || d.includes('confirm') || d.includes('acknowledge')) return 'bg-emerald-50 text-emerald-700';
+    if (t === 'defensive' || d.includes('raised voice') || d.includes('sharp') || d.includes('hostile') || d.includes('contradict')) return 'bg-rose-50 text-rose-700';
+    if (t === 'pause' || t === 'nervous' || t === 'stutter' || d.includes('hesit') || d.includes('avoid') || d.includes('shifted') || d.includes('evasive')) return 'bg-orange-50 text-orange-700';
+    if (t === 'emotional' || d.includes('emotion') || d.includes('distress') || d.includes('upset')) return 'bg-purple-50 text-purple-700';
+    return 'bg-amber-50 text-amber-700';
   };
 
   const countExhibits = (segments) =>
@@ -821,7 +821,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                       {s.cues?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {s.cues.map((c, i) => (
-                            <span key={i} className={cls('text-[10.5px] px-1.5 py-0.5 rounded border', cueColor(c))}>
+                            <span key={i} className={cls('text-[10.5px] px-1.5 py-0.5 rounded', cueColor(c))}>
                               ⚑ {c.description}
                             </span>
                           ))}
@@ -1250,7 +1250,7 @@ function ChatTab({ depo }) {
   const [busy, setBusy] = useState(false);
   const [workingStep, setWorkingStep] = useState(0);
   const [workingExpanded, setWorkingExpanded] = useState(true);
-  const [mode, setMode] = useState('Ask');
+
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -1371,17 +1371,6 @@ function ChatTab({ depo }) {
               <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors">
                 <Ic.filter size={13}/>
               </button>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors">
-                <Ic.sparkles size={13}/>
-              </button>
-              <div className="flex items-center gap-0.5 ml-1 bg-[#E8E6E3] rounded-lg p-0.5">
-                {['Ask','Analyze','Draft'].map((m) => (
-                  <button key={m} onClick={() => setMode(m)}
-                    className={cls('text-[11px] font-medium px-2 py-1 rounded-md transition-colors', mode === m ? 'bg-white text-[#14110D] shadow-sm' : 'text-[#9A8573] hover:text-[#14110D]')}>
-                    {m}
-                  </button>
-                ))}
-              </div>
             </div>
             <button onClick={() => send()} disabled={busy || !input.trim()}
               className="w-7 h-7 rounded-lg bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-25 disabled:cursor-not-allowed transition-all">
@@ -1524,7 +1513,7 @@ function ExhibitsTab({ jump }) {
           <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[#E2E1DF]/60">
             <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-[#E2E1DF]/50 text-[#6B5744]')}>{e.category}</span>
             {e.contradictions > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"/>
                 {e.contradictions} contradiction{e.contradictions > 1 ? 's' : ''}
               </span>
@@ -1721,7 +1710,7 @@ function DepositionDetail({ id, onBack }) {
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
             <button
               onClick={() => setTab('flagged')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
             >
               <Ic.flag size={11}/>
               {MOCK_DETAIL.flaggedItems.length} flagged
@@ -1741,7 +1730,7 @@ function DepositionDetail({ id, onBack }) {
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={cls(
-                    'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap rounded-full px-3 py-1.5',
+                    'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap rounded-md px-3 py-1.5',
                     isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
                   )}>
                   {t.label}
