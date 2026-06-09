@@ -1707,13 +1707,6 @@ function DepositionDetail({ id, onBack }) {
           <div className="text-xs text-[#9A8573] mt-0.5">Deposition of {depo.witness} · {depo.date} · {depo.caseNumber}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className={cls(
-            'text-[11px] font-semibold uppercase tracking-wider rounded px-2.5 py-1 border',
-            depo.status === 'ready' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
-            depo.status === 'processing' ? 'text-amber-700 bg-amber-50 border-amber-200' :
-            'text-[#7A2E20] bg-[#F5E6E1] border-[#E8CCBF]'
-          )}>{depo.status}</span>
-          {canEdit && <Button variant="ghost" size="sm"><Ic.upload size={13}/> Upload</Button>}
           <div className="relative">
             <Button variant="outline" size="sm" onClick={() => setExportOpen((o) => !o)}>
               <Ic.fileText size={13}/> Export <Ic.chevD size={11}/>
@@ -1733,7 +1726,6 @@ function DepositionDetail({ id, onBack }) {
               </div>
             )}
           </div>
-          <Button size="sm"><Ic.plus size={13}/> Issue</Button>
         </div>
       </header>
 
