@@ -641,7 +641,6 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
 // ---------- Deposition Detail ----------
 function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) {
   const [videoIdx, setVideoIdx] = useState(0);
-  const [summaryOpen, setSummaryOpen] = useState(true);
   const duration = 540;
   const v = depo.videos?.[videoIdx];
 
@@ -698,13 +697,6 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
         </div>
       </div>
 
-      <div className="border-t border-[#E4DCC9]/40 pt-3">
-        <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider mb-2">Summary</p>
-        <p className="text-xs text-[#6B5744] leading-relaxed">{summaryOpen ? MOCK_DETAIL.summary : MOCK_DETAIL.summary.slice(0, 200) + '…'}</p>
-        <button onClick={() => setSummaryOpen((o) => !o)} className="text-[11px] text-[#9A8573] mt-1.5 hover:text-[#7A2E20] hover:underline transition-colors">
-          {summaryOpen ? 'Show less' : 'Read more'}
-        </button>
-      </div>
     </div>
   );
 }
@@ -714,11 +706,8 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
     <div className="flex flex-col gap-8">
       {topics.map((topic) => (
         <div key={topic.id}>
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{topic.title}</h3>
-          </div>
-          {topic.summary && <p className="text-xs text-slate-400 mb-4 leading-relaxed">{topic.summary}</p>}
-          <div className="flex flex-col border-l-2 border-slate-100 ml-0.5">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[#9A8573] mb-3 pb-2 border-b border-[#E4DCC9]">{topic.title}</div>
+          <div className="flex flex-col border-l-2 border-[#E4DCC9] ml-0.5">
             {topic.segments.map((s) => {
               const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
               const isW = s.speaker === 'Witness';
@@ -727,25 +716,25 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
                   key={s.id}
                   onClick={() => setCurrentTime(s.timestamp)}
                   className={cls(
-                    'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all',
+                    'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all rounded-r',
                     active
-                      ? 'border-[#7A2E20] bg-rose-50/30'
-                      : 'border-transparent hover:border-slate-200 hover:bg-slate-50/60'
+                      ? 'border-[#7A2E20] bg-[#FDF0EC]'
+                      : 'border-transparent hover:border-[#E4DCC9] hover:bg-[#F7F2EA]'
                   )}
                 >
                   <div className="flex items-baseline justify-between mb-1.5">
-                    <span className={cls('text-[11px] font-semibold tracking-wide', isW ? 'text-[#7A2E20]' : 'text-slate-500')}>
+                    <span className={cls('text-[11px] font-bold tracking-wide', isW ? 'text-[#7A2E20]' : 'text-[#6B5744]')}>
                       {s.speaker}
                     </span>
-                    <span className="text-[10px] text-slate-300 tabular-nums font-mono shrink-0 ml-3">
+                    <span className="text-[10px] text-[#B5A899] tabular-nums font-mono shrink-0 ml-3">
                       {Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">{s.text}</p>
+                  <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: "Georgia, serif" }}>{s.text}</p>
                   {s.cues?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {s.cues.map((c, i) => (
-                        <span key={i} className="text-[11px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                        <span key={i} className="text-[10.5px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
                           ⚑ {c.description}
                         </span>
                       ))}
@@ -1254,6 +1243,7 @@ function ExhibitsTab({ jump }) {
 
 function DepositionDetail({ id, onBack }) {
   const depo = MOCK_DEPOSITIONS.find((d) => d.id === id);
+  const selectedCase = MOCK_CASES.find((c) => c.caseNumber === depo.caseNumber);
   const { user } = useAuth();
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
   const [tab, setTab] = useState('chat');
@@ -1262,48 +1252,56 @@ function DepositionDetail({ id, onBack }) {
   const [exportOpen, setExportOpen] = useState(false);
 
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
+  const fmtDur = (m) => { const h = Math.floor(m/60); const r = m%60; return h ? `${h}h ${r}m` : `${r}m`; };
 
   const tabs = [
-    { id: 'chat',           label: 'AI Chat',       icon: Ic.msg },
-    { id: 'goals',          label: 'Goals',         icon: Ic.checkC },
-    { id: 'flagged',        label: 'Flagged',       icon: Ic.flag,  count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
-    { id: 'contradictions', label: 'Contradictions',icon: Ic.alert, count: MOCK_DETAIL.contradictions?.length },
-    { id: 'exhibits',       label: 'Exhibits',      icon: Ic.fileText },
-    { id: 'sentiment',      label: 'Sentiment',     icon: Ic.sparkles },
-    { id: 'timeline',       label: 'Timeline',      icon: Ic.calendar },
-    { id: 'summaries',      label: 'Summaries',     icon: Ic.list },
+    { id: 'chat',           label: 'AI Chat' },
+    { id: 'contradictions', label: 'Contradictions', count: MOCK_DETAIL.contradictions?.length },
+    { id: 'flagged',        label: 'Flagged',         count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
+    { id: 'goals',          label: 'Goals' },
+    { id: 'sentiment',      label: 'Sentiment' },
+    { id: 'exhibits',       label: 'Exhibits' },
+    { id: 'timeline',       label: 'Timeline' },
+    { id: 'summaries',      label: 'Summaries' },
   ];
 
   const exportOptions = [
-    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations, sentiment, contradictions, annotated transcript', bg: 'bg-[#E4DCC9]/50', fg: 'text-[#6B5744]' },
-    { icon: Ic.msg,      title: 'Case Update',       sub: 'For the client · 2-page executive summary, plain language, key findings', bg: 'bg-emerald-50', fg: 'text-emerald-700' },
-    { icon: Ic.edit,     title: 'Discovery Memo',    sub: 'For opposing counsel · contradictions cited to transcript, no AI methodology disclosed', bg: 'bg-rose-50', fg: 'text-rose-600' },
+    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations', bg: 'bg-[#E4DCC9]/50', fg: 'text-[#6B5744]' },
+    { icon: Ic.msg,      title: 'Case Update',       sub: 'For the client · executive summary',  bg: 'bg-emerald-50',   fg: 'text-emerald-700' },
+    { icon: Ic.edit,     title: 'Discovery Memo',    sub: 'For opposing counsel',                bg: 'bg-rose-50',      fg: 'text-rose-600' },
+  ];
+
+  const topicColors = ['#7A2E20', '#7A2E20', '#C4882A', '#C4882A', '#4A6741', '#4A6741'];
+
+  const keyFacts = [
+    ['Witness',  depo.witness],
+    ['Date',     depo.date],
+    ['Duration', fmtDur(depo.duration)],
+    ['Case No.', depo.caseNumber],
   ];
 
   return (
     <div className="flex-1 flex flex-col bg-[#F7F2EA] overflow-hidden">
       {/* Header */}
-      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="min-w-0">
-            <h2 className="text-base font-semibold text-[#14110D] truncate">{depo.title}</h2>
-            <div className="flex items-center gap-1.5 text-xs text-[#9A8573] mt-0.5">
-              <span>{depo.witness}</span>
-              <span className="text-[#E4DCC9]">·</span>
-              <span>{depo.date}</span>
-              <span className="text-[#E4DCC9]">·</span>
-              <span>Case {depo.caseNumber}</span>
-            </div>
-          </div>
+      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-5 py-2.5 flex items-center gap-4 shrink-0">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold text-[#14110D] truncate">{selectedCase?.caseName || depo.caseNumber}</div>
+          <div className="text-xs text-[#9A8573] mt-0.5">Deposition of {depo.witness} · {depo.date} · {depo.caseNumber}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {canEdit && <Button variant="ghost" size="sm"><Ic.upload size={13}/> Upload transcript</Button>}
+          <span className={cls(
+            'text-[11px] font-semibold uppercase tracking-wider rounded px-2.5 py-1 border',
+            depo.status === 'ready' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+            depo.status === 'processing' ? 'text-amber-700 bg-amber-50 border-amber-200' :
+            'text-[#7A2E20] bg-[#F5E6E1] border-[#E8CCBF]'
+          )}>{depo.status}</span>
+          {canEdit && <Button variant="ghost" size="sm"><Ic.upload size={13}/> Upload</Button>}
           <div className="relative">
             <Button variant="outline" size="sm" onClick={() => setExportOpen((o) => !o)}>
               <Ic.fileText size={13}/> Export <Ic.chevD size={11}/>
             </Button>
             {exportOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-lg p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
+              <div className="absolute right-0 mt-2 w-64 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-lg p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
                 <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest px-3 py-2">Choose audience</p>
                 {exportOptions.map(({ icon: Icon, title, sub, bg, fg }) => (
                   <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-2.5 rounded-lg hover:bg-[#F0EAE0] transition-colors flex items-center gap-3">
@@ -1317,23 +1315,60 @@ function DepositionDetail({ id, onBack }) {
               </div>
             )}
           </div>
+          <Button size="sm"><Ic.plus size={13}/> Issue</Button>
         </div>
       </header>
 
-      <div className="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
-        {/* Left: video + controls */}
-        <div className="col-span-3 border-r border-[#E4DCC9] overflow-y-auto bg-[#F7F2EA]">
-          <div className="p-4">
+      <div className="flex-1 flex overflow-hidden">
+        {/* LEFT SIDEBAR */}
+        <div className="w-72 shrink-0 border-r border-[#E4DCC9] flex flex-col overflow-y-auto bg-[#F7F2EA]">
+
+          {/* Recording */}
+          <div className="p-4 border-b border-[#E4DCC9]">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-3">Recording</div>
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+          </div>
+
+          {/* Summary */}
+          <div className="p-4 border-b border-[#E4DCC9]">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-2">Summary</div>
+            <p className="text-xs text-[#4A3828] leading-relaxed">{MOCK_DETAIL.summary}</p>
+          </div>
+
+          {/* Key Facts */}
+          <div className="p-4 border-b border-[#E4DCC9]">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">Key Facts</div>
+            {keyFacts.map(([label, value]) => (
+              <div key={label} className="flex justify-between items-baseline py-1.5 border-b border-[#EDE9E0] last:border-0">
+                <span className="text-xs text-[#7A6A58]">{label}</span>
+                <span className="text-xs font-semibold text-[#14110D] text-right max-w-[55%] truncate">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Topics */}
+          <div className="p-4">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-2">Topics Covered</div>
+            {MOCK_DETAIL.topics.map((topic, i) => (
+              <button key={topic.id}
+                onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
+                className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#EDE9E0] last:border-0 hover:bg-[#EDE9E0]/60 -mx-1 px-1 rounded transition-colors text-left">
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
+                <span className="text-xs text-[#4A3828] flex-1">{topic.title}</span>
+                <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
+                  {Math.floor((topic.segments[0]?.timestamp || 0)/60)}:{String((topic.segments[0]?.timestamp || 0)%60).padStart(2,'0')}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Middle: transcript — clean white working surface */}
-        <div className="col-span-5 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-white">
-          <div className="flex items-center justify-between px-6 py-2.5 border-b border-slate-100 shrink-0">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Transcript</span>
-            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1 text-[11px] text-rose-400 hover:text-rose-600 transition-colors">
-              <Ic.flag size={10}/>
+        {/* CENTER: TRANSCRIPT */}
+        <div className="flex-1 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-[#FFFEFB]">
+          <div className="flex items-center justify-between px-6 py-2.5 border-b border-[#E4DCC9] shrink-0">
+            <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
+            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700 transition-colors">
+              <Ic.flag size={11}/>
               {MOCK_DETAIL.flaggedItems.length} flagged
             </button>
           </div>
@@ -1342,35 +1377,30 @@ function DepositionDetail({ id, onBack }) {
           </div>
         </div>
 
-        {/* Right panel: tabs — clean white */}
-        <div className="col-span-4 flex flex-col bg-white overflow-hidden">
-          {/* Text tab bar */}
-          <div className="flex flex-wrap gap-0.5 border-b border-slate-100 shrink-0 px-3 pt-2.5 pb-0">
+        {/* RIGHT PANEL */}
+        <div className="w-80 shrink-0 flex flex-col bg-[#FBF8F1] overflow-hidden">
+          {/* Tab bar */}
+          <div className="flex flex-wrap gap-0.5 border-b border-[#E4DCC9] shrink-0 px-3 pt-2.5 pb-0">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
-                <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
+                <button key={t.id} onClick={() => setTab(t.id)}
                   className={cls(
                     'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
-                      ? 'text-slate-900 bg-slate-50 border border-b-0 border-slate-200'
-                      : 'text-slate-400 hover:text-slate-700'
-                  )}
-                >
+                      ? 'text-[#14110D] bg-[#FFFEFB] border border-b-0 border-[#E4DCC9]'
+                      : 'text-[#9A8573] hover:text-[#14110D]'
+                  )}>
                   {t.label}
                   {t.count > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white text-[9px] font-bold w-3.5 h-3.5">
-                      {t.count}
-                    </span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white text-[9px] font-bold w-3.5 h-3.5">{t.count}</span>
                   )}
                 </button>
               );
             })}
           </div>
 
-          <div className={cls('flex-1 min-h-0 bg-slate-50/40', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
+          <div className={cls('flex-1 min-h-0', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
             {tab === 'chat'           && <ChatTab depo={depo}/>}
             {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals}/>}
             {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
