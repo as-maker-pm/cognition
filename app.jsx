@@ -812,7 +812,12 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                           {Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}
                         </span>
                       </div>
-                      <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>{s.text}</p>
+                      <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
+                        {s.text}
+                        {(s.page || s.line) && (
+                          <span className="ml-2 text-[10px] text-[#C4B5A2] font-mono align-baseline">p.{s.page} l.{s.line}</span>
+                        )}
+                      </p>
                       {s.cues?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {s.cues.map((c, i) => (
@@ -820,11 +825,6 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                               ⚑ {c.description}
                             </span>
                           ))}
-                        </div>
-                      )}
-                      {(s.page || s.line) && (
-                        <div className="mt-1.5">
-                          <span className="text-[10px] text-[#C4B5A2] font-mono">p.{s.page} l.{s.line}</span>
                         </div>
                       )}
                     </button>
