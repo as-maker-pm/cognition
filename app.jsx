@@ -2044,16 +2044,56 @@ function DepositionDetail({ id, onBack }) {
 }
 
 // ---------- Add Deposition ----------
+function DropZone({ label, required, icon, file, setFile, dragOver, setDragOver, inputRef, accept, hint }) {
+  return (
+    <div className="bg-white rounded-xl border border-[#E2E1DF] p-6">
+      <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">
+        {label}{required && <span className="text-rose-400 ml-1">*</span>}
+      </p>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) setFile(f); }}
+        onClick={() => inputRef.current?.click()}
+        className={cls('border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all',
+          dragOver ? 'border-[#D0C5B0] bg-[#E9E8E7]' :
+          file     ? 'border-emerald-300 bg-emerald-50/60' :
+                     'border-[#E2E1DF] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]/50')}
+      >
+        <input ref={inputRef} type="file" className="hidden" accept={accept} onChange={(e) => setFile(e.target.files[0])}/>
+        {file ? (
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><Ic.fileText size={20}/></div>
+            <div className="text-left">
+              <div className="text-sm font-medium text-[#14110D]">{file.name}</div>
+              <div className="text-xs text-[#6B5744] mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</div>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white ml-2"><Ic.check size={12}/></div>
+          </div>
+        ) : (
+          <>
+            <div className="w-12 h-12 rounded-xl bg-[#E2E1DF]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3">{icon}</div>
+            <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your file here, or <span className="text-[#7A2E20]">click to browse</span></p>
+            <p className="text-xs text-[#9A8573]">{hint}</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AddDepositionFlow({ caseId, onBack }) {
   const selectedCase = MOCK_CASES.find((c) => c.id === caseId);
   const [phase, setPhase] = useState('upload');
-  const [uploadType, setUploadType] = useState('video');
   const [witnessName, setWitnessName] = useState('');
   const [depositionDate, setDepositionDate] = useState('');
-  const [file, setFile] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
+  const [videoFile, setVideoFile] = useState(null);
+  const [transcriptFile, setTranscriptFile] = useState(null);
+  const [dragOverVideo, setDragOverVideo] = useState(false);
+  const [dragOverTranscript, setDragOverTranscript] = useState(false);
   const [completedSteps, setCompletedSteps] = useState(1);
-  const fileRef = useRef(null);
+  const videoRef = useRef(null);
+  const transcriptRef = useRef(null);
 
   const steps = [
     { id: 'upload',   label: 'Upload deposition',       desc: 'Upload video, audio, or transcript to begin.' },
@@ -2071,14 +2111,8 @@ function AddDepositionFlow({ caseId, onBack }) {
     return () => timers.forEach(clearTimeout);
   }, [phase]);
 
-  const handleDrop = (e) => {
-    e.preventDefault(); setDragOver(false);
-    const f = e.dataTransfer.files[0];
-    if (f) setFile(f);
-  };
-
   const handleSubmit = () => {
-    if (!witnessName.trim() || !file) return;
+    if (!witnessName.trim() || (!videoFile && !transcriptFile)) return;
     setPhase('processing');
   };
 
@@ -2094,29 +2128,8 @@ function AddDepositionFlow({ caseId, onBack }) {
         </div>
         <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F8F8F7]">
           <div className="w-full max-w-xl space-y-5">
-            {/* Upload type selector */}
-            <div className="flex gap-3">
-              {[
-                { id: 'video',      label: 'Video',      desc: 'MP4, MOV, AVI, etc.',        icon: Ic.film },
-                { id: 'transcript', label: 'Transcript', desc: 'PDF, DOCX, TXT, etc.', icon: Ic.fileText },
-              ].map(({ id, label, desc, icon: Icon }) => (
-                <button key={id} onClick={() => { setUploadType(id); setFile(null); }}
-                  className={cls('flex-1 flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all',
-                    uploadType === id ? 'border-[#14110D] bg-white' : 'border-[#E2E1DF] bg-[#F8F8F7] hover:border-[#D0C5B0]')}>
-                  <div className={cls('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', uploadType === id ? 'bg-[#14110D]' : 'bg-[#E2E1DF]/60')}>
-                    <Icon size={16} className={uploadType === id ? 'text-white' : 'text-[#6B5744]'}/>
-                  </div>
-                  <div>
-                    <p className={cls('text-sm font-semibold', uploadType === id ? 'text-[#14110D]' : 'text-[#6B5744]')}>{label}</p>
-                    <p className="text-[11px] text-[#9A8573]">{desc}</p>
-                  </div>
-                  {uploadType === id && <Ic.checkC size={16} className="text-[#14110D] ml-auto shrink-0"/>}
-                </button>
-              ))}
-            </div>
-
             {/* Witness details */}
-            <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6 space-y-4">
+            <div className="bg-white rounded-xl border border-[#E2E1DF] p-6 space-y-4">
               <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest">Witness Details</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -2130,49 +2143,24 @@ function AddDepositionFlow({ caseId, onBack }) {
               </div>
             </div>
 
-            {/* File drop zone */}
-            <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6">
-              <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Upload File <span className="text-rose-400">*</span></p>
-              <div
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
-                onClick={() => fileRef.current?.click()}
-                className={cls(
-                  'border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all',
-                  dragOver       ? 'border-[#D0C5B0] bg-[#E9E8E7]' :
-                  file           ? 'border-emerald-300 bg-emerald-50/60' :
-                                   'border-[#E2E1DF] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]/50'
-                )}
-              >
-                <input ref={fileRef} type="file" className="hidden"
-                  accept={uploadType === 'video' ? 'video/*,audio/*' : '.pdf,.doc,.docx,.txt'}
-                  onChange={(e) => setFile(e.target.files[0])}/>
-                {file ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><Ic.fileText size={20}/></div>
-                    <div className="text-left">
-                      <div className="text-sm font-medium text-[#14110D]">{file.name}</div>
-                      <div className="text-xs text-[#6B5744] mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</div>
-                    </div>
-                    <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white ml-2"><Ic.check size={12}/></div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-12 h-12 rounded-xl bg-[#E2E1DF]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3">
-                      {uploadType === 'video' ? <Ic.film size={22}/> : <Ic.fileText size={22}/>}
-                    </div>
-                    <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your {uploadType} here, or <span className="text-[#7A2E20]">click to browse</span></p>
-                    <p className="text-xs text-[#9A8573]">{uploadType === 'video' ? 'MP4, MOV, AVI, WAV, MP3' : 'PDF, DOCX, TXT'}</p>
-                  </>
-                )}
-              </div>
-            </div>
+            {/* Deposition upload */}
+            <DropZone label="Deposition" required icon={<Ic.film size={22}/>}
+              file={videoFile} setFile={setVideoFile}
+              dragOver={dragOverVideo} setDragOver={setDragOverVideo}
+              inputRef={videoRef} accept="video/*,audio/*"
+              hint="MP4, MOV, AVI, WAV, MP3"/>
+
+            {/* Transcript upload */}
+            <DropZone label="Transcript" icon={<Ic.fileText size={22}/>}
+              file={transcriptFile} setFile={setTranscriptFile}
+              dragOver={dragOverTranscript} setDragOver={setDragOverTranscript}
+              inputRef={transcriptRef} accept=".pdf,.doc,.docx,.txt"
+              hint="PDF, DOCX, TXT"/>
 
             {/* Actions */}
             <div className="flex items-center justify-between pt-1">
               <Button variant="ghost" onClick={onBack}>Cancel</Button>
-              <Button onClick={handleSubmit} disabled={!witnessName.trim() || !file}>
+              <Button onClick={handleSubmit} disabled={!witnessName.trim() || (!videoFile && !transcriptFile)}>
                 Begin Processing <Ic.chevR size={14}/>
               </Button>
             </div>
