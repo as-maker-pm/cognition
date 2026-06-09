@@ -1667,7 +1667,7 @@ function DepositionDetail({ id, onBack }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
-                      {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
+                      {g.notes && <div className="text-[10px] text-[#9A8573] mt-0.5">{g.notes}</div>}
                       {g.citations?.length > 0 && (
                         <div className="mt-1.5 flex flex-wrap gap-1">
                           {g.citations.map((c, i) => (
