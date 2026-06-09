@@ -1546,7 +1546,6 @@ function DepositionDetail({ id, onBack }) {
     { id: 'sentiment',      label: 'Sentiment' },
     { id: 'exhibits',       label: 'Exhibits' },
     { id: 'timeline',       label: 'Timeline' },
-    { id: 'summaries',      label: 'Summaries' },
   ];
 
   const exportOptions = [
@@ -1689,15 +1688,20 @@ function DepositionDetail({ id, onBack }) {
             {!sideCollapsed.topics && (
               <div className="px-4 pb-4">
                 {MOCK_DETAIL.topics.map((topic, i) => (
-                  <button key={topic.id}
-                    onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
-                    className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#E9E8E7] last:border-0 hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors text-left">
-                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
-                    <span className="text-xs text-[#4A3828] flex-1">{topic.title}</span>
-                    <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
-                      {Math.floor((topic.segments[0]?.timestamp || 0)/60)}:{String((topic.segments[0]?.timestamp || 0)%60).padStart(2,'0')}
-                    </span>
-                  </button>
+                  <div key={topic.id} className="py-2.5 border-b border-[#E9E8E7] last:border-0">
+                    <button
+                      onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
+                      className="flex items-center gap-2.5 w-full hover:opacity-80 transition-opacity text-left">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
+                      <span className="text-xs font-medium text-[#4A3828] flex-1">{topic.title}</span>
+                      <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
+                        {Math.floor((topic.segments[0]?.timestamp || 0)/60)}:{String((topic.segments[0]?.timestamp || 0)%60).padStart(2,'0')}
+                      </span>
+                    </button>
+                    {topic.summary && (
+                      <p className="text-[10px] text-[#9A8573] leading-relaxed mt-1.5 pl-4.5" style={{ paddingLeft: '18px' }}>{topic.summary}</p>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -1749,7 +1753,6 @@ function DepositionDetail({ id, onBack }) {
             {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
             {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
             {tab === 'timeline'       && <div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div>}
-            {tab === 'summaries'      && <div className="px-4 py-3"><SummariesTab topics={MOCK_DETAIL.topics}/></div>}
           </div>
         </div>
       </div>
