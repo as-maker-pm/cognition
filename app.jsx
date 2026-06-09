@@ -941,16 +941,12 @@ function GoalsTab({ goals: initialGoals, jump }) {
                         <div className="text-[15px] font-semibold text-[#111] leading-snug">{g.title}</div>
                         {g.notes && <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1">{g.notes}</div>}
                         {g.citations?.length > 0 && (
-                          <div className="mt-2 flex flex-col gap-1.5">
+                          <div className="mt-2 flex flex-wrap gap-1">
                             {g.citations.map((c, i) => (
-                              <div key={i} className="flex items-start gap-2 pl-2 border-l-2 border-[#E8E6E3]">
-                                <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">p.{c.page} l.{c.line}</span>
-                                <span className="text-[11px] text-[#6B7280] leading-snug line-clamp-2 italic">"{c.quote}"</span>
-                                <button onClick={() => jump && jump(c.timestamp)}
-                                  className="text-[10px] font-mono text-[#9A8573] hover:text-[#7A2E20] shrink-0 mt-0.5 whitespace-nowrap transition-colors">
-                                  {Math.floor(c.timestamp/60)}:{String(c.timestamp%60).padStart(2,'0')}
-                                </button>
-                              </div>
+                              <button key={i} onClick={() => jump && jump(c.timestamp)}
+                                className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                                p.{c.page} l.{c.line}
+                              </button>
                             ))}
                           </div>
                         )}
@@ -1671,12 +1667,11 @@ function DepositionDetail({ id, onBack }) {
                       <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
                       {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
                       {g.citations?.length > 0 && (
-                        <div className="mt-1.5 flex flex-col gap-1">
+                        <div className="mt-1.5 flex flex-wrap gap-1">
                           {g.citations.map((c, i) => (
                             <button key={i} onClick={() => jump(c.timestamp)}
-                              className="flex items-start gap-1.5 text-left group/cit hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors">
-                              <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">p.{c.page} l.{c.line}</span>
-                              <span className="text-[10px] text-[#9A8573] italic leading-snug line-clamp-1 group-hover/cit:text-[#4A3828]">"{c.quote}"</span>
+                              className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                              p.{c.page} l.{c.line}
                             </button>
                           ))}
                         </div>
