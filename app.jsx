@@ -509,9 +509,6 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
       ? <Badge variant="amber"><Ic.alert size={10}/> Mixed</Badge>
       : <Badge variant="blue"><Ic.sparkles size={10}/> AI Generated</Badge>;
 
-  const statusPills = ['all', 'ready', 'processing', 'draft'];
-  const statusLabels = { all: 'All', ready: 'Ready', processing: 'Processing', draft: 'Draft' };
-
   // Derive witness initials from witness name
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
@@ -525,42 +522,10 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
             {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseNumber}</p>}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
+            <Button variant="outline"><Ic.upload size={14}/> Export</Button>
           </div>
         </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center justify-between gap-4 mt-4">
-          {/* Status pills */}
-          <div className="flex items-center gap-1.5">
-            {statusPills.map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatus(s)}
-                className={cls(
-                  'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-                  status === s
-                    ? 'bg-[#14110D] text-white'
-                    : 'bg-[#F8F8F7] border border-[#E2E1DF] text-[#6B5744] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]'
-                )}
-              >
-                {statusLabels[s]}
-                {s === 'all' && <span className="ml-1.5 text-[10px] opacity-70">{all.length}</span>}
-              </button>
-            ))}
-          </div>
-          {/* Right: search + view toggle */}
-          <div className="flex items-center gap-2">
-            <div className="relative w-64">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
-              <Input placeholder="Search depositions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-8 text-sm"/>
-            </div>
-            <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-md p-1 bg-[#F8F8F7]">
-              <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
-              <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="flex-1 overflow-auto p-6">
@@ -573,17 +538,6 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   <span className="brand text-white/80 select-none" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
                     {witnessInitials(d.witness)}
                   </span>
-                  {/* Status badge top-left */}
-                  <div className="absolute top-2 left-2">
-                    <span className={cls(
-                      'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
-                      d.status === 'ready' ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/50' :
-                      d.status === 'processing' ? 'bg-amber-900/60 text-amber-300 border border-amber-700/50' :
-                      'bg-stone-700 text-stone-300 border border-stone-600'
-                    )}>
-                      {d.status}
-                    </span>
-                  </div>
                   {/* Transcript source badge top-right */}
                   <div className="absolute top-2 right-2">
                     {d.transcriptSource === 'verified'
@@ -634,14 +588,6 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {tBadge(d.transcriptSource)}
-                    <span className={cls(
-                      'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border',
-                      d.status === 'ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                      d.status === 'processing' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      'bg-[#E2E1DF]/40 text-[#6B5744] border-[#E2E1DF]'
-                    )}>
-                      {d.status}
-                    </span>
                     <Ic.chevR size={14} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                   </div>
                 </div>
