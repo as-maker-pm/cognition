@@ -389,7 +389,7 @@ function CaseLibrary({ onSelect }) {
   const list = MOCK_CASES.filter((c) => [c.caseName, c.caseNumber, c.client, c.type].some((s) => s.toLowerCase().includes(search.toLowerCase())));
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-[#F8F8F7]">
       {/* Header */}
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -503,7 +503,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-[#F8F8F7]">
       {/* Header — no back button, breadcrumb handles navigation */}
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
         <div className="flex items-start justify-between gap-4">
@@ -1585,7 +1585,7 @@ function DepositionDetail({ id, onBack }) {
   const topicColors = ['#7A2E20', '#7A2E20', '#C4882A', '#C4882A', '#4A6741', '#4A6741'];
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
       {/* Header */}
       <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-5 py-2.5 flex items-center gap-4 shrink-0">
         <div className="flex-1 min-w-0">
@@ -1831,7 +1831,7 @@ function AddDepositionFlow({ caseId, onBack }) {
   /* ── Phase 1: Upload form ── */
   if (phase === 'upload') {
     return (
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-[#F8F8F7]">
         <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
           <h2 className="text-lg font-semibold text-[#14110D]">Add Deposition</h2>
           {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
