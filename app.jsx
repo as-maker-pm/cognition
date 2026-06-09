@@ -638,6 +638,44 @@ function CaseChatPanel({ selectedCase }) {
   );
 }
 
+function AddNewButton({ onAdd }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex items-center gap-1.5 bg-[#14110D] text-white text-sm font-medium rounded-lg px-3.5 py-2 hover:bg-[#2C2316] transition-colors"
+      >
+        <Ic.plus size={14}/> Add New <Ic.chevD size={12}/>
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-52 bg-white border border-[#E2E1DF] rounded-xl shadow-lg py-1.5 z-50" onMouseLeave={() => setOpen(false)}>
+          <button onClick={() => { setOpen(false); onAdd('video'); }}
+            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F0F0EE] transition-colors text-left">
+            <div className="w-7 h-7 rounded-lg bg-[#2C2316] flex items-center justify-center shrink-0">
+              <Ic.film size={13} className="text-white/80"/>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#14110D]">Video</p>
+              <p className="text-[11px] text-[#9A8573]">Upload recording file</p>
+            </div>
+          </button>
+          <button onClick={() => { setOpen(false); onAdd('transcript'); }}
+            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F0F0EE] transition-colors text-left">
+            <div className="w-7 h-7 rounded-lg bg-[#F0EDE8] flex items-center justify-center shrink-0">
+              <Ic.fileText size={13} className="text-[#7A2E20]"/>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#14110D]">Transcript</p>
+              <p className="text-[11px] text-[#9A8573]">Upload text or PDF</p>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------- Deposition Library ----------
 function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const [view, setView] = useState('grid');
@@ -681,7 +719,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
               <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-9 w-9 p-0"><Ic.list size={18}/></Button>
               <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-9 w-9 p-0"><Ic.grid size={18}/></Button>
             </div>
-            <Button onClick={onAdd}><Ic.plus size={14}/> Add New</Button>
+            <AddNewButton onAdd={onAdd}/>
           </div>
         </div>
 
