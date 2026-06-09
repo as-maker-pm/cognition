@@ -790,7 +790,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
             </button>
 
             {!isCollapsed && (
-              <div className="flex flex-col border-l-2 border-[#E2E1DF] ml-0.5 mt-2">
+              <div className="flex flex-col mt-2">
                 {topic.segments.map((s) => {
                   const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
                   const isW = s.speaker === 'Witness';
@@ -800,8 +800,8 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                       ref={active ? activeRef : null}
                       onClick={() => setCurrentTime(s.timestamp)}
                       className={cls(
-                        'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all rounded-r',
-                        active ? 'border-[#7A2E20] bg-[#FDF0EC]' : 'border-transparent hover:border-[#E2E1DF] hover:bg-[#F0F0EE]'
+                        'text-left px-3 py-3 transition-all rounded-lg',
+                        active ? 'bg-[#FDF0EC]' : 'hover:bg-[#F0F0EE]'
                       )}
                     >
                       <div className="flex items-baseline justify-between mb-1.5">
