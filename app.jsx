@@ -1680,15 +1680,13 @@ function ExhibitsTab({ jump }) {
               {isOpen && citations.length > 0 && (
                 <div className="border-t border-[#F0F0EE] px-4 py-3 bg-[#F8F8F7]">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] mb-2">Citations</p>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {citations.map((c, i) => (
                       <button key={i} onClick={() => jump(c.timestamp)}
-                        className="text-left flex items-start gap-2 px-2.5 py-2 rounded-lg bg-white hover:bg-[#F0F0EE] transition-colors border border-[#E2E1DF]">
-                        <span className={cls('text-[9px] font-bold uppercase tracking-wide shrink-0 mt-0.5 w-12', c.speaker === 'Witness' ? 'text-[#7A2E20]' : 'text-[#9A8573]')}>{c.speaker}</span>
-                        <span className="text-[11px] text-[#6B5744] leading-relaxed italic flex-1">"{c.quote}"</span>
-                        <span className="shrink-0 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">
-                          {fmt(c.timestamp)} · p.{c.page} l.{c.line}
-                        </span>
+                        className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                        <span>{fmt(c.timestamp)}</span>
+                        <span className="text-[#D0C8BF]">·</span>
+                        <span>p.{c.page} l.{c.line}</span>
                       </button>
                     ))}
                   </div>
