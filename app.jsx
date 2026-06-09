@@ -645,8 +645,8 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
 function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) {
   const [videoIdx, setVideoIdx] = useState(0);
   const [volume, setVolume] = useState(70);
+  const [showVolume, setShowVolume] = useState(false);
   const duration = 540;
-  const videoRef = useRef(null);
   const v = depo.videos?.[videoIdx];
 
   useEffect(() => {
@@ -663,7 +663,7 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
   const fmt = (s) => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="flex flex-col gap-3">
       {depo.videos?.length > 1 && (
         <div className="flex items-center justify-between text-xs text-[#6B5744]">
           <span className="flex items-center gap-1.5"><Ic.film size={12}/>Video {videoIdx + 1} of {depo.videos.length}</span>
@@ -671,15 +671,27 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
         </div>
       )}
 
-      <div className="bg-[#2C2316] rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
+      {/* Video with overlaid controls */}
+      <div className="bg-[#2C2316] rounded-lg aspect-video flex items-center justify-center relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-br from-[#2C2316] to-[#14110D]"/>
         <div className="relative z-10 text-center">
-          <div className={cls('w-16 h-16 rounded-full flex items-center justify-center mb-3 mx-auto transition-all', playing ? 'bg-[#7A2E20]/30 animate-pulse' : 'bg-white/10')}>
+          <button
+            onClick={() => setPlaying(!playing)}
+            className={cls('w-16 h-16 rounded-full flex items-center justify-center mb-3 mx-auto transition-all', playing ? 'bg-[#7A2E20]/30 animate-pulse' : 'bg-white/10 hover:bg-white/20')}
+          >
             {playing ? <Ic.pause size={26}/> : <Ic.play size={26}/>}
-          </div>
+          </button>
           <p className="text-white/50 text-xs">{depo.witness}</p>
           {playing && <p className="text-white/70 mt-1 text-xs">▶ Playing</p>}
         </div>
+        {/* Fullscreen button overlay */}
+        <button
+          onClick={() => document.querySelector('.aspect-video')?.requestFullscreen?.()}
+          className="absolute top-2 right-2 z-20 w-7 h-7 rounded-md bg-black/30 hover:bg-black/50 text-white/70 hover:text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+          title="Fullscreen"
+        >
+          <Ic.maximize size={12}/>
+        </button>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -699,30 +711,28 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
             <Button size="sm" variant="outline" disabled={videoIdx === 0} onClick={() => { setVideoIdx(videoIdx - 1); setCurrentTime(0); }}><Ic.chevL size={13}/> Prev</Button>
             <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}>Next <Ic.chevR size={13}/></Button>
           </>}
-        </div>
-        {/* Volume + fullscreen row */}
-        <div className="flex items-center gap-2 pt-1">
-          <button onClick={() => setVolume(v => v === 0 ? 70 : 0)} className="text-[#9A8573] hover:text-[#14110D] transition-colors shrink-0">
-            {volume === 0 ? <Ic.volumeX size={13}/> : <Ic.volume size={13}/>}
-          </button>
-          <input
-            type="range" min="0" max="100" value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
-            className="flex-1 accent-[#7A2E20]"
-            style={{ height: '4px' }}
-          />
-          <span className="text-[10px] text-[#9A8573] font-mono w-6 text-right shrink-0">{volume}%</span>
-          <button
-            ref={videoRef}
-            onClick={() => videoRef.current?.closest('.bg-\\[\\#2C2316\\]')?.requestFullscreen?.()}
-            title="Fullscreen"
-            className="ml-1 shrink-0 text-[#9A8573] hover:text-[#14110D] border border-[#E2E1DF] rounded p-1 transition-colors"
-          >
-            <Ic.maximize size={12}/>
-          </button>
+          {/* Volume icon with hover slider */}
+          <div className="relative shrink-0" onMouseEnter={() => setShowVolume(true)} onMouseLeave={() => setShowVolume(false)}>
+            <button
+              onClick={() => setVolume(v => v === 0 ? 70 : 0)}
+              className="w-8 h-8 flex items-center justify-center rounded-md border border-[#E2E1DF] text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors"
+            >
+              {volume === 0 ? <Ic.volumeX size={13}/> : <Ic.volume size={13}/>}
+            </button>
+            {showVolume && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white border border-[#E2E1DF] rounded-xl shadow-lg px-3 py-3 flex flex-col items-center gap-2 z-50" style={{ width: '36px' }}>
+                <span className="text-[10px] text-[#9A8573] font-mono">{volume}</span>
+                <input
+                  type="range" min="0" max="100" value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  className="accent-[#7A2E20]"
+                  style={{ writingMode: 'vertical-lr', direction: 'rtl', width: '4px', height: '60px', cursor: 'pointer' }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -824,11 +834,31 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
   );
 }
 
-function GoalsTab({ goals }) {
+function GoalsTab({ goals: initialGoals }) {
+  const [goals, setGoals] = useState(initialGoals);
   const [collapsed, setCollapsed] = useState({});
+  const [adding, setAdding] = useState(false);
+  const [newGoal, setNewGoal] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState('');
+
   const covered = goals.filter((g) => g.covered);
   const uncovered = goals.filter((g) => !g.covered);
   const pct = goals.length ? Math.round((covered.length / goals.length) * 100) : 0;
+
+  const addGoal = () => {
+    if (!newGoal.trim()) return;
+    setGoals(gs => [...gs, { id: Date.now(), title: newGoal.trim(), covered: false }]);
+    setNewGoal('');
+    setAdding(false);
+  };
+
+  const deleteGoal = (id) => setGoals(gs => gs.filter(g => g.id !== id));
+  const toggleCovered = (id) => setGoals(gs => gs.map(g => g.id === id ? { ...g, covered: !g.covered } : g));
+  const saveEdit = (id) => {
+    setGoals(gs => gs.map(g => g.id === id ? { ...g, title: editText.trim() || g.title } : g));
+    setEditingId(null);
+  };
 
   const groups = [
     { key: 'uncovered', label: 'Needs coverage', dot: '#f59e0b', items: uncovered },
@@ -840,11 +870,31 @@ function GoalsTab({ goals }) {
       <div className="px-5 py-3 border-b border-[#F3F3F3]">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-[13px] text-[#9CA3AF]">Coverage</span>
-          <span className="text-[13px] font-semibold text-[#111]">{covered.length}/{goals.length}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[13px] font-semibold text-[#111]">{covered.length}/{goals.length}</span>
+            <button onClick={() => { setAdding(true); setEditingId(null); }}
+              className="flex items-center gap-1 text-[12px] text-[#7A2E20] hover:text-[#5A1E10] font-medium transition-colors">
+              <Ic.plus size={12}/> Add goal
+            </button>
+          </div>
         </div>
         <div className="h-1 bg-[#F3F3F3] rounded-full overflow-hidden">
           <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }}/>
         </div>
+        {adding && (
+          <div className="mt-3 flex items-center gap-2">
+            <input
+              autoFocus
+              value={newGoal}
+              onChange={(e) => setNewGoal(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') addGoal(); if (e.key === 'Escape') { setAdding(false); setNewGoal(''); } }}
+              placeholder="Describe the goal…"
+              className="flex-1 text-[13px] border border-[#E2E1DF] rounded-lg px-3 py-1.5 outline-none focus:border-[#7A2E20]/40 bg-white text-[#14110D] placeholder:text-[#9CA3AF]"
+            />
+            <button onClick={addGoal} className="text-[12px] font-medium text-white bg-[#14110D] px-3 py-1.5 rounded-lg hover:bg-[#2C2316] transition-colors">Add</button>
+            <button onClick={() => { setAdding(false); setNewGoal(''); }} className="text-[12px] text-[#9CA3AF] hover:text-[#14110D]"><Ic.x size={14}/></button>
+          </div>
+        )}
       </div>
       {groups.map(({ key, label, dot, items }) => {
         const open = collapsed[key] !== false;
@@ -860,9 +910,45 @@ function GoalsTab({ goals }) {
               <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
             </button>
             {open && items.map((g) => (
-              <div key={g.id} className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
-                <div className="text-[15px] font-semibold text-[#111] leading-snug">{g.title}</div>
-                {g.notes && <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{g.notes}</div>}
+              <div key={g.id} className="group/item w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
+                {editingId === g.id ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      autoFocus
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(g.id); if (e.key === 'Escape') setEditingId(null); }}
+                      className="flex-1 text-[13px] border border-[#E2E1DF] rounded-lg px-2 py-1 outline-none focus:border-[#7A2E20]/40 bg-white text-[#14110D]"
+                    />
+                    <button onClick={() => saveEdit(g.id)} className="text-[11px] font-medium text-white bg-[#14110D] px-2 py-1 rounded-md">Save</button>
+                    <button onClick={() => setEditingId(null)} className="text-[#9CA3AF] hover:text-[#14110D]"><Ic.x size={13}/></button>
+                  </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      <button onClick={() => toggleCovered(g.id)}
+                        className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-colors',
+                          g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0] hover:border-emerald-400'
+                        )}>
+                        {g.covered && <Ic.check size={9}/>}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[15px] font-semibold text-[#111] leading-snug">{g.title}</div>
+                        {g.notes && <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1">{g.notes}</div>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
+                      <button onClick={() => { setEditingId(g.id); setEditText(g.title); }}
+                        className="w-6 h-6 flex items-center justify-center rounded text-[#9CA3AF] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors">
+                        <Ic.edit size={11}/>
+                      </button>
+                      <button onClick={() => deleteGoal(g.id)}
+                        className="w-6 h-6 flex items-center justify-center rounded text-[#9CA3AF] hover:text-rose-500 hover:bg-rose-50 transition-colors">
+                        <Ic.x size={11}/>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
