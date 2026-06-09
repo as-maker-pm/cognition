@@ -1012,12 +1012,12 @@ function FlaggedTab({ items, jump }) {
               <Ic.chevD size={13} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
             </button>
             {open && (
-              <div className="px-4 pb-2 flex flex-col gap-1.5">
+              <div className="px-4 py-2.5 flex flex-col gap-1.5 bg-[#F5F5F3]">
                 {groupItems.map((f) => {
                   const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
                   return (
                     <button key={f.id} onClick={() => jump(f.timestamp)}
-                      className="w-full text-left rounded-lg bg-[#FAFAF9] overflow-hidden hover:shadow-sm transition-all"
+                      className="w-full text-left rounded-lg bg-white overflow-hidden hover:shadow-sm transition-all"
                       style={{ border: `1px solid ${cfg.color}22` }}>
                       <div className="flex items-stretch">
                         {/* Colored left strip */}
