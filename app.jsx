@@ -1246,7 +1246,7 @@ function ChatTab({ depo }) {
       </div>
 
       <div className="px-4 pb-4 pt-2 shrink-0">
-        <div className="bg-[#F5F5F3] rounded-2xl px-4 pt-4 pb-3 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
+        <div className="bg-[#F9F9F8] rounded-2xl px-4 pt-4 pb-3 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
           <textarea
             ref={inputRef}
             value={input}
