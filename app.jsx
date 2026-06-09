@@ -815,7 +815,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                       <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
                         {s.text}
                         {(s.page || s.line) && (
-                          <span className="ml-2 text-[10px] text-[#C4B5A2] font-mono align-baseline">p.{s.page} l.{s.line}</span>
+                          <span className="ml-2 inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 align-middle">p.{s.page} l.{s.line}</span>
                         )}
                       </p>
                       {s.cues?.length > 0 && (
@@ -944,7 +944,7 @@ function GoalsTab({ goals: initialGoals, jump }) {
                           <div className="mt-2 flex flex-col gap-1.5">
                             {g.citations.map((c, i) => (
                               <div key={i} className="flex items-start gap-2 pl-2 border-l-2 border-[#E8E6E3]">
-                                <span className="text-[10px] font-mono text-[#9CA3AF] shrink-0 mt-0.5 whitespace-nowrap">p.{c.page} l.{c.line}</span>
+                                <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">p.{c.page} l.{c.line}</span>
                                 <span className="text-[11px] text-[#6B7280] leading-snug line-clamp-2 italic">"{c.quote}"</span>
                                 <button onClick={() => jump && jump(c.timestamp)}
                                   className="text-[10px] font-mono text-[#9A8573] hover:text-[#7A2E20] shrink-0 mt-0.5 whitespace-nowrap transition-colors">
@@ -1675,7 +1675,7 @@ function DepositionDetail({ id, onBack }) {
                           {g.citations.map((c, i) => (
                             <button key={i} onClick={() => jump(c.timestamp)}
                               className="flex items-start gap-1.5 text-left group/cit hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors">
-                              <span className="text-[9px] font-mono text-[#B5A899] shrink-0 mt-0.5 whitespace-nowrap">p.{c.page} l.{c.line}</span>
+                              <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">p.{c.page} l.{c.line}</span>
                               <span className="text-[10px] text-[#9A8573] italic leading-snug line-clamp-1 group-hover/cit:text-[#4A3828]">"{c.quote}"</span>
                             </button>
                           ))}
