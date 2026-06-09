@@ -1608,155 +1608,96 @@ function ExhibitsTab({ jump }) {
   const exhibits = MOCK_DETAIL.exhibits || [];
   const contradictionCount = exhibits.reduce((s, e) => s + e.contradictions, 0);
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
-  const [variant, setVariant] = useState('A');
+  const [expanded, setExpanded] = useState(null);
 
   const CAT = {
-    Contract: { pill: 'bg-amber-50 text-amber-700',   strip: '#F59E0B' },
-    Calendar: { pill: 'bg-blue-50 text-blue-700',     strip: '#3B82F6' },
-    Document: { pill: 'bg-violet-50 text-violet-700', strip: '#8B5CF6' },
+    Contract: { pill: 'bg-amber-50 text-amber-700',     strip: '#F59E0B' },
+    Calendar: { pill: 'bg-blue-50 text-blue-700',       strip: '#3B82F6' },
+    Document: { pill: 'bg-violet-50 text-violet-700',   strip: '#8B5CF6' },
     Email:    { pill: 'bg-emerald-50 text-emerald-700', strip: '#10B981' },
-    Records:  { pill: 'bg-rose-50 text-rose-700',     strip: '#F43F5E' },
+    Records:  { pill: 'bg-rose-50 text-rose-700',       strip: '#F43F5E' },
   };
   const cat = (e) => CAT[e.category] || { pill: 'bg-[#F0F0EE] text-[#6B5744]', strip: '#C5BEB5' };
 
+  const EXHIBIT_CITATIONS = {
+    'exh-001': [
+      { timestamp: 310, page: 8, line: 4,  speaker: 'Attorney', quote: 'You signed this contract on January 15th, 2023, correct?' },
+      { timestamp: 315, page: 8, line: 5,  speaker: 'Witness',  quote: 'Yes, I signed it.' },
+      { timestamp: 320, page: 8, line: 5,  speaker: 'Attorney', quote: 'And are you familiar with Section 7, the non-compete clause?' },
+      { timestamp: 325, page: 8, line: 6,  speaker: 'Witness',  quote: "I... I don't recall the specific details of Section 7." },
+    ],
+    'exh-002': [
+      { timestamp: 145, page: 3, line: 18, speaker: 'Attorney', quote: 'Were you present at the 2 PM meeting?' },
+      { timestamp: 152, page: 3, line: 19, speaker: 'Witness',  quote: 'The meeting started a bit late, around 2:15.' },
+      { timestamp: 158, page: 3, line: 21, speaker: 'Attorney', quote: 'Calendar records show all attendees joined at 2:02 PM.' },
+    ],
+    'exh-003': [
+      { timestamp: 130, page: 3, line: 16, speaker: 'Witness',  quote: 'I worked on the quarterly report until lunch.' },
+      { timestamp: 145, page: 3, line: 18, speaker: 'Attorney', quote: 'The version history shows the last edit at 11:47 AM — is that consistent?' },
+    ],
+    'exh-004': [
+      { timestamp: 335, page: 8, line: 8,  speaker: 'Attorney', quote: 'This email thread shows you forwarded the amendment to legal with the note "reviewed, looks fine."' },
+      { timestamp: 340, page: 8, line: 9,  speaker: 'Witness',  quote: 'I... yes, I may have forwarded it.' },
+    ],
+    'exh-005': [
+      { timestamp: 365, page: 9, line: 4,  speaker: 'Witness',  quote: "I remember now I was actually running late — I think I came in closer to 9:15." },
+      { timestamp: 370, page: 9, line: 5,  speaker: 'Attorney', quote: 'Badge records show entry at 9:03 AM. How do you reconcile that?' },
+    ],
+  };
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Variant picker */}
-      <div className="flex items-center gap-1.5 p-1 bg-[#F0F0EE] rounded-lg self-start">
-        {['A','B','C'].map(v => (
-          <button key={v} onClick={() => setVariant(v)}
-            className={cls('px-3 py-1 rounded-md text-[11px] font-bold transition-colors', variant === v ? 'bg-white text-[#14110D] shadow-sm' : 'text-[#9A8573] hover:text-[#14110D]')}>
-            Option {v}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Option A: Document Index (clean rows) ── */}
-      {variant === 'A' && (
-        <div className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF]">
-            <span className="text-[12px] font-semibold text-[#14110D]">Documentary Record</span>
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] text-[#9A8573]">{exhibits.length} exhibits</span>
-              {contradictionCount > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-50 rounded-full px-2 py-0.5">
-                  <Ic.alert size={9}/> {contradictionCount} conflicts
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Rows */}
-          {exhibits.map((e, i) => (
-            <div key={e.id} className={cls('flex items-center gap-3 px-4 py-3 hover:bg-[#F0F0EE] transition-colors cursor-default', i < exhibits.length - 1 && 'border-b border-[#F0F0EE]')}>
-              {/* Label badge */}
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-white text-[11px] font-bold"
-                style={{ background: cat(e).strip }}>
-                {e.label.replace('Exh. ','')}
-              </div>
-              {/* Title + desc */}
-              <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-semibold text-[#14110D] leading-snug">{e.title}</div>
-                <div className="text-[11px] text-[#9A8573] truncate mt-0.5">{e.desc}</div>
-              </div>
-              {/* Right meta */}
-              <div className="flex items-center gap-2 shrink-0">
-                {e.contradictions > 0 && (
-                  <span className="text-[10px] font-mono text-rose-500 bg-rose-50 rounded-full px-1.5 py-0.5">{e.contradictions}×</span>
-                )}
-                <span className="text-[10px] text-[#9A8573]">{e.references} refs</span>
-                {e.timestamp && (
-                  <button onClick={() => jump(e.timestamp)}
-                    className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
-                    <span>{fmt(e.timestamp)}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── Option B: File Cards with left accent strip ── */}
-      {variant === 'B' && (
-        <div className="flex flex-col gap-2">
-          {exhibits.map((e) => (
-            <div key={e.id} className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden hover:bg-[#F0F0EE] transition-colors flex">
-              {/* Color strip */}
-              <div className="w-1 shrink-0" style={{ background: cat(e).strip }}/>
-              <div className="flex-1 px-4 py-3">
+    <div className="flex flex-col gap-2">
+      {exhibits.map((e) => {
+        const isOpen = expanded === e.id;
+        const citations = EXHIBIT_CITATIONS[e.id] || [];
+        return (
+          <div key={e.id} className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden flex">
+            <div className="w-1 shrink-0" style={{ background: cat(e).strip }}/>
+            <div className="flex-1 min-w-0">
+              {/* Main row — click to expand */}
+              <button onClick={() => setExpanded(isOpen ? null : e.id)}
+                className="w-full text-left px-4 py-3 hover:bg-[#F0F0EE] transition-colors">
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono font-bold text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5">{e.label}</span>
-                    <span className="text-[12px] font-semibold text-[#14110D]">{e.title}</span>
+                  <span className="text-[10px] font-mono font-bold text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5 whitespace-nowrap">{e.label}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {e.contradictions > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[9px] text-rose-600 bg-rose-50 rounded-full px-1.5 py-0.5">
+                        <Ic.alert size={8}/> {e.contradictions} conflict{e.contradictions > 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {isOpen ? <Ic.chevU size={12}/> : <Ic.chevD size={12}/>}
                   </div>
-                  {e.timestamp && (
-                    <button onClick={() => jump(e.timestamp)}
-                      className="shrink-0 inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
-                      {fmt(e.timestamp)}
-                    </button>
-                  )}
                 </div>
+                <div className="text-[13px] font-semibold text-[#14110D] leading-snug mb-1">{e.title}</div>
                 <p className="text-[11px] text-[#6B5744] leading-relaxed mb-2">{e.desc}</p>
                 <div className="flex items-center gap-2">
                   <span className={cls('text-[9px] font-medium rounded-full px-2 py-0.5', cat(e).pill)}>{e.category}</span>
-                  {e.contradictions > 0 && (
-                    <span className="inline-flex items-center gap-1 text-[9px] text-rose-600 bg-rose-50 rounded-full px-1.5 py-0.5">
-                      <Ic.alert size={8}/> {e.contradictions} conflict{e.contradictions > 1 ? 's' : ''}
-                    </span>
-                  )}
                   <span className="text-[10px] text-[#9A8573] ml-auto">{e.references} transcript refs</span>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              </button>
 
-      {/* ── Option C: Two-column grid with watermark letter ── */}
-      {variant === 'C' && (
-        <div>
-          <div className="flex items-center gap-4 mb-3 px-1">
-            <div className="text-center">
-              <div className="text-[22px] font-bold text-[#14110D]">{exhibits.length}</div>
-              <div className="text-[10px] text-[#9A8573] uppercase tracking-wide">Exhibits</div>
-            </div>
-            <div className="w-px h-8 bg-[#E2E1DF]"/>
-            <div className="text-center">
-              <div className="text-[22px] font-bold text-rose-600">{contradictionCount}</div>
-              <div className="text-[10px] text-[#9A8573] uppercase tracking-wide">Conflicts</div>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {exhibits.map((e) => (
-              <div key={e.id} className="relative bg-white rounded-xl border border-[#E2E1DF] p-3 overflow-hidden hover:bg-[#F0F0EE] transition-colors">
-                {/* Watermark letter */}
-                <div className="absolute top-1 right-2 text-[40px] font-bold leading-none select-none pointer-events-none"
-                  style={{ color: cat(e).strip, opacity: 0.12 }}>
-                  {e.label.replace('Exh. ','')}
-                </div>
-                <div className="relative">
-                  <div className="text-[9px] font-mono text-[#9A8573] mb-1">{e.label}</div>
-                  <div className="text-[12px] font-semibold text-[#14110D] leading-snug mb-1.5">{e.title}</div>
-                  <p className="text-[10px] text-[#6B5744] leading-relaxed mb-2 line-clamp-2">{e.desc}</p>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={cls('text-[9px] font-medium rounded-full px-1.5 py-0.5', cat(e).pill)}>{e.category}</span>
-                    {e.contradictions > 0 && (
-                      <span className="text-[9px] text-rose-500 bg-rose-50 rounded-full px-1.5 py-0.5">{e.contradictions}×</span>
-                    )}
-                    {e.timestamp && (
-                      <button onClick={() => jump(e.timestamp)}
-                        className="ml-auto inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] transition-colors">
-                        {fmt(e.timestamp)}
+              {/* Expanded citations */}
+              {isOpen && citations.length > 0 && (
+                <div className="border-t border-[#F0F0EE] px-4 py-3 bg-[#F8F8F7]">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] mb-2">Citations</p>
+                  <div className="flex flex-col gap-1.5">
+                    {citations.map((c, i) => (
+                      <button key={i} onClick={() => jump(c.timestamp)}
+                        className="text-left flex items-start gap-2 px-2.5 py-2 rounded-lg bg-white hover:bg-[#F0F0EE] transition-colors border border-[#E2E1DF]">
+                        <span className={cls('text-[9px] font-bold uppercase tracking-wide shrink-0 mt-0.5 w-12', c.speaker === 'Witness' ? 'text-[#7A2E20]' : 'text-[#9A8573]')}>{c.speaker}</span>
+                        <span className="text-[11px] text-[#6B5744] leading-relaxed italic flex-1">"{c.quote}"</span>
+                        <span className="shrink-0 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">
+                          {fmt(c.timestamp)} · p.{c.page} l.{c.line}
+                        </span>
                       </button>
-                    )}
+                    ))}
                   </div>
                 </div>
-              </div>
-            ))}
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 }
