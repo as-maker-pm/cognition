@@ -60,7 +60,7 @@ function ToastProvider({ children }) {
       {children}
       <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2">
         {toasts.map((t) => (
-          <div key={t.id} className={`min-w-[280px] max-w-sm rounded-lg border bg-[#FBF8F1] shadow-lg px-4 py-3 ${t.kind === 'err' ? 'border-rose-200' : 'border-[#E4DCC9]'}`}>
+          <div key={t.id} className={`min-w-[280px] max-w-sm rounded-lg border bg-[#F8F8F7] shadow-lg px-4 py-3 ${t.kind === 'err' ? 'border-rose-200' : 'border-[#E2E1DF]'}`}>
             <div className={`text-sm font-medium ${t.kind === 'err' ? 'text-rose-700' : 'text-[#14110D]'}`}>{t.title}</div>
             {t.desc && <div className="text-xs text-[#6B5744] mt-0.5">{t.desc}</div>}
           </div>
@@ -96,9 +96,9 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
   const sizes = { sm: 'h-8 px-3 text-sm', md: 'h-9 px-4 text-sm', icon: 'h-9 w-9 p-0' };
   const variants = {
     primary:    'bg-[#14110D] text-white hover:bg-[#2C2316]',
-    secondary:  'bg-[#E4DCC9]/50 text-[#14110D] hover:bg-[#E4DCC9]',
-    outline:    'border border-[#E4DCC9] bg-[#FBF8F1] text-[#3D2E1E] hover:bg-[#F0EAE0]',
-    ghost:      'text-[#6B5744] hover:bg-[#E4DCC9]/40 hover:text-[#14110D]',
+    secondary:  'bg-[#E2E1DF]/50 text-[#14110D] hover:bg-[#E2E1DF]',
+    outline:    'border border-[#E2E1DF] bg-[#F8F8F7] text-[#3D2E1E] hover:bg-[#E9E8E7]',
+    ghost:      'text-[#6B5744] hover:bg-[#E2E1DF]/40 hover:text-[#14110D]',
     teal:       'bg-[#7A2E20] text-white hover:bg-[#5A1F14]',
     destructive:'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100',
   };
@@ -106,13 +106,13 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
 };
 
 const Input = ({ className = '', ...rest }) => (
-  <input className={cls('h-9 w-full rounded-md border border-[#E4DCC9] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors text-[#14110D] placeholder:text-[#9A8573]', className)} {...rest}/>
+  <input className={cls('h-9 w-full rounded-md border border-[#E2E1DF] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors text-[#14110D] placeholder:text-[#9A8573]', className)} {...rest}/>
 );
 
 const Badge = ({ variant = 'secondary', className = '', children }) => {
   const v = {
-    secondary:   'bg-[#E4DCC9]/50 text-[#3D2E1E] border border-[#E4DCC9]',
-    outline:     'bg-[#FBF8F1] border border-[#E4DCC9] text-[#3D2E1E]',
+    secondary:   'bg-[#E2E1DF]/50 text-[#3D2E1E] border border-[#E2E1DF]',
+    outline:     'bg-[#F8F8F7] border border-[#E2E1DF] text-[#3D2E1E]',
     destructive: 'bg-rose-600 text-white',
     green:       'bg-emerald-50 border border-emerald-300 text-emerald-700',
     amber:       'bg-amber-50 border border-amber-300 text-amber-700',
@@ -133,7 +133,7 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
   const RoleIcon = { admin: Ic.shield, editor: Ic.edit, reader: Ic.eye }[user?.role] || (() => null);
 
   return (
-    <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] sticky top-0 z-40 h-14">
+    <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] sticky top-0 z-40 h-14">
       <div className="px-6 h-full flex items-center gap-3">
         {/* Logo */}
         <button onClick={onLogo} className="hover:opacity-75 transition-opacity shrink-0">
@@ -143,7 +143,7 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
         {/* Divider + Breadcrumb */}
         {breadcrumb.length > 0 && (
           <>
-            <div className="w-px h-5 bg-[#E4DCC9] shrink-0"/>
+            <div className="w-px h-5 bg-[#E2E1DF] shrink-0"/>
             <nav className="flex items-center gap-1.5 min-w-0">
               {breadcrumb.map((item, idx) => {
                 const isLast = idx === breadcrumb.length - 1;
@@ -185,7 +185,7 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
               {initials || <Ic.user size={14}/>}
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-[#FBF8F1] border border-[#E4DCC9] rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
+              <div className="absolute right-0 mt-2 w-60 bg-[#F8F8F7] border border-[#E2E1DF] rounded-lg shadow-lg p-1 z-50" onMouseLeave={() => setMenuOpen(false)}>
                 <div className="px-3 py-2.5">
                   <div className="text-sm font-medium text-[#14110D]">{user?.name}</div>
                   <div className="text-xs text-[#6B5744] mt-0.5">{user?.email}</div>
@@ -196,9 +196,9 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
                     <span>{user?.organization.name}</span>
                   </div>
                 </div>
-                <div className="h-px bg-[#E4DCC9]/60 my-1"/>
+                <div className="h-px bg-[#E2E1DF]/60 my-1"/>
                 {user?.role === 'admin' && (
-                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#E4DCC9]/40 flex items-center gap-2 text-[#3D2E1E]">
+                  <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#E2E1DF]/40 flex items-center gap-2 text-[#3D2E1E]">
                     <Ic.user size={13}/> User Management
                   </button>
                 )}
@@ -326,7 +326,7 @@ function LoginPage() {
       </div>
 
       {/* Right — Auth form */}
-      <div className="flex-1 flex items-center justify-center bg-[#F7F2EA] p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#F0F0EE] p-8">
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
@@ -352,7 +352,7 @@ function LoginPage() {
             </Button>
           </form>
 
-          <div className="border-t border-[#E4DCC9] pt-6">
+          <div className="border-t border-[#E2E1DF] pt-6">
             <p className="text-xs text-[#9A8573] uppercase tracking-widest mb-3">Demo access</p>
             <div className="space-y-2">
               {[
@@ -362,7 +362,7 @@ function LoginPage() {
                 ['reader@lawfirm.com',   'Law Firm — Reader',        Ic.scale],
               ].map(([em, label, Icn]) => (
                 <button key={em} onClick={() => demo(em, label)}
-                  className="w-full text-left px-3 py-2.5 text-sm text-[#3D2E1E] border border-[#E4DCC9] rounded-md hover:bg-[#FBF8F1] hover:border-[#D0C5B0] bg-[#FBF8F1]/60 transition-colors flex items-center gap-2.5">
+                  className="w-full text-left px-3 py-2.5 text-sm text-[#3D2E1E] border border-[#E2E1DF] rounded-md hover:bg-[#F8F8F7] hover:border-[#D0C5B0] bg-[#F8F8F7]/60 transition-colors flex items-center gap-2.5">
                   <Icn size={13} className="text-[#9A8573] shrink-0"/>
                   <span>{label}</span>
                 </button>
@@ -389,19 +389,19 @@ function CaseLibrary({ onSelect }) {
   const list = MOCK_CASES.filter((c) => [c.caseName, c.caseNumber, c.client, c.type].some((s) => s.toLowerCase().includes(search.toLowerCase())));
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F2EA]">
+    <div className="flex-1 flex flex-col bg-[#F0F0EE]">
       {/* Header */}
-      <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-semibold text-[#14110D]">Cases</h1>
-          <span className="inline-flex items-center rounded-full bg-[#E4DCC9]/50 border border-[#E4DCC9] px-2.5 py-0.5 text-xs font-medium text-[#6B5744]">{MOCK_CASES.length}</span>
+          <span className="inline-flex items-center rounded-full bg-[#E2E1DF]/50 border border-[#E2E1DF] px-2.5 py-0.5 text-xs font-medium text-[#6B5744]">{MOCK_CASES.length}</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative w-72">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
             <Input placeholder="Search cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9"/>
           </div>
-          <div className="flex items-center gap-1 border border-[#E4DCC9] rounded-md p-1 bg-[#FBF8F1]">
+          <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-md p-1 bg-[#F8F8F7]">
             <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
             <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
           </div>
@@ -416,20 +416,20 @@ function CaseLibrary({ onSelect }) {
               <div
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150"
+                className="group rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150"
               >
                 <div className="p-4 flex flex-col gap-3">
                   {/* Top row: case type label + deposition count badge */}
                   <div className="flex items-center justify-between">
                     <span className="text-xs uppercase tracking-wide font-medium text-[#9A8573]">{c.type || 'Civil'}</span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-[#E4DCC9]/40 border border-[#E4DCC9] px-2 py-0.5 text-xs font-medium text-[#6B5744]">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#E2E1DF]/40 border border-[#E2E1DF] px-2 py-0.5 text-xs font-medium text-[#6B5744]">
                       <Ic.fileText size={10}/>{c.depositionCount}
                     </span>
                   </div>
                   {/* Case name */}
                   <h3 className="text-base font-semibold text-[#14110D] leading-snug line-clamp-2">{c.caseName}</h3>
                   {/* Divider */}
-                  <div className="h-px bg-[#E4DCC9]/60"/>
+                  <div className="h-px bg-[#E2E1DF]/60"/>
                   {/* Meta */}
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-[#6B5744]">
@@ -451,7 +451,7 @@ function CaseLibrary({ onSelect }) {
               <div
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150"
+                className="group rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150"
               >
                 <div className="px-4 py-3 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
@@ -503,9 +503,9 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F2EA]">
+    <div className="flex-1 flex flex-col bg-[#F0F0EE]">
       {/* Header — no back button, breadcrumb handles navigation */}
-      <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4">
+      <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-[#14110D]">{selectedCase?.caseName || 'Depositions'}</h1>
@@ -528,7 +528,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   'px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
                   status === s
                     ? 'bg-[#14110D] text-white'
-                    : 'bg-[#FBF8F1] border border-[#E4DCC9] text-[#6B5744] hover:border-[#D0C5B0] hover:bg-[#F0EAE0]'
+                    : 'bg-[#F8F8F7] border border-[#E2E1DF] text-[#6B5744] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]'
                 )}
               >
                 {statusLabels[s]}
@@ -542,7 +542,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
               <Input placeholder="Search depositions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-8 text-sm"/>
             </div>
-            <div className="flex items-center gap-1 border border-[#E4DCC9] rounded-md p-1 bg-[#FBF8F1]">
+            <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-md p-1 bg-[#F8F8F7]">
               <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
               <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
             </div>
@@ -554,7 +554,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
         {view === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {list.map((d) => (
-              <div key={d.id} className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden" onClick={() => onSelect(d.id)}>
+              <div key={d.id} className="group rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] cursor-pointer hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden" onClick={() => onSelect(d.id)}>
                 {/* Dark top section with initials */}
                 <div className="bg-[#2C2316] h-24 relative flex items-center justify-center">
                   <span className="brand text-white/80 select-none" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
@@ -592,7 +592,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                     <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
                   </div>
                   {d.tags && d.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 pt-1 border-t border-[#E4DCC9]/60">
+                    <div className="flex flex-wrap gap-1 pt-1 border-t border-[#E2E1DF]/60">
                       {d.tags.slice(0,2).map((t) => <Badge key={t} variant="outline">{t}</Badge>)}
                       {d.tags.length > 2 && <Badge variant="outline">+{d.tags.length - 2}</Badge>}
                     </div>
@@ -604,7 +604,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
         ) : (
           <div className="flex flex-col gap-1.5">
             {list.map((d) => (
-              <div key={d.id} className="group rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150 overflow-hidden flex" onClick={() => onSelect(d.id)}>
+              <div key={d.id} className="group rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] cursor-pointer hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150 overflow-hidden flex" onClick={() => onSelect(d.id)}>
                 {/* Oxblood left strip */}
                 <div className="w-2 bg-[#7A2E20]/30 shrink-0"/>
                 <div className="flex-1 px-4 py-3 flex items-center gap-4 min-w-0">
@@ -625,7 +625,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                       'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border',
                       d.status === 'ready' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                       d.status === 'processing' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      'bg-[#E4DCC9]/40 text-[#6B5744] border-[#E4DCC9]'
+                      'bg-[#E2E1DF]/40 text-[#6B5744] border-[#E2E1DF]'
                     )}>
                       {d.status}
                     </span>
@@ -716,7 +716,7 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
             ref={videoRef}
             onClick={() => videoRef.current?.closest('.bg-\\[\\#2C2316\\]')?.requestFullscreen?.()}
             title="Fullscreen"
-            className="ml-1 shrink-0 text-[#9A8573] hover:text-[#14110D] border border-[#E4DCC9] rounded p-1 transition-colors"
+            className="ml-1 shrink-0 text-[#9A8573] hover:text-[#14110D] border border-[#E2E1DF] rounded p-1 transition-colors"
           >
             <Ic.maximize size={12}/>
           </button>
@@ -737,12 +737,13 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
     }
   }, [currentTime, playing]);
 
-  const cueColor = (desc) => {
-    const d = (desc || '').toLowerCase();
-    if (d.includes('contradict') || d.includes('inconsist') || d.includes('conflict')) return 'bg-rose-50 border-rose-200 text-rose-700';
-    if (d.includes('evasive') || d.includes('hesit') || d.includes('deflect') || d.includes('avoid') || d.includes('pause')) return 'bg-orange-50 border-orange-200 text-orange-700';
-    if (d.includes('confirm') || d.includes('admit') || d.includes('acknowledg') || d.includes('agree')) return 'bg-emerald-50 border-emerald-200 text-emerald-700';
-    if (d.includes('emotion') || d.includes('stress') || d.includes('upset') || d.includes('distress')) return 'bg-purple-50 border-purple-200 text-purple-700';
+  const cueColor = (cue) => {
+    const t = (cue.type || '').toLowerCase();
+    const d = (cue.description || '').toLowerCase();
+    if (t === 'confident' || d.includes('eye contact') || d.includes('direct') || d.includes('clear') || d.includes('confirm') || d.includes('acknowledge')) return 'bg-emerald-50 border-emerald-200 text-emerald-700';
+    if (t === 'defensive' || d.includes('raised voice') || d.includes('sharp') || d.includes('hostile') || d.includes('contradict')) return 'bg-rose-50 border-rose-200 text-rose-700';
+    if (t === 'pause' || t === 'nervous' || t === 'stutter' || d.includes('hesit') || d.includes('avoid') || d.includes('shifted') || d.includes('evasive')) return 'bg-orange-50 border-orange-200 text-orange-700';
+    if (t === 'emotional' || d.includes('emotion') || d.includes('distress') || d.includes('upset')) return 'bg-purple-50 border-purple-200 text-purple-700';
     return 'bg-amber-50 border-amber-200 text-amber-700';
   };
 
@@ -758,13 +759,13 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
           <div key={topic.id}>
             <button
               onClick={() => setCollapsed((c) => ({ ...c, [topic.id]: !c[topic.id] }))}
-              className="w-full text-left pb-2 border-b border-[#E4DCC9] flex items-start justify-between gap-3 group"
+              className="w-full text-left pb-2 border-b border-[#E2E1DF] flex items-start justify-between gap-3 group"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A8573]">{topic.title}</span>
                   {exhibitCount > 0 && (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold bg-[#E4DCC9]/60 text-[#6B5744] px-1.5 py-0.5 rounded border border-[#E4DCC9]">
+                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold bg-[#E2E1DF]/60 text-[#6B5744] px-1.5 py-0.5 rounded border border-[#E2E1DF]">
                       <Ic.fileText size={8}/>{exhibitCount} exhibit{exhibitCount !== 1 ? 's' : ''}
                     </span>
                   )}
@@ -779,7 +780,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
             </button>
 
             {!isCollapsed && (
-              <div className="flex flex-col border-l-2 border-[#E4DCC9] ml-0.5 mt-2">
+              <div className="flex flex-col border-l-2 border-[#E2E1DF] ml-0.5 mt-2">
                 {topic.segments.map((s) => {
                   const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
                   const isW = s.speaker === 'Witness';
@@ -790,7 +791,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                       onClick={() => setCurrentTime(s.timestamp)}
                       className={cls(
                         'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all rounded-r',
-                        active ? 'border-[#7A2E20] bg-[#FDF0EC]' : 'border-transparent hover:border-[#E4DCC9] hover:bg-[#F7F2EA]'
+                        active ? 'border-[#7A2E20] bg-[#FDF0EC]' : 'border-transparent hover:border-[#E2E1DF] hover:bg-[#F0F0EE]'
                       )}
                     >
                       <div className="flex items-baseline justify-between mb-1.5">
@@ -805,7 +806,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                       {s.cues?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {s.cues.map((c, i) => (
-                            <span key={i} className={cls('text-[10.5px] px-1.5 py-0.5 rounded border', cueColor(c.description))}>
+                            <span key={i} className={cls('text-[10.5px] px-1.5 py-0.5 rounded border', cueColor(c))}>
                               ⚑ {c.description}
                             </span>
                           ))}
@@ -860,7 +861,7 @@ function GoalsTab({ goals }) {
 }
 
 function FlaggedTab({ items, jump }) {
-  const sevColor = { high: 'bg-rose-50 border-rose-200 text-rose-700', medium: 'bg-amber-50 border-amber-200 text-amber-700', low: 'bg-[#F7F2EA] border-[#E4DCC9] text-[#6B5744]' };
+  const sevColor = { high: 'bg-rose-50 border-rose-200 text-rose-700', medium: 'bg-amber-50 border-amber-200 text-amber-700', low: 'bg-[#F0F0EE] border-[#E2E1DF] text-[#6B5744]' };
   return (
     <div className="flex flex-col gap-2">
       {items.map((f) => (
@@ -912,7 +913,7 @@ function SentimentTab({ data }) {
           { label: 'Sentiment range', value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} → +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, color: '#14110D' },
           { label: 'Key shifts', value: shifts.length, color: '#7A2E20' },
         ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] px-3 py-2.5">
+          <div key={s.label} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] px-3 py-2.5">
             <div className="text-[10px] text-[#9A8573] mb-1 uppercase tracking-wider">{s.label}</div>
             <div className="text-base font-bold" style={{ color: s.color }}>{s.value}</div>
           </div>
@@ -922,7 +923,7 @@ function SentimentTab({ data }) {
       {/* Timeline ribbon */}
       <div>
         <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Sentiment Timeline</p>
-        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#E4DCC9' }}>
+        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#E2E1DF' }}>
           {data.map((d, i) => {
             const next = data[i + 1];
             const width = next ? ((next.t - d.t) / xMax * 100) : (5);
@@ -947,7 +948,7 @@ function SentimentTab({ data }) {
       <Card className="p-3">
         <p className="text-xs font-semibold text-[#6B5744] mb-2">Emotional Curve</p>
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#E4DCC9" strokeDasharray="3 3"/>
+          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#E2E1DF" strokeDasharray="3 3"/>
           <path d={area} fill="#7A2E20" opacity="0.1"/>
           <path d={path} fill="none" stroke="#7A2E20" strokeWidth="1.5"/>
           {data.map((d, i) => (
@@ -963,7 +964,7 @@ function SentimentTab({ data }) {
         <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Key Moments</p>
         <div className="flex flex-col gap-1.5">
           {labeled.map((d, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs bg-[#FBF8F1] border border-[#E4DCC9] rounded-lg px-3 py-2">
+            <div key={i} className="flex items-center gap-2 text-xs bg-[#F8F8F7] border border-[#E2E1DF] rounded-lg px-3 py-2">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sentColor(d.v) }}/>
               <span className="text-[#9A8573] font-mono tabular-nums shrink-0">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
               <span className="text-[#3D2E1E] flex-1">{d.label}</span>
@@ -1032,10 +1033,10 @@ function ChatTab({ depo }) {
   const goalsDone  = MOCK_DETAIL.goals.filter((g) => g.covered).length;
 
   const suggestions = [
-    { icon: Ic.flag,     label: 'What were the most concerning moments?' },
-    { icon: Ic.alert,    label: `Were all ${goalsTotal} deposition goals achieved?` },
-    { icon: Ic.sparkles, label: 'Summarize the contract knowledge section' },
-    { icon: Ic.checkC,   label: 'What contradictions were found?' },
+    'What were the most concerning moments?',
+    `Were all ${goalsTotal} deposition goals achieved?`,
+    'Summarize testimony on the key contract terms',
+    'What contradictions were identified?',
   ];
 
   useEffect(() => {
@@ -1067,60 +1068,49 @@ function ChatTab({ depo }) {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4">
         {isEmpty ? (
-          <div className="p-3">
-            <div className="flex items-start gap-2.5 mb-5">
-              <div className="w-7 h-7 rounded-full bg-[#14110D] flex items-center justify-center shrink-0 mt-0.5">
-                <Ic.sparkles size={12} className="text-white"/>
-              </div>
-              <div className="bg-[#E4DCC9]/40 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm text-[#3D2E1E] leading-relaxed">
-                Ask me anything about this deposition — I can surface contradictions, assess goal coverage, and explain behavioral patterns in the testimony.
-              </div>
-            </div>
-            <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-widest mb-2 pl-9">Suggested questions</p>
-            <div className="pl-9 flex flex-col gap-1.5">
-              {suggestions.map(({ icon: Icon, label }) => (
-                <button
-                  key={label}
-                  onClick={() => send(label)}
-                  className="text-left flex items-center gap-2.5 text-sm px-3 py-2.5 rounded-lg border border-[#E4DCC9] text-[#3D2E1E] bg-[#FBF8F1]/60 hover:border-[#D0C5B0] hover:bg-[#FBF8F1] hover:text-[#14110D] transition-colors group"
-                >
-                  <Icon size={13} className="text-[#9A8573] group-hover:text-[#7A2E20] shrink-0"/>
-                  {label}
-                </button>
-              ))}
-            </div>
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-[#9A8573] mb-2">Ask anything about this deposition</p>
+            {suggestions.map((s) => (
+              <button key={s} onClick={() => send(s)}
+                className="text-left text-sm text-[#3D2E1E] bg-white border border-[#E2E1DF] rounded-xl px-3.5 py-2.5 hover:border-[#B0AFAD] hover:bg-[#F8F8F7] transition-colors leading-snug">
+                {s}
+              </button>
+            ))}
           </div>
         ) : (
-          <div className="p-3 flex flex-col gap-3">
+          <div className="flex flex-col gap-5">
             {messages.map((m, i) => (
-              <div key={i} className={cls('flex gap-2 items-end', m.role !== 'ai' && 'flex-row-reverse')}>
+              <div key={i} className={cls('flex flex-col gap-1', m.role !== 'ai' && 'items-end')}>
+                {m.role === 'ai' && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
+                      <Ic.sparkles size={10} className="text-white"/>
+                    </div>
+                    <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wide">Cognition AI</span>
+                  </div>
+                )}
                 <div className={cls(
-                  'w-6 h-6 rounded-full flex items-center justify-center shrink-0 mb-0.5',
-                  m.role === 'ai' ? 'bg-[#14110D]' : 'bg-[#E4DCC9]'
-                )}>
-                  {m.role === 'ai'
-                    ? <Ic.sparkles size={11} className="text-white"/>
-                    : <span className="text-[10px] font-semibold text-[#6B5744]">U</span>}
-                </div>
-                <div className={cls(
-                  'rounded-xl px-3 py-2 text-sm leading-relaxed',
+                  'text-sm leading-relaxed rounded-2xl px-4 py-2.5',
                   m.role === 'ai'
-                    ? 'bg-[#E4DCC9]/40 text-[#14110D] rounded-bl-sm max-w-[88%]'
-                    : 'bg-[#14110D] text-white rounded-br-sm max-w-[88%]'
+                    ? 'text-[#14110D] bg-[#F0F0EE] rounded-tl-sm'
+                    : 'text-white bg-[#14110D] max-w-[85%] rounded-tr-sm'
                 )}>
                   {m.text}
                 </div>
               </div>
             ))}
             {busy && (
-              <div className="flex items-end gap-2">
-                <div className="w-6 h-6 rounded-full bg-[#14110D] flex items-center justify-center shrink-0 mb-0.5">
-                  <Ic.sparkles size={11} className="text-white"/>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
+                    <Ic.sparkles size={10} className="text-white"/>
+                  </div>
+                  <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wide">Cognition AI</span>
                 </div>
-                <div className="bg-[#E4DCC9]/40 rounded-xl rounded-bl-sm px-3 py-3">
-                  <div className="flex gap-1 items-center">
+                <div className="bg-[#F0F0EE] rounded-2xl rounded-tl-sm px-4 py-3">
+                  <div className="flex gap-1">
                     {[0,1,2].map((i) => (
                       <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#9A8573]" style={{ animation: 'bounce 1s ease-in-out infinite', animationDelay: `${i * 0.18}s` }}/>
                     ))}
@@ -1133,18 +1123,25 @@ function ChatTab({ depo }) {
         )}
       </div>
 
-      <div className="border-t border-[#E4DCC9]/60 p-2.5 flex items-center gap-2 shrink-0">
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send()}
-          placeholder="Ask about this deposition…"
-          className="flex-1 h-9 rounded-lg border border-[#E4DCC9] bg-[#FBF8F1] px-3 text-sm text-[#14110D] placeholder:text-[#9A8573] outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors"
-        />
-        <Button size="icon" onClick={() => send()} disabled={busy || !input.trim()} className="shrink-0 h-9 w-9">
-          <Ic.send size={14}/>
-        </Button>
+      <div className="border-t border-[#E2E1DF] px-4 py-3 shrink-0">
+        <div className="flex items-end gap-2 bg-white border border-[#E2E1DF] rounded-2xl px-3.5 py-2.5 focus-within:border-[#9A8573] transition-colors">
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+            placeholder="Ask about this deposition…"
+            rows={1}
+            className="flex-1 text-sm text-[#14110D] placeholder:text-[#9A8573] outline-none resize-none bg-transparent leading-5"
+            style={{ minHeight: '20px' }}
+          />
+          <button onClick={() => send()} disabled={busy || !input.trim()}
+            className="shrink-0 w-7 h-7 rounded-xl bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-30 disabled:cursor-not-allowed transition-all mb-0.5">
+            <Ic.send size={12}/>
+          </button>
+        </div>
+        <p className="text-[10px] text-[#B5A899] mt-1.5 px-1">↵ send · ⇧↵ new line</p>
+      </div>
       </div>
     </div>
   );
@@ -1183,7 +1180,7 @@ function ContradictionsTab({ jump }) {
         {[['all', 'All'], ['self', 'Self'], ['record', 'vs. Record']].map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)} className={cls(
             'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
-            filter === key ? 'bg-[#14110D] text-white' : 'bg-[#FBF8F1] border border-[#E4DCC9] text-[#6B5744] hover:bg-[#F0EAE0]'
+            filter === key ? 'bg-[#14110D] text-white' : 'bg-[#F8F8F7] border border-[#E2E1DF] text-[#6B5744] hover:bg-[#E9E8E7]'
           )}>
             {label}
             <span className={cls('font-mono text-[10px]', filter === key ? 'opacity-70' : 'text-[#9A8573]')}>{counts[key]}</span>
@@ -1192,7 +1189,7 @@ function ContradictionsTab({ jump }) {
       </div>
 
       {list.map((c, idx) => (
-        <div key={c.id} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] overflow-hidden">
+        <div key={c.id} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] overflow-hidden">
           <div className="flex">
             <div className={cls('w-1 shrink-0', c.type === 'record' ? 'bg-rose-500' : 'bg-amber-500')}/>
             <div className="flex-1 p-3.5 min-w-0">
@@ -1205,7 +1202,7 @@ function ContradictionsTab({ jump }) {
               <p className="text-xs font-semibold text-[#14110D] mb-3 leading-snug">{c.title}</p>
 
               <div className="grid grid-cols-[1fr_auto_1fr] gap-2 mb-3 items-stretch">
-                <div className="rounded-lg bg-[#F7F2EA] border border-[#E4DCC9] border-l-2 border-l-[#9A8573] p-2.5">
+                <div className="rounded-lg bg-[#F0F0EE] border border-[#E2E1DF] border-l-2 border-l-[#9A8573] p-2.5">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtA.label}</p>
                   {c.stmtA.page && <p className="font-mono text-[9px] text-[#9A8573] mb-1">p.{c.stmtA.page} · l.{c.stmtA.line}</p>}
                   <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtA.quote}"</p>
@@ -1216,7 +1213,7 @@ function ContradictionsTab({ jump }) {
                 <div className="flex items-center self-center shrink-0">
                   <span className="font-mono text-[9px] font-bold text-[#C4B5A2] uppercase tracking-wider">vs</span>
                 </div>
-                <div className="rounded-lg bg-[#F7F2EA] border border-[#E4DCC9] border-l-2 border-l-rose-400 p-2.5">
+                <div className="rounded-lg bg-[#F0F0EE] border border-[#E2E1DF] border-l-2 border-l-rose-400 p-2.5">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtB.label}</p>
                   <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtB.quote}"</p>
                 </div>
@@ -1224,12 +1221,12 @@ function ContradictionsTab({ jump }) {
 
               <div className="text-xs text-amber-800 bg-amber-50 border-l-2 border-amber-400 px-3 py-2 rounded-r-lg mb-3 leading-relaxed">{c.why}</div>
 
-              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-[#E4DCC9] pt-2.5">
+              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-[#E2E1DF] pt-2.5">
                 {c.crosslinks?.map((link) => (
-                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-[#9A8573] bg-[#F7F2EA] border border-[#E4DCC9] rounded-full px-2 py-0.5">{link}</span>
+                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-2 py-0.5">{link}</span>
                 ))}
                 <div className="flex items-center gap-1.5 ml-auto">
-                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E4DCC9]/50 text-[#6B5744] hover:bg-[#E4DCC9] transition-colors">Dismiss</button>
+                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E2E1DF]/50 text-[#6B5744] hover:bg-[#E2E1DF] transition-colors">Dismiss</button>
                   <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#14110D] text-white hover:bg-[#2C2316] transition-colors">Add to Brief</button>
                 </div>
               </div>
@@ -1238,7 +1235,7 @@ function ContradictionsTab({ jump }) {
         </div>
       ))}
       {list.length === 0 && <div className="text-center py-8 text-sm text-[#9A8573]">No contradictions match this filter.</div>}
-      <p className="text-xs text-[#9A8573] bg-[#F7F2EA] border border-dashed border-[#E4DCC9] rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
+      <p className="text-xs text-[#9A8573] bg-[#F0F0EE] border border-dashed border-[#E2E1DF] rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
     </div>
   );
 }
@@ -1250,7 +1247,7 @@ function ExhibitsTab({ jump }) {
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
   const categoryColors = {
-    Contract: 'bg-[#E4DCC9]/50 text-[#6B5744]',
+    Contract: 'bg-[#E2E1DF]/50 text-[#6B5744]',
     Calendar: 'bg-blue-50 text-blue-700',
     Document: 'bg-amber-50 text-amber-700',
     Email:    'bg-emerald-50 text-emerald-700',
@@ -1259,13 +1256,13 @@ function ExhibitsTab({ jump }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-4">
+      <div className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] p-4">
         <div className="flex items-center justify-between mb-2.5">
           <span className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider">Documentary Record</span>
           <span className="text-sm font-semibold text-[#14110D]">{exhibits.length} exhibits</span>
         </div>
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="rounded-lg bg-[#F7F2EA] px-3 py-2">
+          <div className="rounded-lg bg-[#F0F0EE] px-3 py-2">
             <div className="text-lg font-bold text-[#14110D]">{exhibits.length}</div>
             <div className="text-[11px] text-[#6B5744]">Total exhibits</div>
           </div>
@@ -1276,15 +1273,15 @@ function ExhibitsTab({ jump }) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           {[...new Set(exhibits.map((e) => e.category))].map((cat) => (
-            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-[#E4DCC9]/50 text-[#6B5744]')}>{cat}</span>
+            <span key={cat} className={cls('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium', categoryColors[cat] || 'bg-[#E2E1DF]/50 text-[#6B5744]')}>{cat}</span>
           ))}
         </div>
       </div>
 
       {exhibits.map((e) => (
-        <div key={e.id} className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-3 flex flex-col gap-2">
+        <div key={e.id} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] p-3 flex flex-col gap-2">
           <div className="flex items-start gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#E4DCC9]/40 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-8 h-8 rounded-lg bg-[#E2E1DF]/40 flex items-center justify-center shrink-0 mt-0.5">
               <Ic.fileText size={14} className="text-[#6B5744]"/>
             </div>
             <div className="flex-1 min-w-0">
@@ -1298,8 +1295,8 @@ function ExhibitsTab({ jump }) {
               <button onClick={() => jump(e.timestamp)} className="font-mono text-[11px] text-[#7A2E20] hover:underline shrink-0 mt-0.5">{fmt(e.timestamp)}</button>
             )}
           </div>
-          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[#E4DCC9]/60">
-            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-[#E4DCC9]/50 text-[#6B5744]')}>{e.category}</span>
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[#E2E1DF]/60">
+            <span className={cls('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', categoryColors[e.category] || 'bg-[#E2E1DF]/50 text-[#6B5744]')}>{e.category}</span>
             {e.contradictions > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] text-rose-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"/>
@@ -1338,7 +1335,7 @@ function DepositionDetail({ id, onBack }) {
   ];
 
   const exportOptions = [
-    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations', bg: 'bg-[#E4DCC9]/50', fg: 'text-[#6B5744]' },
+    { icon: Ic.fileText, title: 'Litigation Brief',  sub: 'Internal team · full AI annotations', bg: 'bg-[#E2E1DF]/50', fg: 'text-[#6B5744]' },
     { icon: Ic.msg,      title: 'Case Update',       sub: 'For the client · executive summary',  bg: 'bg-emerald-50',   fg: 'text-emerald-700' },
     { icon: Ic.edit,     title: 'Discovery Memo',    sub: 'For opposing counsel',                bg: 'bg-rose-50',      fg: 'text-rose-600' },
   ];
@@ -1346,9 +1343,9 @@ function DepositionDetail({ id, onBack }) {
   const topicColors = ['#7A2E20', '#7A2E20', '#C4882A', '#C4882A', '#4A6741', '#4A6741'];
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F2EA] overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[#F0F0EE] overflow-hidden">
       {/* Header */}
-      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-5 py-2.5 flex items-center gap-4 shrink-0">
+      <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-5 py-2.5 flex items-center gap-4 shrink-0">
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold text-[#14110D] truncate">{selectedCase?.caseName || depo.caseNumber}</div>
           <div className="text-xs text-[#9A8573] mt-0.5">Deposition of {depo.witness} · {depo.date} · {depo.caseNumber}</div>
@@ -1366,10 +1363,10 @@ function DepositionDetail({ id, onBack }) {
               <Ic.fileText size={13}/> Export <Ic.chevD size={11}/>
             </Button>
             {exportOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-[#FBF8F1] border border-[#E4DCC9] rounded-xl shadow-lg p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
+              <div className="absolute right-0 mt-2 w-64 bg-[#F8F8F7] border border-[#E2E1DF] rounded-xl shadow-lg p-1.5 z-50" onMouseLeave={() => setExportOpen(false)}>
                 <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest px-3 py-2">Choose audience</p>
                 {exportOptions.map(({ icon: Icon, title, sub, bg, fg }) => (
-                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-2.5 rounded-lg hover:bg-[#F0EAE0] transition-colors flex items-center gap-3">
+                  <button key={title} onClick={() => setExportOpen(false)} className="w-full text-left p-2.5 rounded-lg hover:bg-[#E9E8E7] transition-colors flex items-center gap-3">
                     <div className={cls('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', bg, fg)}><Icon size={15}/></div>
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-[#14110D]">{title}</div>
@@ -1386,35 +1383,35 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR */}
-        <div className="w-72 shrink-0 border-r border-[#E4DCC9] flex flex-col overflow-y-auto bg-[#F7F2EA]">
+        <div className="w-72 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F0F0EE]">
 
           {/* Recording */}
-          <div className="p-4 border-b border-[#E4DCC9]">
+          <div className="p-4 border-b border-[#E2E1DF]">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-3">Recording</div>
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
           </div>
 
           {/* Summary */}
-          <div className="p-4 border-b border-[#E4DCC9]">
+          <div className="p-4 border-b border-[#E2E1DF]">
             <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-2">Summary</div>
             <p className="text-xs text-[#4A3828] leading-relaxed">{MOCK_DETAIL.summary}</p>
           </div>
 
           {/* Goals */}
-          <div className="p-4 border-b border-[#E4DCC9]">
+          <div className="p-4 border-b border-[#E2E1DF]">
             <div className="flex items-center justify-between mb-2">
               <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</div>
               <span className="text-[10px] font-semibold text-[#6B5744]">
                 {MOCK_DETAIL.goals.filter((g) => g.covered).length}/{MOCK_DETAIL.goals.length}
               </span>
             </div>
-            <div className="h-1 bg-[#E4DCC9] rounded-full overflow-hidden mb-3">
+            <div className="h-1 bg-[#E2E1DF] rounded-full overflow-hidden mb-3">
               <div className="h-full bg-[#7A2E20] rounded-full transition-all"
                 style={{ width: `${Math.round(MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length * 100)}%` }}
               />
             </div>
             {MOCK_DETAIL.goals.map((g) => (
-              <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#EDE9E0] last:border-0">
+              <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#E9E8E7] last:border-0">
                 <div className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5',
                   g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0]'
                 )}>
@@ -1434,7 +1431,7 @@ function DepositionDetail({ id, onBack }) {
             {MOCK_DETAIL.topics.map((topic, i) => (
               <button key={topic.id}
                 onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
-                className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#EDE9E0] last:border-0 hover:bg-[#EDE9E0]/60 -mx-1 px-1 rounded transition-colors text-left">
+                className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#E9E8E7] last:border-0 hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors text-left">
                 <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
                 <span className="text-xs text-[#4A3828] flex-1">{topic.title}</span>
                 <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
@@ -1446,8 +1443,8 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-[#FFFEFB]" style={{ maxWidth: '42%' }}>
-          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E4DCC9] shrink-0">
+        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#FFFEFB]" style={{ maxWidth: '42%' }}>
+          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E2E1DF] shrink-0">
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
             <button
               onClick={() => setTab('flagged')}
@@ -1463,9 +1460,9 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="flex-1 flex flex-col bg-[#FBF8F1] overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap gap-0.5 border-b border-[#E4DCC9] shrink-0 px-3 pt-2.5 pb-0">
+          <div className="flex flex-wrap gap-0.5 border-b border-[#E2E1DF] shrink-0 px-3 pt-2.5 pb-0">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
@@ -1473,7 +1470,7 @@ function DepositionDetail({ id, onBack }) {
                   className={cls(
                     'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
-                      ? 'text-[#14110D] bg-[#FFFEFB] border border-b-0 border-[#E4DCC9]'
+                      ? 'text-[#14110D] bg-[#FFFEFB] border border-b-0 border-[#E2E1DF]'
                       : 'text-[#9A8573] hover:text-[#14110D]'
                   )}>
                   {t.label}
@@ -1544,15 +1541,15 @@ function AddDepositionFlow({ caseId, onBack }) {
   /* ── Phase 1: Upload form ── */
   if (phase === 'upload') {
     return (
-      <div className="flex-1 flex flex-col bg-[#F7F2EA]">
-        <div className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4">
+      <div className="flex-1 flex flex-col bg-[#F0F0EE]">
+        <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
           <h2 className="text-lg font-semibold text-[#14110D]">Add Deposition</h2>
           {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
         </div>
-        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F7F2EA]">
+        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F0F0EE]">
           <div className="w-full max-w-xl space-y-5">
             {/* Witness details */}
-            <div className="bg-[#FBF8F1] rounded-xl border border-[#E4DCC9] p-6 space-y-4">
+            <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6 space-y-4">
               <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest">Witness Details</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -1567,7 +1564,7 @@ function AddDepositionFlow({ caseId, onBack }) {
             </div>
 
             {/* File drop zone */}
-            <div className="bg-[#FBF8F1] rounded-xl border border-[#E4DCC9] p-6">
+            <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6">
               <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Upload File <span className="text-rose-400">*</span></p>
               <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -1576,9 +1573,9 @@ function AddDepositionFlow({ caseId, onBack }) {
                 onClick={() => fileRef.current?.click()}
                 className={cls(
                   'border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-all',
-                  dragOver       ? 'border-[#D0C5B0] bg-[#F0EAE0]' :
+                  dragOver       ? 'border-[#D0C5B0] bg-[#E9E8E7]' :
                   file           ? 'border-emerald-300 bg-emerald-50/60' :
-                                   'border-[#E4DCC9] hover:border-[#D0C5B0] hover:bg-[#F0EAE0]/50'
+                                   'border-[#E2E1DF] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]/50'
                 )}
               >
                 <input ref={fileRef} type="file" className="hidden" accept="video/*,audio/*,.pdf,.doc,.docx" onChange={(e) => setFile(e.target.files[0])}/>
@@ -1593,7 +1590,7 @@ function AddDepositionFlow({ caseId, onBack }) {
                   </div>
                 ) : (
                   <>
-                    <div className="w-12 h-12 rounded-xl bg-[#E4DCC9]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3"><Ic.upload size={22}/></div>
+                    <div className="w-12 h-12 rounded-xl bg-[#E2E1DF]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3"><Ic.upload size={22}/></div>
                     <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your file here, or <span className="text-[#7A2E20]">click to browse</span></p>
                     <p className="text-xs text-[#9A8573]">MP4, MOV, WAV, MP3, PDF, DOCX</p>
                   </>
@@ -1616,8 +1613,8 @@ function AddDepositionFlow({ caseId, onBack }) {
 
   /* ── Phase 2: Processing view ── */
   return (
-    <div className="flex-1 flex flex-col bg-[#FBF8F1] overflow-hidden">
-      <header className="border-b border-[#E4DCC9] bg-[#FBF8F1] px-6 py-4 flex items-center justify-between shrink-0">
+    <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
+      <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between shrink-0">
         <div>
           <h2 className="text-lg font-semibold text-[#14110D]">{witnessName} Deposition</h2>
           <div className="flex items-center gap-2 text-sm text-[#6B5744] mt-0.5 flex-wrap">
@@ -1630,23 +1627,23 @@ function AddDepositionFlow({ caseId, onBack }) {
 
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* Left: video preview + summary */}
-        <div className="col-span-3 border-r border-[#E4DCC9] flex flex-col overflow-y-auto">
+        <div className="col-span-3 border-r border-[#E2E1DF] flex flex-col overflow-y-auto">
           <div className="bg-[#2C2316] aspect-video relative flex items-center justify-center shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-[#2C2316] to-[#14110D]"/>
             <div className="relative w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
               <Ic.play size={22} className="text-white/60"/>
             </div>
           </div>
-          <div className="px-4 py-2.5 border-b border-[#E4DCC9]/60 flex items-center gap-3 text-xs shrink-0">
+          <div className="px-4 py-2.5 border-b border-[#E2E1DF]/60 flex items-center gap-3 text-xs shrink-0">
             <span className="flex items-center gap-1.5 font-medium text-[#3D2E1E]"><Ic.play size={12}/> Play</span>
-            <span className="text-[#E4DCC9]">|</span>
+            <span className="text-[#E2E1DF]">|</span>
             <span className="flex items-center gap-1.5 text-[#9A8573]"><Ic.skipBack size={12}/> Restart</span>
             <span className="text-[#9A8573] ml-auto">0:00 / –:––</span>
           </div>
           <div className="p-4 flex-1">
             <p className="text-xs font-semibold text-[#14110D] uppercase tracking-wider mb-3">Summary</p>
             <div className="text-center py-8">
-              <div className="w-8 h-8 rounded-full bg-[#E4DCC9]/40 flex items-center justify-center mx-auto mb-2 text-[#9A8573]"><Ic.fileText size={14}/></div>
+              <div className="w-8 h-8 rounded-full bg-[#E2E1DF]/40 flex items-center justify-center mx-auto mb-2 text-[#9A8573]"><Ic.fileText size={14}/></div>
               <p className="text-sm text-[#6B5744] font-medium">Summary not available</p>
               <p className="text-xs text-[#9A8573] mt-1 leading-relaxed">Summary will be available after processing is complete.</p>
             </div>
@@ -1654,7 +1651,7 @@ function AddDepositionFlow({ caseId, onBack }) {
         </div>
 
         {/* Right: processing timeline */}
-        <div className="col-span-9 overflow-y-auto p-10 bg-[#F7F2EA]">
+        <div className="col-span-9 overflow-y-auto p-10 bg-[#F0F0EE]">
           <div className="max-w-lg">
             <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Processing Timeline</p>
             <h2 className="brand text-[#14110D] mb-2 leading-tight" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
@@ -1678,7 +1675,7 @@ function AddDepositionFlow({ caseId, onBack }) {
                         'w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 mt-0.5',
                         done   ? 'bg-emerald-500 text-white' :
                         active ? 'bg-[#14110D] text-white' :
-                                 'bg-[#E4DCC9]/40 border border-[#E4DCC9]'
+                                 'bg-[#E2E1DF]/40 border border-[#E2E1DF]'
                       )}>
                         {done   ? <Ic.check size={11}/> :
                          active ? (
@@ -1688,7 +1685,7 @@ function AddDepositionFlow({ caseId, onBack }) {
                          ) : <span className="w-1.5 h-1.5 rounded-full bg-[#C4B5A2] block"/>}
                       </div>
                       {i < steps.length - 1 && (
-                        <div className={cls('w-px flex-1 my-1 transition-colors duration-500', done ? 'bg-emerald-200' : 'bg-[#E4DCC9]')}/>
+                        <div className={cls('w-px flex-1 my-1 transition-colors duration-500', done ? 'bg-emerald-200' : 'bg-[#E2E1DF]')}/>
                       )}
                     </div>
                     {/* Content */}
@@ -1706,7 +1703,7 @@ function AddDepositionFlow({ caseId, onBack }) {
                           </div>
                           {file && (
                             <div className="flex items-center gap-2.5 px-1">
-                              <div className="w-7 h-7 rounded bg-[#E4DCC9]/40 flex items-center justify-center text-[#6B5744] text-[9px] font-bold uppercase shrink-0">
+                              <div className="w-7 h-7 rounded bg-[#E2E1DF]/40 flex items-center justify-center text-[#6B5744] text-[9px] font-bold uppercase shrink-0">
                                 {file.name.split('.').pop()}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -1767,7 +1764,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#F7F2EA]" data-screen-label={view}>
+    <div className="h-full flex flex-col bg-[#F0F0EE]" data-screen-label={view}>
       <TopNav
         onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
         onUserManagement={() => {}}
