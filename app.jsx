@@ -326,7 +326,7 @@ function LoginPage() {
       </div>
 
       {/* Right — Auth form */}
-      <div className="flex-1 flex items-center justify-center bg-white p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#F8F8F7] p-8">
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
@@ -1334,7 +1334,7 @@ function ChatTab({ depo }) {
   const isEmpty = messages.length === 0 && !busy;
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-white">
+    <div className="flex flex-col h-full min-h-0 bg-[#F8F8F7]">
       <div className="flex-1 overflow-y-auto min-h-0">
         {isEmpty ? (
           <div className="flex flex-col h-full">
@@ -1625,7 +1625,7 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR */}
-        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-white">
+        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
 
           {/* Recording */}
           <div className="border-b border-[#E2E1DF]">
@@ -1737,7 +1737,7 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-white" style={{ maxWidth: '42%' }}>
+        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F8F8F7]" style={{ maxWidth: '42%' }}>
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E2E1DF] shrink-0">
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
             <button
@@ -1754,7 +1754,7 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="flex-1 flex flex-col bg-white overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
           {/* Tab bar */}
           <div className="flex flex-wrap shrink-0 px-4 py-3 gap-1.5 border-b border-[#F0F0EE]">
             {tabs.map((t) => {
@@ -1836,7 +1836,7 @@ function AddDepositionFlow({ caseId, onBack }) {
           <h2 className="text-lg font-semibold text-[#14110D]">Add Deposition</h2>
           {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
         </div>
-        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-white">
+        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F8F8F7]">
           <div className="w-full max-w-xl space-y-5">
             {/* Witness details */}
             <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6 space-y-4">
@@ -1941,7 +1941,7 @@ function AddDepositionFlow({ caseId, onBack }) {
         </div>
 
         {/* Right: processing timeline */}
-        <div className="col-span-9 overflow-y-auto p-10 bg-white">
+        <div className="col-span-9 overflow-y-auto p-10 bg-[#F8F8F7]">
           <div className="max-w-lg">
             <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Processing Timeline</p>
             <h2 className="brand text-[#14110D] mb-2 leading-tight" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
@@ -2054,7 +2054,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white" data-screen-label={view}>
+    <div className="h-full flex flex-col bg-[#F8F8F7]" data-screen-label={view}>
       <TopNav
         onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
         onUserManagement={() => {}}
