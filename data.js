@@ -102,6 +102,13 @@ window.MOCK_DETAIL = {
       description: 'Sarah Chen signed employment agreement with TechCorp as Senior Project Manager. Contract includes Section 7 non-compete clause.',
       source: 'Exhibit A — Employment Contract',
       contradiction: false,
+      references: [
+        { label: 'Exhibit A', desc: 'Employment Contract, 14 pages' },
+      ],
+      mentionedBy: [
+        { speaker: 'Attorney', timestamp: 310, page: 8, line: 4, quote: 'You signed this contract on January 15th, 2023, correct?' },
+        { speaker: 'Witness',  timestamp: 315, page: 8, line: 5, quote: 'Yes, I signed it. I was excited to start.' },
+      ],
     },
     {
       id: 'ev2', date: '2024-01-01', time: null, category: 'document',
@@ -109,6 +116,13 @@ window.MOCK_DETAIL = {
       description: 'Annual compensation set at $185,000 base salary. Amendment appended to original contract.',
       source: 'Exhibit D — Compensation Amendment',
       contradiction: false,
+      references: [
+        { label: 'Exhibit D', desc: 'Compensation Amendment, signed Jan 3 2024' },
+      ],
+      mentionedBy: [
+        { speaker: 'Attorney', timestamp: 400, page: 10, line: 2, quote: 'Your 2024 compensation was $185,000 per the amendment?' },
+        { speaker: 'Witness',  timestamp: 405, page: 10, line: 3, quote: 'That\'s correct.' },
+      ],
     },
     {
       id: 'ev3', date: '2024-06-03', time: '9:00 AM', category: 'action',
@@ -119,6 +133,13 @@ window.MOCK_DETAIL = {
       contradiction: true,
       contradictionDetails: 'Badge scan log (Exhibit E) records key-card entry at 9:03 AM. Witness later stated she arrived "closer to 9:15." Testimony is internally inconsistent and conflicts with the access record.',
       contradictionRef: 'Exhibit E — Badge Scan Log',
+      references: [
+        { label: 'Exhibit E', desc: 'Badge Scan Log, June 3 2024' },
+      ],
+      mentionedBy: [
+        { speaker: 'Attorney', timestamp: 125, page: 3, line: 15, quote: 'Can you describe your activities on June 3rd, 2024?' },
+        { speaker: 'Witness',  timestamp: 130, page: 3, line: 16, quote: 'I arrived at the office around 9 AM.' },
+      ],
     },
     {
       id: 'ev4', date: '2024-06-03', time: '9:30 AM', category: 'meeting',
@@ -127,6 +148,10 @@ window.MOCK_DETAIL = {
       source: 'Testimony — p.3 l.17',
       transcriptTimestamp: 140,
       contradiction: false,
+      references: [],
+      mentionedBy: [
+        { speaker: 'Witness', timestamp: 140, page: 3, line: 17, quote: 'I had a team standup at 9:30, then worked on the quarterly report until lunch.' },
+      ],
     },
     {
       id: 'ev5', date: '2024-06-03', time: '9:45 AM – 12:00 PM', category: 'action',
@@ -135,6 +160,10 @@ window.MOCK_DETAIL = {
       source: 'Testimony — p.3 l.18',
       transcriptTimestamp: 145,
       contradiction: false,
+      references: [],
+      mentionedBy: [
+        { speaker: 'Witness', timestamp: 145, page: 3, line: 18, quote: 'I worked on the quarterly report until lunch, around noon.' },
+      ],
     },
     {
       id: 'ev6', date: '2024-06-03', time: '2:00 PM', category: 'meeting',
@@ -145,6 +174,14 @@ window.MOCK_DETAIL = {
       contradictionDetails: 'Witness testified the meeting "started a bit late, around 2:15." Attendance logs (Exhibit C) confirm all participants joined at 2:02 PM. Witness was 13 minutes off — consistent across both statements but conflicts with records.',
       contradictionRef: 'Exhibit B & C — Calendar + Attendance Log',
       transcriptTimestamp: 152,
+      references: [
+        { label: 'Exhibit B', desc: 'Calendar Invite, sent June 1 2024' },
+        { label: 'Exhibit C', desc: 'Meeting Attendance Log' },
+      ],
+      mentionedBy: [
+        { speaker: 'Attorney', timestamp: 145, page: 3, line: 18, quote: 'And what happened after lunch? Were you present at the 2 PM meeting?' },
+        { speaker: 'Witness',  timestamp: 152, page: 3, line: 19, quote: 'The meeting started a bit late, around 2:15.' },
+      ],
     },
     {
       id: 'ev7', date: '2024-06-03', time: '4:30 PM', category: 'action',
@@ -155,6 +192,14 @@ window.MOCK_DETAIL = {
       contradictionDetails: 'Witness claimed she was "not familiar with the specifics of Section 7." Exhibit F shows she initiated a legal review of that exact clause on the same day as the disputed meeting.',
       contradictionRef: 'Exhibit F — Internal Email Chain',
       transcriptTimestamp: 325,
+      references: [
+        { label: 'Exhibit A', desc: 'Employment Contract, Section 7' },
+        { label: 'Exhibit F', desc: 'Internal Email Chain, June 3 2024' },
+      ],
+      mentionedBy: [
+        { speaker: 'Attorney', timestamp: 320, page: 8, line: 5, quote: 'Are you familiar with the non-compete clause in Section 7 of your contract?' },
+        { speaker: 'Witness',  timestamp: 325, page: 8, line: 6, quote: 'I... I don\'t recall the specific details of Section 7.' },
+      ],
     },
   ],
   contradictions: [
