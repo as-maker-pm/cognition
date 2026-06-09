@@ -125,6 +125,19 @@ const Card = ({ className = '', children, ...rest }) => (
   <div className={cls('rounded-lg border border-slate-100 bg-white', className)} {...rest}>{children}</div>
 );
 
+class ErrorBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(e) { return { err: e }; }
+  render() {
+    if (this.state.err) return (
+      <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg m-4">
+        <strong>Error:</strong> {this.state.err.message}
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 // ---------- Top Nav ----------
 function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
   const { user, logout } = useAuth();
@@ -1874,7 +1887,7 @@ function DepositionDetail({ id, onBack }) {
             {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
             {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
             {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
-            {tab === 'timeline'       && <div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div>}
+            {tab === 'timeline'       && <ErrorBoundary><div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div></ErrorBoundary>}
           </div>
         </div>
       </div>
