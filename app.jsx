@@ -822,6 +822,11 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
                           ))}
                         </div>
                       )}
+                      {(s.page || s.line) && (
+                        <div className="mt-1.5">
+                          <span className="text-[10px] text-[#C4B5A2] font-mono">p.{s.page} l.{s.line}</span>
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -834,7 +839,7 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
   );
 }
 
-function GoalsTab({ goals: initialGoals }) {
+function GoalsTab({ goals: initialGoals, jump }) {
   const [goals, setGoals] = useState(initialGoals);
   const [collapsed, setCollapsed] = useState({});
   const [adding, setAdding] = useState(false);
@@ -935,6 +940,23 @@ function GoalsTab({ goals: initialGoals }) {
                       <div className="flex-1 min-w-0">
                         <div className="text-[15px] font-semibold text-[#111] leading-snug">{g.title}</div>
                         {g.notes && <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1">{g.notes}</div>}
+                        {g.citations?.length > 0 && (
+                          <div className="mt-2 flex flex-col gap-1.5">
+                            {g.citations.map((c, i) => (
+                              <div key={i} className="flex items-start gap-2 pl-2 border-l-2 border-[#E8E6E3]">
+                                <span className="text-[10px] font-mono text-[#9CA3AF] shrink-0 mt-0.5 whitespace-nowrap">p.{c.page} l.{c.line}</span>
+                                <span className="text-[11px] text-[#6B7280] leading-snug line-clamp-2 italic">"{c.quote}"</span>
+                                <button onClick={() => jump && jump(c.timestamp)}
+                                  className="text-[10px] font-mono text-[#9A8573] hover:text-[#7A2E20] shrink-0 mt-0.5 whitespace-nowrap transition-colors">
+                                  {Math.floor(c.timestamp/60)}:{String(c.timestamp%60).padStart(2,'0')}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {g.citations?.length === 0 && !g.covered && (
+                          <div className="mt-1.5 text-[11px] text-[#C4B5A2] italic">No transcript citations yet</div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
@@ -1724,7 +1746,7 @@ function DepositionDetail({ id, onBack }) {
 
           <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
             {tab === 'chat'           && <ChatTab depo={depo}/>}
-            {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals}/>}
+            {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals} jump={jump}/>}
             {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
             {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
             {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}

@@ -45,10 +45,20 @@ window.MOCK_DETAIL = {
     { id: 'flag-007', type: 'defensive',       timestamp: 325, description: 'Leaning back, closed posture when contract details mentioned',         severity: 'medium' },
   ],
   goals: [
-    { id: 'g1', title: 'Establish timeline of events on June 3rd',         covered: true,  notes: 'Well covered — witness provided detailed account' },
-    { id: 'g2', title: 'Verify witness presence at 2PM meeting',           covered: true,  notes: 'Confirmed but showed signs of nervousness' },
-    { id: 'g3', title: 'Determine knowledge of contract terms',            covered: true,  notes: 'Claimed limited knowledge — evasive responses' },
-    { id: 'g4', title: 'Obtain admission regarding email correspondence',  covered: false, notes: 'Not addressed — schedule follow-up' },
+    { id: 'g1', title: 'Establish timeline of events on June 3rd', covered: true, notes: 'Well covered — witness provided detailed account', citations: [
+      { timestamp: 125, page: 3, line: 15, quote: 'Can you describe your activities on June 3rd, 2024?' },
+      { timestamp: 130, page: 3, line: 16, quote: 'I arrived at the office around 9 AM. I had a team standup at 9:30, then worked on the quarterly report until lunch.' },
+    ]},
+    { id: 'g2', title: 'Verify witness presence at 2PM meeting', covered: true, notes: 'Confirmed but showed signs of nervousness', citations: [
+      { timestamp: 145, page: 3, line: 18, quote: 'And what happened after lunch? Were you present at the 2 PM meeting?' },
+      { timestamp: 152, page: 3, line: 19, quote: 'Um... yes, I was there. The meeting started a bit late, around 2:15.' },
+    ]},
+    { id: 'g3', title: 'Determine knowledge of contract terms', covered: true, notes: 'Claimed limited knowledge — evasive responses', citations: [
+      { timestamp: 320, page: 8, line: 5,  quote: 'Were you aware of the non-compete clause in Section 7 of the contract?' },
+      { timestamp: 325, page: 8, line: 6,  quote: "I... I don't recall the specific details of Section 7." },
+      { timestamp: 337, page: 8, line: 9,  quote: "Yes, but I signed many documents that day. I can't be expected to remember every detail." },
+    ]},
+    { id: 'g4', title: 'Obtain admission regarding email correspondence', covered: false, notes: 'Not addressed — schedule follow-up', citations: [] },
   ],
   topics: [
     { id: 't1', title: 'Background & Identification', summary: 'Witness identified herself as Sarah Chen, Senior Project Manager at TechCorp since January 2023.', segments: [
