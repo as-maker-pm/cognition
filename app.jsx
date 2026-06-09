@@ -1142,7 +1142,6 @@ function ChatTab({ depo }) {
         </div>
         <p className="text-[10px] text-[#B5A899] mt-1.5 px-1">↵ send · ⇧↵ new line</p>
       </div>
-      </div>
     </div>
   );
 }
