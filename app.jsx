@@ -1348,7 +1348,7 @@ function ChatTab({ depo }) {
               <div className="flex flex-col gap-1">
                 {WORKFLOWS.map((w) => (
                   <button key={w.title} onClick={() => send(w.title)}
-                    className="flex items-start gap-3 px-3.5 py-3 rounded-xl hover:bg-[#F8F8F7] transition-colors text-left border border-transparent hover:border-[#E8E7E5]">
+                    className="flex items-start gap-3 px-3.5 py-3 rounded-xl hover:bg-[#F0F0EE] transition-colors text-left">
                     <span className="text-[#9A8573] mt-0.5 shrink-0">{w.icon}</span>
                     <div>
                       <p className="text-[13px] font-semibold text-[#14110D] leading-snug">{w.title}</p>
