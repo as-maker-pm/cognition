@@ -1246,7 +1246,7 @@ function ChatTab({ depo }) {
       </div>
 
       <div className="px-4 pb-4 pt-2 shrink-0">
-        <div className="bg-[#F9F9F8] rounded-2xl px-4 pt-4 pb-3 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
+        <div className="bg-white border border-[#E2E1DF] rounded-2xl px-4 pt-4 pb-3 focus-within:border-[#9A8573] transition-all">
           <textarea
             ref={inputRef}
             value={input}
@@ -1440,6 +1440,7 @@ function DepositionDetail({ id, onBack }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [sideCollapsed, setSideCollapsed] = useState({});
 
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
@@ -1503,62 +1504,97 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR */}
-        <div className="w-72 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F0F0EE]">
+        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F0F0EE]">
 
           {/* Recording */}
-          <div className="p-4 border-b border-[#E2E1DF]">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-3">Recording</div>
-            <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+          <div className="border-b border-[#E2E1DF]">
+            <button onClick={() => setSideCollapsed(c => ({ ...c, recording: !c.recording }))}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Recording</span>
+              <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.recording && '-rotate-90')}/>
+            </button>
+            {!sideCollapsed.recording && (
+              <div className="px-4 pb-4">
+                <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+              </div>
+            )}
           </div>
 
           {/* Summary */}
-          <div className="p-4 border-b border-[#E2E1DF]">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-2">Summary</div>
-            <p className="text-xs text-[#4A3828] leading-relaxed">{MOCK_DETAIL.summary}</p>
+          <div className="border-b border-[#E2E1DF]">
+            <button onClick={() => setSideCollapsed(c => ({ ...c, summary: !c.summary }))}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Summary</span>
+              <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.summary && '-rotate-90')}/>
+            </button>
+            {!sideCollapsed.summary && (
+              <div className="px-4 pb-4">
+                <p className="text-xs text-[#4A3828] leading-relaxed">{MOCK_DETAIL.summary}</p>
+              </div>
+            )}
           </div>
 
           {/* Goals */}
-          <div className="p-4 border-b border-[#E2E1DF]">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</div>
-              <span className="text-[10px] font-semibold text-[#6B5744]">
-                {MOCK_DETAIL.goals.filter((g) => g.covered).length}/{MOCK_DETAIL.goals.length}
-              </span>
-            </div>
-            <div className="h-1 bg-[#E2E1DF] rounded-full overflow-hidden mb-3">
-              <div className="h-full bg-[#7A2E20] rounded-full transition-all"
-                style={{ width: `${Math.round(MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length * 100)}%` }}
-              />
-            </div>
-            {MOCK_DETAIL.goals.map((g) => (
-              <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#E9E8E7] last:border-0">
-                <div className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5',
-                  g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0]'
-                )}>
-                  {g.covered && <Ic.check size={9}/>}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
-                  {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
-                </div>
+          <div className="border-b border-[#E2E1DF]">
+            <button onClick={() => setSideCollapsed(c => ({ ...c, goals: !c.goals }))}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-semibold text-[#6B5744]">
+                  {MOCK_DETAIL.goals.filter((g) => g.covered).length}/{MOCK_DETAIL.goals.length}
+                </span>
+                <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.goals && '-rotate-90')}/>
               </div>
-            ))}
+            </button>
+            {!sideCollapsed.goals && (
+              <div className="px-4 pb-4">
+                <div className="h-1 bg-[#E2E1DF] rounded-full overflow-hidden mb-3">
+                  <div className="h-full bg-[#7A2E20] rounded-full transition-all"
+                    style={{ width: `${Math.round(MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length * 100)}%` }}
+                  />
+                </div>
+                {MOCK_DETAIL.goals.map((g) => (
+                  <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#E9E8E7] last:border-0">
+                    <div className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5',
+                      g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0]'
+                    )}>
+                      {g.covered && <Ic.check size={9}/>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
+                      {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
+                    </div>
+                  </div>
+                ))}
+                <button className="mt-2 w-full flex items-center gap-1.5 text-[11px] text-[#7A2E20] hover:text-[#5A1E10] font-medium transition-colors py-1">
+                  <Ic.plus size={11}/> Add goal
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Topics */}
-          <div className="p-4">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-2">Topics Covered</div>
-            {MOCK_DETAIL.topics.map((topic, i) => (
-              <button key={topic.id}
-                onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
-                className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#E9E8E7] last:border-0 hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors text-left">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
-                <span className="text-xs text-[#4A3828] flex-1">{topic.title}</span>
-                <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
-                  {Math.floor((topic.segments[0]?.timestamp || 0)/60)}:{String((topic.segments[0]?.timestamp || 0)%60).padStart(2,'0')}
-                </span>
-              </button>
-            ))}
+          <div>
+            <button onClick={() => setSideCollapsed(c => ({ ...c, topics: !c.topics }))}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Topics Covered</span>
+              <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.topics && '-rotate-90')}/>
+            </button>
+            {!sideCollapsed.topics && (
+              <div className="px-4 pb-4">
+                {MOCK_DETAIL.topics.map((topic, i) => (
+                  <button key={topic.id}
+                    onClick={() => setCurrentTime(topic.segments[0]?.timestamp || 0)}
+                    className="flex items-center gap-2.5 w-full py-1.5 border-b border-[#E9E8E7] last:border-0 hover:bg-[#E9E8E7]/60 -mx-1 px-1 rounded transition-colors text-left">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: topicColors[i % topicColors.length] }}/>
+                    <span className="text-xs text-[#4A3828] flex-1">{topic.title}</span>
+                    <span className="text-[10px] text-[#9A8573] font-mono shrink-0">
+                      {Math.floor((topic.segments[0]?.timestamp || 0)/60)}:{String((topic.segments[0]?.timestamp || 0)%60).padStart(2,'0')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1582,13 +1618,13 @@ function DepositionDetail({ id, onBack }) {
         {/* RIGHT PANEL */}
         <div className="flex-1 flex flex-col bg-white overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap border-b border-[#F0F0EE] shrink-0 px-4 pt-3 gap-x-4 gap-y-0">
+          <div className="flex flex-wrap border-b border-[#F0F0EE] shrink-0 px-5 pt-4 gap-x-6 gap-y-0">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={cls(
-                    'relative inline-flex items-center gap-1.5 pb-2.5 text-sm font-medium transition-colors whitespace-nowrap border-b-2',
+                    'relative inline-flex items-center gap-1.5 pb-3 text-[13px] font-normal transition-colors whitespace-nowrap border-b-2',
                     isActive ? 'text-[#14110D] border-[#14110D]' : 'text-[#9A8573] border-transparent hover:text-[#14110D]'
                   )}>
                   {t.label}
