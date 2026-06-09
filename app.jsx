@@ -41,6 +41,9 @@ const Ic = {
   msg:      (p) => <I {...p} d={<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>}/>,
   x:        (p) => <I {...p} d={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>}/>,
   user:     (p) => <I {...p} d={<><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></>}/>,
+  volume:   (p) => <I {...p} d={<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></>}/>,
+  volumeX:  (p) => <I {...p} d={<><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></>}/>,
+  maximize: (p) => <I {...p} d={<><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></>}/>,
 };
 
 // ---------- Tiny toast ----------
@@ -103,7 +106,7 @@ const Button = ({ variant = 'primary', size = 'md', className = '', children, ..
 };
 
 const Input = ({ className = '', ...rest }) => (
-  <input className={cls('h-9 w-full rounded-md border border-[#E4DCC9] bg-[#FBF8F1] px-3 text-sm outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors text-[#14110D] placeholder:text-[#9A8573]', className)} {...rest}/>
+  <input className={cls('h-9 w-full rounded-md border border-[#E4DCC9] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 focus:ring-2 focus:ring-[#7A2E20]/8 transition-colors text-[#14110D] placeholder:text-[#9A8573]', className)} {...rest}/>
 );
 
 const Badge = ({ variant = 'secondary', className = '', children }) => {
@@ -641,7 +644,9 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
 // ---------- Deposition Detail ----------
 function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) {
   const [videoIdx, setVideoIdx] = useState(0);
+  const [volume, setVolume] = useState(70);
   const duration = 540;
+  const videoRef = useRef(null);
   const v = depo.videos?.[videoIdx];
 
   useEffect(() => {
@@ -695,57 +700,125 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
             <Button size="sm" variant="outline" disabled={videoIdx >= (depo.videos?.length || 1) - 1} onClick={() => { setVideoIdx(videoIdx + 1); setCurrentTime(0); }}>Next <Ic.chevR size={13}/></Button>
           </>}
         </div>
+        {/* Volume + fullscreen row */}
+        <div className="flex items-center gap-2 pt-1">
+          <button onClick={() => setVolume(v => v === 0 ? 70 : 0)} className="text-[#9A8573] hover:text-[#14110D] transition-colors shrink-0">
+            {volume === 0 ? <Ic.volumeX size={13}/> : <Ic.volume size={13}/>}
+          </button>
+          <input
+            type="range" min="0" max="100" value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+            className="flex-1 accent-[#7A2E20]"
+            style={{ height: '4px' }}
+          />
+          <span className="text-[10px] text-[#9A8573] font-mono w-6 text-right shrink-0">{volume}%</span>
+          <button
+            ref={videoRef}
+            onClick={() => videoRef.current?.closest('.bg-\\[\\#2C2316\\]')?.requestFullscreen?.()}
+            title="Fullscreen"
+            className="ml-1 shrink-0 text-[#9A8573] hover:text-[#14110D] border border-[#E4DCC9] rounded p-1 transition-colors"
+          >
+            <Ic.maximize size={12}/>
+          </button>
+        </div>
       </div>
 
     </div>
   );
 }
 
-function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
+function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
+  const [collapsed, setCollapsed] = useState({});
+  const activeRef = useRef(null);
+
+  useEffect(() => {
+    if (playing && activeRef.current) {
+      activeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [currentTime, playing]);
+
+  const cueColor = (desc) => {
+    const d = (desc || '').toLowerCase();
+    if (d.includes('contradict') || d.includes('inconsist') || d.includes('conflict')) return 'bg-rose-50 border-rose-200 text-rose-700';
+    if (d.includes('evasive') || d.includes('hesit') || d.includes('deflect') || d.includes('avoid') || d.includes('pause')) return 'bg-orange-50 border-orange-200 text-orange-700';
+    if (d.includes('confirm') || d.includes('admit') || d.includes('acknowledg') || d.includes('agree')) return 'bg-emerald-50 border-emerald-200 text-emerald-700';
+    if (d.includes('emotion') || d.includes('stress') || d.includes('upset') || d.includes('distress')) return 'bg-purple-50 border-purple-200 text-purple-700';
+    return 'bg-amber-50 border-amber-200 text-amber-700';
+  };
+
+  const countExhibits = (segments) =>
+    segments.reduce((c, s) => c + ((s.text || '').match(/Exh\b|Exhibit/gi) || []).length, 0);
+
   return (
-    <div className="flex flex-col gap-8">
-      {topics.map((topic) => (
-        <div key={topic.id}>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#9A8573] mb-3 pb-2 border-b border-[#E4DCC9]">{topic.title}</div>
-          <div className="flex flex-col border-l-2 border-[#E4DCC9] ml-0.5">
-            {topic.segments.map((s) => {
-              const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
-              const isW = s.speaker === 'Witness';
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setCurrentTime(s.timestamp)}
-                  className={cls(
-                    'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all rounded-r',
-                    active
-                      ? 'border-[#7A2E20] bg-[#FDF0EC]'
-                      : 'border-transparent hover:border-[#E4DCC9] hover:bg-[#F7F2EA]'
+    <div className="flex flex-col gap-5">
+      {topics.map((topic) => {
+        const isCollapsed = !!collapsed[topic.id];
+        const exhibitCount = countExhibits(topic.segments);
+        return (
+          <div key={topic.id}>
+            <button
+              onClick={() => setCollapsed((c) => ({ ...c, [topic.id]: !c[topic.id] }))}
+              className="w-full text-left pb-2 border-b border-[#E4DCC9] flex items-start justify-between gap-3 group"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A8573]">{topic.title}</span>
+                  {exhibitCount > 0 && (
+                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold bg-[#E4DCC9]/60 text-[#6B5744] px-1.5 py-0.5 rounded border border-[#E4DCC9]">
+                      <Ic.fileText size={8}/>{exhibitCount} exhibit{exhibitCount !== 1 ? 's' : ''}
+                    </span>
                   )}
-                >
-                  <div className="flex items-baseline justify-between mb-1.5">
-                    <span className={cls('text-[11px] font-bold tracking-wide', isW ? 'text-[#7A2E20]' : 'text-[#6B5744]')}>
-                      {s.speaker}
-                    </span>
-                    <span className="text-[10px] text-[#B5A899] tabular-nums font-mono shrink-0 ml-3">
-                      {Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: "Georgia, serif" }}>{s.text}</p>
-                  {s.cues?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {s.cues.map((c, i) => (
-                        <span key={i} className="text-[10.5px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                          ⚑ {c.description}
+                </div>
+                {topic.summary && (
+                  <p className="text-[11px] text-[#9A8573] leading-relaxed line-clamp-2">{topic.summary}</p>
+                )}
+              </div>
+              <span className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors shrink-0 mt-0.5">
+                {isCollapsed ? <Ic.chevD size={12}/> : <Ic.chevU size={12}/>}
+              </span>
+            </button>
+
+            {!isCollapsed && (
+              <div className="flex flex-col border-l-2 border-[#E4DCC9] ml-0.5 mt-2">
+                {topic.segments.map((s) => {
+                  const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
+                  const isW = s.speaker === 'Witness';
+                  return (
+                    <button
+                      key={s.id}
+                      ref={active ? activeRef : null}
+                      onClick={() => setCurrentTime(s.timestamp)}
+                      className={cls(
+                        'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all rounded-r',
+                        active ? 'border-[#7A2E20] bg-[#FDF0EC]' : 'border-transparent hover:border-[#E4DCC9] hover:bg-[#F7F2EA]'
+                      )}
+                    >
+                      <div className="flex items-baseline justify-between mb-1.5">
+                        <span className={cls('text-[11px] font-bold tracking-wide', isW ? 'text-[#7A2E20]' : 'text-[#6B5744]')}>
+                          {s.speaker}
                         </span>
-                      ))}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+                        <span className="text-[10px] text-[#B5A899] tabular-nums font-mono shrink-0 ml-3">
+                          {Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}
+                        </span>
+                      </div>
+                      <p className="text-sm text-[#2A1F14] leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>{s.text}</p>
+                      {s.cues?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {s.cues.map((c, i) => (
+                            <span key={i} className={cls('text-[10.5px] px-1.5 py-0.5 rounded border', cueColor(c.description))}>
+                              ⚑ {c.description}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -1252,7 +1325,6 @@ function DepositionDetail({ id, onBack }) {
   const [exportOpen, setExportOpen] = useState(false);
 
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
-  const fmtDur = (m) => { const h = Math.floor(m/60); const r = m%60; return h ? `${h}h ${r}m` : `${r}m`; };
 
   const tabs = [
     { id: 'chat',           label: 'AI Chat' },
@@ -1272,13 +1344,6 @@ function DepositionDetail({ id, onBack }) {
   ];
 
   const topicColors = ['#7A2E20', '#7A2E20', '#C4882A', '#C4882A', '#4A6741', '#4A6741'];
-
-  const keyFacts = [
-    ['Witness',  depo.witness],
-    ['Date',     depo.date],
-    ['Duration', fmtDur(depo.duration)],
-    ['Case No.', depo.caseNumber],
-  ];
 
   return (
     <div className="flex-1 flex flex-col bg-[#F7F2EA] overflow-hidden">
@@ -1335,13 +1400,30 @@ function DepositionDetail({ id, onBack }) {
             <p className="text-xs text-[#4A3828] leading-relaxed">{MOCK_DETAIL.summary}</p>
           </div>
 
-          {/* Key Facts */}
+          {/* Goals */}
           <div className="p-4 border-b border-[#E4DCC9]">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">Key Facts</div>
-            {keyFacts.map(([label, value]) => (
-              <div key={label} className="flex justify-between items-baseline py-1.5 border-b border-[#EDE9E0] last:border-0">
-                <span className="text-xs text-[#7A6A58]">{label}</span>
-                <span className="text-xs font-semibold text-[#14110D] text-right max-w-[55%] truncate">{value}</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</div>
+              <span className="text-[10px] font-semibold text-[#6B5744]">
+                {MOCK_DETAIL.goals.filter((g) => g.covered).length}/{MOCK_DETAIL.goals.length}
+              </span>
+            </div>
+            <div className="h-1 bg-[#E4DCC9] rounded-full overflow-hidden mb-3">
+              <div className="h-full bg-[#7A2E20] rounded-full transition-all"
+                style={{ width: `${Math.round(MOCK_DETAIL.goals.filter((g) => g.covered).length / MOCK_DETAIL.goals.length * 100)}%` }}
+              />
+            </div>
+            {MOCK_DETAIL.goals.map((g) => (
+              <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#EDE9E0] last:border-0">
+                <div className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5',
+                  g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0]'
+                )}>
+                  {g.covered && <Ic.check size={9}/>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className={cls('text-xs leading-snug', g.covered ? 'text-[#4A3828]' : 'text-[#7A6A58]')}>{g.title}</div>
+                  {g.notes && <div className="text-[10px] text-amber-600 mt-0.5">{g.notes}</div>}
+                </div>
               </div>
             ))}
           </div>
@@ -1364,21 +1446,24 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-[#FFFEFB]">
-          <div className="flex items-center justify-between px-6 py-2.5 border-b border-[#E4DCC9] shrink-0">
+        <div className="flex-1 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-[#FFFEFB]" style={{ maxWidth: '42%' }}>
+          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E4DCC9] shrink-0">
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
-            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700 transition-colors">
+            <button
+              onClick={() => setTab('flagged')}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+            >
               <Ic.flag size={11}/>
               {MOCK_DETAIL.flaggedItems.length} flagged
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto px-6 py-5">
-            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime}/>
+          <div className="flex-1 overflow-y-auto px-5 py-5">
+            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing}/>
           </div>
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-80 shrink-0 flex flex-col bg-[#FBF8F1] overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[#FBF8F1] overflow-hidden">
           {/* Tab bar */}
           <div className="flex flex-wrap gap-0.5 border-b border-[#E4DCC9] shrink-0 px-3 pt-2.5 pb-0">
             {tabs.map((t) => {
