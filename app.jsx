@@ -1208,7 +1208,7 @@ function TimelineTab({ events, jump }) {
                       ? 'bg-[#FEF2F2] border-[#FECACA]'
                       : 'bg-white border-[#E2E1DF] hover:bg-[#F0F0EE] transition-colors'
                   )}>
-                    <div className="flex items-start justify-between gap-3 mb-1.5">
+                    <div className="flex items-start justify-between gap-3 mb-0.5">
                       <div>
                         {ev.time && (
                           <div className="text-[10px] font-mono text-[#9A8573] mb-0.5">{ev.time}</div>
@@ -1222,37 +1222,32 @@ function TimelineTab({ events, jump }) {
                       )}
                     </div>
 
-                    <p className="text-[12px] text-[#6B5744] leading-relaxed mb-3">{ev.description}</p>
-
-                    {/* References */}
-                    {ev.references && ev.references.length > 0 && (
-                      <div className="mb-3">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] mb-1.5">References</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {ev.references.map((r, i) => (
-                            <span key={i} className="inline-flex items-center gap-1 text-[10px] font-mono text-[#6B5744] bg-[#F0F0EE] rounded-full px-2 py-0.5">
-                              <Ic.fileText size={9}/> {r.label}
-                              <span className="text-[#9A8573]">· {r.desc}</span>
-                            </span>
-                          ))}
-                        </div>
+                    {/* Mentioned by — inline attribution under title */}
+                    {ev.mentionedBy && ev.mentionedBy.length > 0 && (
+                      <div className="text-[11px] text-[#9A8573] mb-2">
+                        Mentioned by{' '}
+                        {[...new Set(ev.mentionedBy.map(m => m.speaker))].join(', ')}
                       </div>
                     )}
 
-                    {/* Mentioned by */}
-                    {ev.mentionedBy && ev.mentionedBy.length > 0 && (
-                      <div className={cls('mb-2', ev.contradiction && 'mb-3')}>
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] mb-1.5">Mentioned by</p>
-                        <div className="flex flex-col gap-1.5">
-                          {ev.mentionedBy.map((m, i) => (
-                            <button key={i} onClick={() => jump && jump(m.timestamp)}
-                              className="text-left flex items-start gap-2 px-2.5 py-2 rounded-lg bg-[#F8F8F7] hover:bg-[#F0F0EE] transition-colors border border-[#E2E1DF]">
-                              <span className={cls('text-[9px] font-bold uppercase tracking-wide shrink-0 mt-0.5', m.speaker === 'Witness' ? 'text-[#7A2E20]' : 'text-[#9A8573]')}>{m.speaker}</span>
-                              <span className="text-[11px] text-[#6B5744] leading-relaxed italic flex-1">"{m.quote}"</span>
-                              <span className="shrink-0 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">{Math.floor(m.timestamp/60)}:{String(m.timestamp%60).padStart(2,'0')} · p.{m.page} l.{m.line}</span>
-                            </button>
-                          ))}
-                        </div>
+                    <p className="text-[12px] text-[#6B5744] leading-relaxed mb-3">{ev.description}</p>
+
+                    {/* Exhibits + Citations row */}
+                    {((ev.references && ev.references.length > 0) || (ev.mentionedBy && ev.mentionedBy.length > 0)) && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {(ev.references || []).map((r, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">
+                            {r.label}
+                          </span>
+                        ))}
+                        {(ev.mentionedBy || []).map((m, i) => (
+                          <button key={i} onClick={() => jump && jump(m.timestamp)}
+                            className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                            <span>{Math.floor(m.timestamp/60)}:{String(m.timestamp%60).padStart(2,'0')}</span>
+                            <span className="text-[#D0C8BF]">·</span>
+                            <span>p.{m.page} l.{m.line}</span>
+                          </button>
+                        ))}
                       </div>
                     )}
 
