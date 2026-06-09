@@ -1049,10 +1049,102 @@ function SummariesTab({ topics }) {
   );
 }
 
+const WORKING_STEPS = [
+  'Assessing question',
+  'Reviewing deposition transcript',
+  'Analyzing flagged behaviors',
+  'Cross-referencing contradictions',
+  'Drafting response',
+];
+
+const WORKFLOWS = [
+  { icon: <Ic.flag size={15}/>,     title: 'Analyze key moments',         desc: 'Surface the most significant exchanges and flag patterns' },
+  { icon: <Ic.alert size={15}/>,    title: 'Build contradiction report',   desc: 'Map all testimony contradictions with transcript references' },
+  { icon: <Ic.fileText size={15}/>, title: 'Summarize testimony',          desc: 'Generate a concise summary organized by topic' },
+  { icon: <Ic.edit size={15}/>,     title: 'Draft follow-up questions',    desc: 'Suggest questions for the next deposition session' },
+];
+
+function WorkingState({ steps, currentStep, expanded, onToggle }) {
+  return (
+    <div className="mb-4">
+      <button onClick={onToggle} className="flex items-center gap-2 text-sm font-medium text-[#14110D] hover:text-[#555] transition-colors mb-2">
+        <div className="w-4 h-4 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
+          <Ic.sparkles size={8} className="text-white"/>
+        </div>
+        <span>Working…</span>
+        {expanded ? <Ic.chevU size={13} className="text-[#9A8573]"/> : <Ic.chevD size={13} className="text-[#9A8573]"/>}
+      </button>
+      {expanded && (
+        <div className="pl-6 flex flex-col gap-1.5">
+          {steps.map((step, i) => {
+            const done = i < currentStep;
+            const active = i === currentStep;
+            return (
+              <div key={step} className={cls('flex items-center gap-2 text-[13px]', done ? 'text-[#6B7280]' : active ? 'text-[#14110D]' : 'text-[#C0BDB9]')}>
+                {done
+                  ? <Ic.check size={13} className="text-[#22c55e] shrink-0"/>
+                  : active
+                    ? <div className="w-3 h-3 rounded-full border-2 border-[#14110D] border-t-transparent shrink-0" style={{ animation: 'spin 0.8s linear infinite' }}/>
+                    : <div className="w-3 h-3 rounded-full border border-[#D1D5DB] shrink-0"/>
+                }
+                {step}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AiMessage({ msg, onFollowUp }) {
+  const [thumbs, setThumbs] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const copy = () => { navigator.clipboard?.writeText(msg.text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-4 h-4 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
+          <Ic.sparkles size={8} className="text-white"/>
+        </div>
+        <span className="text-[11px] font-semibold text-[#9A8573] uppercase tracking-wide">Cognition AI</span>
+      </div>
+      <p className="text-[14px] text-[#14110D] leading-relaxed mb-3">{msg.text}</p>
+      <div className="flex items-center gap-3 mb-4">
+        <button onClick={copy} className="flex items-center gap-1.5 text-[12px] text-[#9A8573] hover:text-[#14110D] transition-colors">
+          <Ic.fileText size={12}/>{copied ? 'Copied' : 'Copy'}
+        </button>
+        <button onClick={() => setThumbs('up')} className={cls('text-[12px] transition-colors', thumbs === 'up' ? 'text-[#14110D]' : 'text-[#9A8573] hover:text-[#14110D]')}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill={thumbs==='up'?'currentColor':'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        </button>
+        <button onClick={() => setThumbs('down')} className={cls('text-[12px] transition-colors', thumbs === 'down' ? 'text-[#14110D]' : 'text-[#9A8573] hover:text-[#14110D]')}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill={thumbs==='down'?'currentColor':'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+        </button>
+      </div>
+      {msg.followUps && msg.followUps.length > 0 && (
+        <div>
+          <p className="text-[12px] font-semibold text-[#14110D] mb-2">Follow-ups</p>
+          <div className="flex flex-col divide-y divide-[#F0F0EE]">
+            {msg.followUps.map((q) => (
+              <button key={q} onClick={() => onFollowUp(q)}
+                className="text-left text-[13px] text-[#3D3530] py-2.5 hover:text-[#14110D] transition-colors leading-snug">
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ChatTab({ depo }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
+  const [workingStep, setWorkingStep] = useState(0);
+  const [workingExpanded, setWorkingExpanded] = useState(true);
+  const [mode, setMode] = useState('Ask');
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -1061,115 +1153,136 @@ function ChatTab({ depo }) {
   const goalsTotal = MOCK_DETAIL.goals.length;
   const goalsDone  = MOCK_DETAIL.goals.filter((g) => g.covered).length;
 
-  const suggestions = [
-    'What were the most concerning moments?',
-    `Were all ${goalsTotal} deposition goals achieved?`,
-    'Summarize testimony on the key contract terms',
-    'What contradictions were identified?',
-  ];
-
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, busy]);
+  }, [messages, busy, workingStep]);
+
+  useEffect(() => {
+    if (!busy) return;
+    setWorkingStep(0);
+    setWorkingExpanded(true);
+    const interval = setInterval(() => {
+      setWorkingStep((s) => {
+        if (s >= WORKING_STEPS.length - 1) { clearInterval(interval); return s; }
+        return s + 1;
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [busy]);
 
   const send = async (text) => {
     const q = (text !== undefined ? text : input).trim();
     if (!q || busy) return;
     setInput('');
+    if (inputRef.current) { inputRef.current.style.height = 'auto'; }
     setMessages((m) => [...m, { role: 'user', text: q }]);
     setBusy(true);
     try {
       const reply = await window.claude.complete({
         messages: [{
           role: 'user',
-          content: `You are an AI legal analyst reviewing a deposition of ${depo.witness}. Context: ${MOCK_DETAIL.summary} There are ${flagCount} flagged items (${highFlags} high severity). Goals: ${goalsDone}/${goalsTotal} covered. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Be specific and reference actual details from the deposition.`,
+          content: `You are an AI legal analyst reviewing a deposition of ${depo.witness}. Context: ${MOCK_DETAIL.summary} There are ${flagCount} flagged items (${highFlags} high severity). Goals: ${goalsDone}/${goalsTotal} covered. Question: ${q}\n\nRespond in 2-3 sentences, conversational tone. Be specific. End your JSON response as plain text only, no JSON.`,
         }],
       });
-      setMessages((m) => [...m, { role: 'ai', text: reply }]);
+      const followUps = [
+        `What evidence supports this from the transcript?`,
+        `How does this relate to the primary case theory?`,
+        `What follow-up questions should we ask?`,
+      ];
+      setMessages((m) => [...m, { role: 'ai', text: reply, followUps }]);
     } catch {
-      setMessages((m) => [...m, { role: 'ai', text: 'Sorry, I had trouble responding. Try again.' }]);
+      setMessages((m) => [...m, { role: 'ai', text: 'Sorry, I had trouble responding. Try again.', followUps: [] }]);
     }
     setBusy(false);
     inputRef.current?.focus();
   };
 
-  const isEmpty = messages.length === 0;
+  const isEmpty = messages.length === 0 && !busy;
 
   return (
-    <div className="flex flex-col h-full min-h-0">
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4">
+    <div className="flex flex-col h-full min-h-0 bg-white">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-[#9A8573] mb-2">Ask anything about this deposition</p>
-            {suggestions.map((s) => (
-              <button key={s} onClick={() => send(s)}
-                className="text-left text-sm text-[#3D2E1E] bg-white border border-[#E2E1DF] rounded-xl px-3.5 py-2.5 hover:border-[#B0AFAD] hover:bg-[#F8F8F7] transition-colors leading-snug">
-                {s}
-              </button>
-            ))}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center">
+              <span className="text-[44px] font-light text-[#D8D5D1] select-none" style={{ fontFamily: "'Source Serif 4', Georgia, serif", letterSpacing: '-0.02em' }}>Cognition</span>
+            </div>
+            <div className="px-5 pb-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[12px] text-[#9A8573]">Suggested</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                {WORKFLOWS.map((w) => (
+                  <button key={w.title} onClick={() => send(w.title)}
+                    className="flex items-start gap-3 px-3.5 py-3 rounded-xl hover:bg-[#F8F8F7] transition-colors text-left border border-transparent hover:border-[#E8E7E5]">
+                    <span className="text-[#9A8573] mt-0.5 shrink-0">{w.icon}</span>
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#14110D] leading-snug">{w.title}</p>
+                      <p className="text-[12px] text-[#9A8573] mt-0.5 leading-snug">{w.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="px-5 pt-5 pb-2">
             {messages.map((m, i) => (
-              <div key={i} className={cls('flex flex-col gap-1', m.role !== 'ai' && 'items-end')}>
-                {m.role === 'ai' && (
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
-                      <Ic.sparkles size={10} className="text-white"/>
-                    </div>
-                    <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wide">Cognition AI</span>
-                  </div>
-                )}
-                <div className={cls(
-                  'text-sm leading-relaxed rounded-2xl px-4 py-2.5',
-                  m.role === 'ai'
-                    ? 'text-[#14110D] bg-[#F0F0EE] rounded-tl-sm'
-                    : 'text-white bg-[#14110D] max-w-[85%] rounded-tr-sm'
-                )}>
-                  {m.text}
-                </div>
-              </div>
+              m.role === 'user'
+                ? <p key={i} className="text-[13px] text-[#9A8573] mb-3 leading-snug">{m.text}</p>
+                : <AiMessage key={i} msg={m} onFollowUp={send}/>
             ))}
             {busy && (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-[#14110D] flex items-center justify-center shrink-0">
-                    <Ic.sparkles size={10} className="text-white"/>
-                  </div>
-                  <span className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wide">Cognition AI</span>
-                </div>
-                <div className="bg-[#F0F0EE] rounded-2xl rounded-tl-sm px-4 py-3">
-                  <div className="flex gap-1">
-                    {[0,1,2].map((i) => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#9A8573]" style={{ animation: 'bounce 1s ease-in-out infinite', animationDelay: `${i * 0.18}s` }}/>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <WorkingState
+                steps={WORKING_STEPS}
+                currentStep={workingStep}
+                expanded={workingExpanded}
+                onToggle={() => setWorkingExpanded((v) => !v)}
+              />
             )}
             <div ref={scrollRef}/>
           </div>
         )}
       </div>
 
-      <div className="border-t border-[#E2E1DF] px-4 py-3 shrink-0">
-        <div className="flex items-end gap-2 bg-white border border-[#E2E1DF] rounded-2xl px-3.5 py-2.5 focus-within:border-[#9A8573] transition-colors">
+      <div className="px-4 pb-4 pt-2 shrink-0">
+        <div className="bg-[#F4F3F1] rounded-2xl px-4 pt-3 pb-2.5 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Ask about this deposition…"
+            placeholder="Ask Cognition anything…"
             rows={1}
-            className="flex-1 text-sm text-[#14110D] placeholder:text-[#9A8573] outline-none resize-none bg-transparent leading-5"
-            style={{ minHeight: '20px' }}
+            className="w-full text-[14px] text-[#14110D] placeholder:text-[#B5B0AB] outline-none resize-none bg-transparent leading-5 mb-2"
+            style={{ minHeight: '22px' }}
           />
-          <button onClick={() => send()} disabled={busy || !input.trim()}
-            className="shrink-0 w-7 h-7 rounded-xl bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-30 disabled:cursor-not-allowed transition-all mb-0.5">
-            <Ic.send size={12}/>
-          </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors">
+                <Ic.plus size={15}/>
+              </button>
+              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors">
+                <Ic.filter size={13}/>
+              </button>
+              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9A8573] hover:bg-[#E8E6E3] transition-colors">
+                <Ic.sparkles size={13}/>
+              </button>
+              <div className="flex items-center gap-0.5 ml-1 bg-[#E8E6E3] rounded-lg p-0.5">
+                {['Ask','Analyze','Draft'].map((m) => (
+                  <button key={m} onClick={() => setMode(m)}
+                    className={cls('text-[11px] font-medium px-2 py-1 rounded-md transition-colors', mode === m ? 'bg-white text-[#14110D] shadow-sm' : 'text-[#9A8573] hover:text-[#14110D]')}>
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button onClick={() => send()} disabled={busy || !input.trim()}
+              className="w-7 h-7 rounded-lg bg-[#14110D] text-white flex items-center justify-center hover:bg-[#2C2316] disabled:opacity-25 disabled:cursor-not-allowed transition-all">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </div>
         </div>
-        <p className="text-[10px] text-[#B5A899] mt-1.5 px-1">↵ send · ⇧↵ new line</p>
       </div>
     </div>
   );
