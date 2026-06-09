@@ -638,44 +638,6 @@ function CaseChatPanel({ selectedCase }) {
   );
 }
 
-function AddNewButton({ onAdd }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 bg-[#14110D] text-white text-sm font-medium rounded-lg px-3.5 py-2 hover:bg-[#2C2316] transition-colors"
-      >
-        <Ic.plus size={14}/> Add New <Ic.chevD size={12}/>
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-white border border-[#E2E1DF] rounded-xl shadow-lg py-1.5 z-50" onMouseLeave={() => setOpen(false)}>
-          <button onClick={() => { setOpen(false); onAdd('video'); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F0F0EE] transition-colors text-left">
-            <div className="w-7 h-7 rounded-lg bg-[#2C2316] flex items-center justify-center shrink-0">
-              <Ic.film size={13} className="text-white/80"/>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#14110D]">Video</p>
-              <p className="text-[11px] text-[#9A8573]">Upload recording file</p>
-            </div>
-          </button>
-          <button onClick={() => { setOpen(false); onAdd('transcript'); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#F0F0EE] transition-colors text-left">
-            <div className="w-7 h-7 rounded-lg bg-[#F0EDE8] flex items-center justify-center shrink-0">
-              <Ic.fileText size={13} className="text-[#7A2E20]"/>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#14110D]">Transcript</p>
-              <p className="text-[11px] text-[#9A8573]">Upload text or PDF</p>
-            </div>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ---------- Deposition Library ----------
 function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const [view, setView] = useState('grid');
@@ -719,7 +681,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
               <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-9 w-9 p-0"><Ic.list size={18}/></Button>
               <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-9 w-9 p-0"><Ic.grid size={18}/></Button>
             </div>
-            <AddNewButton onAdd={onAdd}/>
+            <Button onClick={onAdd}><Ic.plus size={14}/> Add New</Button>
           </div>
         </div>
 
@@ -2085,6 +2047,7 @@ function DepositionDetail({ id, onBack }) {
 function AddDepositionFlow({ caseId, onBack }) {
   const selectedCase = MOCK_CASES.find((c) => c.id === caseId);
   const [phase, setPhase] = useState('upload');
+  const [uploadType, setUploadType] = useState('video');
   const [witnessName, setWitnessName] = useState('');
   const [depositionDate, setDepositionDate] = useState('');
   const [file, setFile] = useState(null);
@@ -2131,6 +2094,27 @@ function AddDepositionFlow({ caseId, onBack }) {
         </div>
         <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F8F8F7]">
           <div className="w-full max-w-xl space-y-5">
+            {/* Upload type selector */}
+            <div className="flex gap-3">
+              {[
+                { id: 'video',      label: 'Video',      desc: 'MP4, MOV, AVI, etc.',        icon: Ic.film },
+                { id: 'transcript', label: 'Transcript', desc: 'PDF, DOCX, TXT, etc.', icon: Ic.fileText },
+              ].map(({ id, label, desc, icon: Icon }) => (
+                <button key={id} onClick={() => { setUploadType(id); setFile(null); }}
+                  className={cls('flex-1 flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all',
+                    uploadType === id ? 'border-[#14110D] bg-white' : 'border-[#E2E1DF] bg-[#F8F8F7] hover:border-[#D0C5B0]')}>
+                  <div className={cls('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', uploadType === id ? 'bg-[#14110D]' : 'bg-[#E2E1DF]/60')}>
+                    <Icon size={16} className={uploadType === id ? 'text-white' : 'text-[#6B5744]'}/>
+                  </div>
+                  <div>
+                    <p className={cls('text-sm font-semibold', uploadType === id ? 'text-[#14110D]' : 'text-[#6B5744]')}>{label}</p>
+                    <p className="text-[11px] text-[#9A8573]">{desc}</p>
+                  </div>
+                  {uploadType === id && <Ic.checkC size={16} className="text-[#14110D] ml-auto shrink-0"/>}
+                </button>
+              ))}
+            </div>
+
             {/* Witness details */}
             <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6 space-y-4">
               <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest">Witness Details</p>
@@ -2161,7 +2145,9 @@ function AddDepositionFlow({ caseId, onBack }) {
                                    'border-[#E2E1DF] hover:border-[#D0C5B0] hover:bg-[#E9E8E7]/50'
                 )}
               >
-                <input ref={fileRef} type="file" className="hidden" accept="video/*,audio/*,.pdf,.doc,.docx" onChange={(e) => setFile(e.target.files[0])}/>
+                <input ref={fileRef} type="file" className="hidden"
+                  accept={uploadType === 'video' ? 'video/*,audio/*' : '.pdf,.doc,.docx,.txt'}
+                  onChange={(e) => setFile(e.target.files[0])}/>
                 {file ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"><Ic.fileText size={20}/></div>
@@ -2173,9 +2159,11 @@ function AddDepositionFlow({ caseId, onBack }) {
                   </div>
                 ) : (
                   <>
-                    <div className="w-12 h-12 rounded-xl bg-[#E2E1DF]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3"><Ic.upload size={22}/></div>
-                    <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your file here, or <span className="text-[#7A2E20]">click to browse</span></p>
-                    <p className="text-xs text-[#9A8573]">MP4, MOV, WAV, MP3, PDF, DOCX</p>
+                    <div className="w-12 h-12 rounded-xl bg-[#E2E1DF]/50 flex items-center justify-center text-[#9A8573] mx-auto mb-3">
+                      {uploadType === 'video' ? <Ic.film size={22}/> : <Ic.fileText size={22}/>}
+                    </div>
+                    <p className="text-sm font-medium text-[#3D2E1E] mb-1">Drop your {uploadType} here, or <span className="text-[#7A2E20]">click to browse</span></p>
+                    <p className="text-xs text-[#9A8573]">{uploadType === 'video' ? 'MP4, MOV, AVI, WAV, MP3' : 'PDF, DOCX, TXT'}</p>
                   </>
                 )}
               </div>
