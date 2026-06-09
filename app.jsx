@@ -1628,7 +1628,7 @@ function DepositionDetail({ id, onBack }) {
           {/* Summary */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, summary: !c.summary }))}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Summary</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.summary && '-rotate-90')}/>
             </button>
@@ -1642,7 +1642,7 @@ function DepositionDetail({ id, onBack }) {
           {/* Goals */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, goals: !c.goals }))}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</span>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-semibold text-[#6B5744]">
@@ -1693,7 +1693,7 @@ function DepositionDetail({ id, onBack }) {
           {/* Topics */}
           <div>
             <button onClick={() => setSideCollapsed(c => ({ ...c, topics: !c.topics }))}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Topics Covered</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.topics && '-rotate-90')}/>
             </button>
@@ -1735,18 +1735,18 @@ function DepositionDetail({ id, onBack }) {
         {/* RIGHT PANEL */}
         <div className="flex-1 flex flex-col bg-white overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap border-b border-[#F0F0EE] shrink-0 px-5 pt-4 gap-x-6 gap-y-0">
+          <div className="flex flex-wrap shrink-0 px-4 py-3 gap-1.5 border-b border-[#F0F0EE]">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={cls(
-                    'relative inline-flex items-center gap-1.5 pb-3 text-[13px] font-normal transition-colors whitespace-nowrap border-b-2',
-                    isActive ? 'text-[#14110D] border-[#14110D]' : 'text-[#9A8573] border-transparent hover:text-[#14110D]'
+                    'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap rounded-full px-3 py-1.5',
+                    isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
                   )}>
                   {t.label}
                   {t.count > 0 && (
-                    <span className="text-[10px] font-semibold text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5">{t.count}</span>
+                    <span className={cls('text-[9px] font-bold rounded-full px-1.5 py-0.5', isActive ? 'bg-white/20 text-white' : 'bg-[#E8E7E5] text-[#9A8573]')}>{t.count}</span>
                   )}
                 </button>
               );
