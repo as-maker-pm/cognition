@@ -1060,92 +1060,121 @@ function FlaggedTab({ items, jump }) {
 }
 
 function SentimentTab({ data }) {
-  const w = 360, h = 120, pad = 20;
+  const w = 360, h = 110, pad = 16;
   const xMax = data[data.length - 1].t;
   const x = (t) => pad + (t / xMax) * (w - pad * 2);
   const y = (v) => pad + ((1 - v) / 2) * (h - pad * 2);
   const path = data.map((d, i) => `${i ? 'L' : 'M'}${x(d.t).toFixed(1)},${y(d.v).toFixed(1)}`).join(' ');
   const area = `${path} L${x(xMax).toFixed(1)},${y(0).toFixed(1)} L${x(0).toFixed(1)},${y(0).toFixed(1)} Z`;
+  const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
   const labeled = data.filter((d) => d.label);
-  const sentColor = (v) => v < -0.2 ? '#be123c' : v > 0.2 ? '#10b981' : '#fbbf24';
+  const sentColor = (v) => v < -0.2 ? '#DC2626' : v > 0.2 ? '#10b981' : '#F59E0B';
+  const sentBg    = (v) => v < -0.2 ? '#FEF2F2' : v > 0.2 ? '#ECFDF5' : '#FFFBEB';
   const sentLabel = (v) => v < -0.2 ? 'Negative' : v > 0.2 ? 'Positive' : 'Neutral';
 
   const avgSentiment = data.reduce((s, d) => s + d.v, 0) / data.length;
-  const shifts = labeled.filter((d, i) => {
-    if (i === 0) return false;
-    const prev = labeled[i - 1];
-    return Math.abs(d.v - prev.v) > 0.2;
-  });
+  const shifts = labeled.filter((d, i) => i > 0 && Math.abs(d.v - labeled[i-1].v) > 0.2);
   const negCount = data.filter((d) => d.v < -0.2).length;
+
+  const [hoverIdx, setHoverIdx] = useState(null);
+
+  const metrics = [
+    { label: 'Baseline Mood',    value: sentLabel(avgSentiment), grad: sentColor(avgSentiment) },
+    { label: 'Negative Moments', value: negCount,                grad: '#DC2626' },
+    { label: 'Sentiment Range',  value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} – +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, grad: '#9A8573' },
+    { label: 'Key Shifts',       value: shifts.length,           grad: '#F59E0B' },
+  ];
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {[
-          { label: 'Baseline', value: sentLabel(avgSentiment), color: sentColor(avgSentiment) },
-          { label: 'Negative moments', value: negCount, color: '#be123c' },
-          { label: 'Sentiment range', value: `${Math.min(...data.map(d=>d.v)).toFixed(1)} → +${Math.max(...data.map(d=>d.v)).toFixed(1)}`, color: '#14110D' },
-          { label: 'Key shifts', value: shifts.length, color: '#7A2E20' },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] px-3 py-2.5">
-            <div className="text-[10px] text-[#9A8573] mb-1 uppercase tracking-wider">{s.label}</div>
-            <div className="text-base font-bold" style={{ color: s.color }}>{s.value}</div>
+      {/* 1×4 metrics */}
+      <div className="grid grid-cols-4 gap-2">
+        {metrics.map((m) => (
+          <div key={m.label} className="rounded-xl border border-[#E2E1DF] px-3 py-2.5 overflow-hidden"
+            style={{ background: `linear-gradient(to bottom, #ffffff 40%, ${m.grad}18 100%)` }}>
+            <div className="text-[9px] text-[#9A8573] mb-1.5 uppercase tracking-wider leading-tight">{m.label}</div>
+            <div className="text-[15px] font-bold text-[#14110D]">{m.value}</div>
           </div>
         ))}
       </div>
 
       {/* Timeline ribbon */}
       <div>
-        <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Sentiment Timeline</p>
-        <div className="flex rounded-lg overflow-hidden h-5" style={{ gap: '1px', background: '#E2E1DF' }}>
-          {data.map((d, i) => {
-            const next = data[i + 1];
-            const width = next ? ((next.t - d.t) / xMax * 100) : (5);
-            const bg = d.v < -0.2 ? '#fca5a5' : d.v > 0.2 ? '#6ee7b7' : '#fde68a';
-            return <div key={i} style={{ width: `${width}%`, background: bg, minWidth: 2 }}/>;
-          })}
+        <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest mb-2">Sentiment Timeline</p>
+        <div className="relative">
+          <div className="flex rounded-lg overflow-hidden h-8" style={{ gap: '1px', background: '#E2E1DF' }}>
+            {data.map((d, i) => {
+              const next = data[i + 1];
+              const width = next ? ((next.t - d.t) / xMax * 100) : 5;
+              const bg = d.v < -0.2 ? '#FCA5A5' : d.v > 0.2 ? '#6EE7B7' : '#FDE68A';
+              return (
+                <div key={i} className="relative group"
+                  style={{ width: `${width}%`, background: bg, minWidth: 2 }}
+                  onMouseEnter={() => setHoverIdx(i)}
+                  onMouseLeave={() => setHoverIdx(null)}>
+                  {hoverIdx === i && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-20 bg-[#14110D] text-white text-[9px] font-mono rounded-md px-2 py-1 whitespace-nowrap pointer-events-none">
+                      {fmt(d.t)} – {fmt(next ? next.t : xMax)}{d.label ? ` · ${d.label}` : ''}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between text-[10px] text-[#9A8573] font-mono mt-1">
+            <span>0:00</span>
+            <span>{fmt(xMax)}</span>
+          </div>
         </div>
-        <div className="flex justify-between text-[10px] text-[#9A8573] font-mono mt-1">
-          <span>0:00</span><span>{Math.floor(xMax/60)}:{String(xMax%60).padStart(2,'0')}</span>
-        </div>
-        <div className="flex items-center gap-3 mt-2">
-          {[['#6ee7b7', 'Positive'], ['#fde68a', 'Neutral'], ['#fca5a5', 'Negative']].map(([c, l]) => (
-            <span key={l} className="flex items-center gap-1 text-[10px] text-[#6B5744]">
-              <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: c }}/>
+        <div className="flex items-center gap-3 mt-1.5">
+          {[['#6EE7B7','Positive'],['#FDE68A','Neutral'],['#FCA5A5','Negative']].map(([c,l]) => (
+            <span key={l} className="flex items-center gap-1 text-[10px] text-[#9A8573]">
+              <span className="w-2 h-2 rounded-sm inline-block" style={{ background: c }}/>
               {l}
             </span>
           ))}
         </div>
       </div>
 
-      {/* Trendline chart */}
-      <Card className="p-3">
-        <p className="text-xs font-semibold text-[#6B5744] mb-2">Emotional Curve</p>
+      {/* Emotional curve — transparent bg */}
+      <div>
+        <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest mb-2">Emotional Curve</p>
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
-          <line x1={pad} y1={y(0)} x2={w - pad} y2={y(0)} stroke="#E2E1DF" strokeDasharray="3 3"/>
-          <path d={area} fill="#7A2E20" opacity="0.1"/>
+          <line x1={pad} y1={y(0)} x2={w-pad} y2={y(0)} stroke="#E2E1DF" strokeDasharray="3 3"/>
+          <path d={area} fill="#7A2E20" opacity="0.08"/>
           <path d={path} fill="none" stroke="#7A2E20" strokeWidth="1.5"/>
           {data.map((d, i) => (
-            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="2.5" fill={sentColor(d.v)}/>
+            <circle key={i} cx={x(d.t)} cy={y(d.v)} r="2.5" fill={sentColor(d.v)} stroke="white" strokeWidth="1"/>
           ))}
-          <text x={pad} y={pad - 4} fontSize="8" fill="#9A8573">+1</text>
-          <text x={pad} y={h - 6} fontSize="8" fill="#9A8573">−1</text>
+          <text x={pad} y={pad-4} fontSize="8" fill="#9A8573">+1</text>
+          <text x={pad} y={h-4} fontSize="8" fill="#9A8573">−1</text>
         </svg>
-      </Card>
+      </div>
 
-      {/* Key moments */}
+      {/* Key moments — flagged tile style */}
       <div>
-        <p className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider mb-2">Key Moments</p>
-        <div className="flex flex-col gap-1.5">
+        <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-widest mb-2">Key Moments</p>
+        <div className="flex flex-col gap-2">
           {labeled.map((d, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs bg-[#F8F8F7] border border-[#E2E1DF] rounded-lg px-3 py-2">
-              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sentColor(d.v) }}/>
-              <span className="text-[#9A8573] font-mono tabular-nums shrink-0">{Math.floor(d.t/60)}:{String(d.t%60).padStart(2,'0')}</span>
-              <span className="text-[#3D2E1E] flex-1">{d.label}</span>
-              <span className="text-[10px] font-mono text-[#9A8573]">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</span>
-            </div>
+            <button key={i} onClick={() => {}}
+              className="w-full text-left bg-white rounded-xl border border-[#E2E1DF] overflow-hidden hover:bg-[#F0F0EE] transition-colors flex">
+              <div className="w-1 shrink-0" style={{ background: sentColor(d.v) }}/>
+              <div className="flex-1 px-3 py-2.5">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5"
+                    style={{ color: sentColor(d.v), background: sentBg(d.v) }}>
+                    {sentLabel(d.v)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">
+                    {fmt(d.t)}
+                  </span>
+                </div>
+                <div className="text-[12px] font-semibold text-[#14110D] leading-snug mb-0.5">{d.label}</div>
+                {d.note && <p className="text-[11px] text-[#6B5744] leading-relaxed">{d.note}</p>}
+                <div className="text-[10px] font-mono text-[#9A8573] mt-1">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</div>
+              </div>
+            </button>
           ))}
         </div>
       </div>
@@ -1533,69 +1562,62 @@ function ChatTab({ depo }) {
 
 // ---------- Contradictions Tab ----------
 function ContradictionsTab({ jump }) {
-  const [collapsed, setCollapsed] = useState({});
   const [expanded, setExpanded] = useState(null);
   const all = MOCK_DETAIL.contradictions || [];
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
-  const groups = [
-    { key: 'record', label: 'vs. Record',         dot: '#ef4444', items: all.filter(c => c.type === 'record') },
-    { key: 'self',   label: 'Self-contradiction',  dot: '#f59e0b', items: all.filter(c => c.type === 'self') },
-  ].filter(g => g.items.length > 0);
+  const TYPE = {
+    record: { label: 'vs. Record',        strip: '#DC2626', pill: 'bg-rose-50 text-rose-700' },
+    self:   { label: 'Self-contradiction', strip: '#F59E0B', pill: 'bg-amber-50 text-amber-700' },
+  };
 
   return (
-    <div className="flex flex-col">
-      {groups.map(({ key, label, dot, items }) => {
-        const open = collapsed[key] !== false;
+    <div className="flex flex-col gap-2 px-4 py-3">
+      {all.map((c) => {
+        const t = TYPE[c.type] || { label: c.type, strip: '#9A8573', pill: 'bg-[#F0F0EE] text-[#6B5744]' };
+        const isOpen = expanded === c.id;
         return (
-          <div key={key}>
-            <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
-              className="w-full flex items-center justify-between px-5 py-3 hover:bg-[#F9F9F9] transition-colors">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
-                <span className="text-[15px] font-semibold text-[#111]">{label}</span>
-                <span className="text-[13px] text-[#9CA3AF]">{items.length}</span>
-              </div>
-              <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
-            </button>
-            {open && items.map((c) => (
-              <div key={c.id}>
-                <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
-                  className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[15px] font-semibold text-[#111] leading-snug">{c.title}</div>
-                      <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{c.why}</div>
-                    </div>
-                    <Ic.chevD size={14} className={cls('text-[#9CA3AF] shrink-0 mt-0.5 transition-transform', expanded === c.id && 'rotate-180')}/>
+          <div key={c.id} className="bg-white rounded-xl border border-[#E2E1DF] overflow-hidden flex">
+            <div className="w-1 shrink-0" style={{ background: t.strip }}/>
+            <div className="flex-1 min-w-0">
+              <button onClick={() => setExpanded(isOpen ? null : c.id)}
+                className="w-full text-left px-4 py-3 hover:bg-[#F0F0EE] transition-colors">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <span className={cls('text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5', t.pill)}>{t.label}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {c.severity === 'high' && (
+                      <span className="inline-flex items-center gap-1 text-[9px] text-rose-600 bg-rose-50 rounded-full px-1.5 py-0.5">
+                        <Ic.alert size={8}/> High
+                      </span>
+                    )}
+                    {isOpen ? <Ic.chevU size={12}/> : <Ic.chevD size={12}/>}
                   </div>
-                </button>
-                {expanded === c.id && (
-                  <div className="px-5 pb-4 border-t border-[#F3F3F3] flex flex-col gap-3 pt-3">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="border border-[#F3F3F3] p-3">
-                        <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wide mb-1.5">{c.stmtA.label}</p>
-                        <p className="text-[13px] text-[#111] italic leading-relaxed">"{c.stmtA.quote}"</p>
-                        {c.stmtA.timestamp && (
-                          <button onClick={() => jump(c.stmtA.timestamp)} className="text-[11px] text-[#9CA3AF] font-mono mt-2 hover:underline">{fmt(c.stmtA.timestamp)}</button>
+                </div>
+                <div className="text-[13px] font-semibold text-[#14110D] leading-snug mb-1">{c.title}</div>
+                <p className="text-[11px] text-[#6B5744] leading-relaxed">{c.why}</p>
+              </button>
+
+              {isOpen && (
+                <div className="border-t border-[#F0F0EE] px-4 py-3 bg-[#F8F8F7]">
+                  <div className="grid grid-cols-2 gap-2 mb-3">
+                    {[c.stmtA, c.stmtB].map((s, i) => (
+                      <div key={i} className="bg-white rounded-lg border border-[#E2E1DF] p-3">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] mb-1.5">{s.label}</p>
+                        <p className="text-[11px] text-[#14110D] italic leading-relaxed mb-2">"{s.quote}"</p>
+                        {s.timestamp && (
+                          <button onClick={() => jump(s.timestamp)}
+                            className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                            <span>{fmt(s.timestamp)}</span>
+                            <span className="text-[#D0C8BF]">·</span>
+                            <span>p.{s.page} l.{s.line}</span>
+                          </button>
                         )}
                       </div>
-                      <div className="border border-[#F3F3F3] p-3">
-                        <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wide mb-1.5">{c.stmtB.label}</p>
-                        <p className="text-[13px] text-[#111] italic leading-relaxed">"{c.stmtB.quote}"</p>
-                        {c.stmtB.timestamp && (
-                          <button onClick={() => jump(c.stmtB.timestamp)} className="text-[11px] text-[#9CA3AF] font-mono mt-2 hover:underline">{fmt(c.stmtB.timestamp)}</button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="flex-1 text-[13px] font-medium py-1.5 border border-[#F3F3F3] text-[#6B7280] hover:bg-[#F9F9F9] transition-colors">Dismiss</button>
-                      <button className="flex-1 text-[13px] font-medium py-1.5 bg-[#111] text-white hover:bg-[#333] transition-colors">Add to Brief</button>
-                    </div>
+                    ))}
                   </div>
-                )}
-              </div>
-            ))}
+                </div>
+              )}
+            </div>
           </div>
         );
       })}
@@ -1776,8 +1798,8 @@ function DepositionDetail({ id, onBack }) {
           {/* Recording */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, recording: !c.recording }))}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#E9E8E7]/40 transition-colors">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Recording</span>
+              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[13px] font-semibold text-[#14110D]">Recording</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.recording && '-rotate-90')}/>
             </button>
             {!sideCollapsed.recording && (
@@ -1790,8 +1812,8 @@ function DepositionDetail({ id, onBack }) {
           {/* Summary */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, summary: !c.summary }))}
-              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Summary</span>
+              className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[13px] font-semibold text-[#14110D]">Summary</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.summary && '-rotate-90')}/>
             </button>
             {!sideCollapsed.summary && (
@@ -1804,8 +1826,8 @@ function DepositionDetail({ id, onBack }) {
           {/* Goals */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, goals: !c.goals }))}
-              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Deposition Goals</span>
+              className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[13px] font-semibold text-[#14110D]">Deposition Goals</span>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-semibold text-[#6B5744]">
                   {MOCK_DETAIL.goals.filter((g) => g.covered).length}/{MOCK_DETAIL.goals.length}
@@ -1855,8 +1877,8 @@ function DepositionDetail({ id, onBack }) {
           {/* Topics */}
           <div>
             <button onClick={() => setSideCollapsed(c => ({ ...c, topics: !c.topics }))}
-              className="w-full flex items-center justify-between px-4 pt-5 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9A8573]">Topics Covered</span>
+              className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-[#E9E8E7]/40 transition-colors">
+              <span className="text-[13px] font-semibold text-[#14110D]">Topics Covered</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.topics && '-rotate-90')}/>
             </button>
             {!sideCollapsed.topics && (
@@ -1884,8 +1906,8 @@ function DepositionDetail({ id, onBack }) {
 
         {/* CENTER: TRANSCRIPT */}
         <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F8F8F7]" style={{ maxWidth: '42%' }}>
-          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E2E1DF] shrink-0">
-            <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E1DF] shrink-0">
+            <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
             <button
               onClick={() => setTab('flagged')}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
@@ -1902,7 +1924,7 @@ function DepositionDetail({ id, onBack }) {
         {/* RIGHT PANEL */}
         <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap shrink-0 px-4 py-3 gap-1.5 border-b border-[#F0F0EE]">
+          <div className="flex flex-wrap shrink-0 px-4 py-3.5 gap-1.5 border-b border-[#E2E1DF]">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
