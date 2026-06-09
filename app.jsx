@@ -1556,7 +1556,6 @@ function DepositionDetail({ id, onBack }) {
     { id: 'chat',           label: 'AI Chat' },
     { id: 'contradictions', label: 'Contradictions', count: MOCK_DETAIL.contradictions?.length },
     { id: 'flagged',        label: 'Flagged',         count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
-    { id: 'goals',          label: 'Goals' },
     { id: 'sentiment',      label: 'Sentiment' },
     { id: 'exhibits',       label: 'Exhibits' },
     { id: 'timeline',       label: 'Timeline' },
@@ -1746,7 +1745,6 @@ function DepositionDetail({ id, onBack }) {
 
           <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
             {tab === 'chat'           && <ChatTab depo={depo}/>}
-            {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals} jump={jump}/>}
             {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
             {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
             {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
