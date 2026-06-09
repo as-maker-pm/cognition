@@ -326,7 +326,7 @@ function LoginPage() {
       </div>
 
       {/* Right — Auth form */}
-      <div className="flex-1 flex items-center justify-center bg-[#F7F7F5] p-8">
+      <div className="flex-1 flex items-center justify-center bg-white p-8">
         <div className="w-full max-w-[340px]">
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
@@ -389,7 +389,7 @@ function CaseLibrary({ onSelect }) {
   const list = MOCK_CASES.filter((c) => [c.caseName, c.caseNumber, c.client, c.type].some((s) => s.toLowerCase().includes(search.toLowerCase())));
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F7F5]">
+    <div className="flex-1 flex flex-col bg-white">
       {/* Header */}
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -503,7 +503,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F7F5]">
+    <div className="flex-1 flex flex-col bg-white">
       {/* Header — no back button, breadcrumb handles navigation */}
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
         <div className="flex items-start justify-between gap-4">
@@ -1017,7 +1017,7 @@ function FlaggedTab({ items, jump }) {
                   const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
                   return (
                     <button key={f.id} onClick={() => jump(f.timestamp)}
-                      className="w-full text-left rounded-lg bg-[#FFFEFB] overflow-hidden hover:shadow-sm transition-all"
+                      className="w-full text-left rounded-lg bg-[#F7F7F5] overflow-hidden hover:shadow-sm transition-all"
                       style={{ border: `1px solid ${cfg.color}22` }}>
                       <div className="flex items-stretch">
                         {/* Colored left strip */}
@@ -1585,7 +1585,7 @@ function DepositionDetail({ id, onBack }) {
   const topicColors = ['#7A2E20', '#7A2E20', '#C4882A', '#C4882A', '#4A6741', '#4A6741'];
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F7F7F5] overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white overflow-hidden">
       {/* Header */}
       <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-5 py-2.5 flex items-center gap-4 shrink-0">
         <div className="flex-1 min-w-0">
@@ -1625,7 +1625,7 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR */}
-        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F7F7F5]">
+        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-white">
 
           {/* Recording */}
           <div className="border-b border-[#E2E1DF]">
@@ -1737,7 +1737,7 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#FFFEFB]" style={{ maxWidth: '42%' }}>
+        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F7F7F5]" style={{ maxWidth: '42%' }}>
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E2E1DF] shrink-0">
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
             <button
@@ -1831,12 +1831,12 @@ function AddDepositionFlow({ caseId, onBack }) {
   /* ── Phase 1: Upload form ── */
   if (phase === 'upload') {
     return (
-      <div className="flex-1 flex flex-col bg-[#F7F7F5]">
+      <div className="flex-1 flex flex-col bg-white">
         <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
           <h2 className="text-lg font-semibold text-[#14110D]">Add Deposition</h2>
           {selectedCase && <p className="text-sm text-[#6B5744] mt-0.5">{selectedCase.caseName} · {selectedCase.caseNumber}</p>}
         </div>
-        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-[#F7F7F5]">
+        <div className="flex-1 flex items-start justify-center p-8 overflow-y-auto bg-white">
           <div className="w-full max-w-xl space-y-5">
             {/* Witness details */}
             <div className="bg-[#F8F8F7] rounded-xl border border-[#E2E1DF] p-6 space-y-4">
@@ -1941,7 +1941,7 @@ function AddDepositionFlow({ caseId, onBack }) {
         </div>
 
         {/* Right: processing timeline */}
-        <div className="col-span-9 overflow-y-auto p-10 bg-[#F7F7F5]">
+        <div className="col-span-9 overflow-y-auto p-10 bg-white">
           <div className="max-w-lg">
             <p className="text-xs font-semibold text-[#9A8573] uppercase tracking-widest mb-4">Processing Timeline</p>
             <h2 className="brand text-[#14110D] mb-2 leading-tight" style={{ fontSize: '2.2rem', fontWeight: 400 }}>
@@ -2054,7 +2054,7 @@ function AppContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#F7F7F5]" data-screen-label={view}>
+    <div className="h-full flex flex-col bg-white" data-screen-label={view}>
       <TopNav
         onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
         onUserManagement={() => {}}
