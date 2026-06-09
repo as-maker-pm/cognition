@@ -825,60 +825,90 @@ function TranscriptViewer({ topics, currentTime, setCurrentTime, playing }) {
 }
 
 function GoalsTab({ goals }) {
-  const covered = goals.filter((g) => g.covered).length;
-  const pct = Math.round((covered / goals.length) * 100);
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Progress summary */}
-      <div className="rounded-lg border border-slate-100 bg-white p-3.5">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Goal Coverage</span>
-          <span className="text-sm font-semibold text-slate-700">{covered}/{goals.length}</span>
-        </div>
-        <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-700"
-            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#64748b' }}
-          />
-        </div>
-        <p className="text-[11px] text-slate-400 mt-1.5">{pct}% of deposition goals addressed</p>
-      </div>
-      {goals.map((g) => (
-        <Card key={g.id} className="p-3">
-          <div className="flex items-start gap-3">
-            <div className={cls('w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5', g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-slate-200')}>
-              {g.covered && <Ic.check size={12}/>}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className={cls('text-sm', g.covered ? 'text-slate-700' : 'text-slate-500')}>{g.title}</div>
-              {g.notes && <div className={cls('text-xs mt-0.5', g.covered ? 'text-slate-400' : 'text-amber-600')}>{g.notes}</div>}
-            </div>
+  const [collapsed, setCollapsed] = useState({});
+  const covered = goals.filter((g) => g.covered);
+  const uncovered = goals.filter((g) => !g.covered);
+  const pct = Math.round((covered.length / goals.length) * 100);
+
+  const Section = ({ label, color, dot, items, defaultOpen = true }) => {
+    const key = label;
+    const open = collapsed[key] !== false;
+    return (
+      <div className="border-b border-[#F0F0EE] last:border-0">
+        <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
+            <span className="text-sm font-semibold text-[#14110D]">{label}</span>
+            <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{items.length}</span>
           </div>
-        </Card>
-      ))}
+          <Ic.chevD size={13} className={cls('text-[#9A8573] transition-transform', open && 'rotate-180')}/>
+        </button>
+        {open && items.map((g) => (
+          <div key={g.id} className="px-4 pb-3">
+            <div className="text-sm font-semibold text-[#14110D] leading-snug">{g.title}</div>
+            {g.notes && <div className="text-sm text-[#9A8573] mt-0.5 leading-snug">{g.notes}</div>}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col">
+      <div className="px-4 py-3 border-b border-[#F0F0EE]">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs text-[#9A8573]">Coverage</span>
+          <span className="text-xs font-semibold text-[#14110D]">{covered.length}/{goals.length}</span>
+        </div>
+        <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden">
+          <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }}/>
+        </div>
+      </div>
+      {uncovered.length > 0 && <Section label="Not covered" dot="#f59e0b" items={uncovered}/>}
+      {covered.length > 0 && <Section label="Covered" dot="#10b981" items={covered}/>}
     </div>
   );
 }
 
 function FlaggedTab({ items, jump }) {
-  const sevColor = { high: 'bg-rose-50 border-rose-200 text-rose-700', medium: 'bg-amber-50 border-amber-200 text-amber-700', low: 'bg-[#F0F0EE] border-[#E2E1DF] text-[#6B5744]' };
+  const [collapsed, setCollapsed] = useState({});
+  const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+  const groups = [
+    { key: 'high',   label: 'High severity',   dot: '#ef4444', items: items.filter(f => f.severity === 'high') },
+    { key: 'medium', label: 'Medium severity',  dot: '#f59e0b', items: items.filter(f => f.severity === 'medium') },
+    { key: 'low',    label: 'Low severity',     dot: '#10b981', items: items.filter(f => f.severity === 'low') },
+  ].filter(g => g.items.length > 0);
+
   return (
-    <div className="flex flex-col gap-2">
-      {items.map((f) => (
-        <button key={f.id} onClick={() => jump(f.timestamp)} className="text-left">
-          <div className={cls('rounded-lg border p-3 hover:shadow-sm transition', sevColor[f.severity])}>
-            <div className="flex items-center justify-between gap-2 mb-1">
+    <div className="flex flex-col">
+      {groups.map(({ key, label, dot, items: groupItems }) => {
+        const open = collapsed[key] !== false;
+        return (
+          <div key={key} className="border-b border-[#F0F0EE] last:border-0">
+            <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
               <div className="flex items-center gap-2">
-                <Ic.flag size={12}/>
-                <span className="text-xs font-medium uppercase tracking-wide">{f.type.replace('-', ' ')}</span>
-                <Badge variant="outline" className="capitalize">{f.severity}</Badge>
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
+                <span className="text-sm font-semibold text-[#14110D]">{label}</span>
+                <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{groupItems.length}</span>
               </div>
-              <span className="text-xs tabular-nums">{Math.floor(f.timestamp/60)}:{String(f.timestamp%60).padStart(2,'0')}</span>
-            </div>
-            <div className="text-sm leading-snug">{f.description}</div>
+              <Ic.chevD size={13} className={cls('text-[#9A8573] transition-transform', open && 'rotate-180')}/>
+            </button>
+            {open && groupItems.map((f) => (
+              <button key={f.id} onClick={() => jump(f.timestamp)}
+                className="w-full text-left px-4 pb-3 hover:bg-[#F8F8F7] transition-colors">
+                <div className="text-sm font-semibold text-[#14110D] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+                <div className="flex items-center justify-between mt-0.5 gap-2">
+                  <div className="text-sm text-[#9A8573] leading-snug line-clamp-2">{f.description}</div>
+                  <span className="text-xs text-[#9A8573] font-mono shrink-0">{fmt(f.timestamp)}</span>
+                </div>
+              </button>
+            ))}
           </div>
-        </button>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -1148,93 +1178,57 @@ function ChatTab({ depo }) {
 
 // ---------- Contradictions Tab ----------
 function ContradictionsTab({ jump }) {
-  const [filter, setFilter] = useState('all');
+  const [expanded, setExpanded] = useState(null);
   const all = MOCK_DETAIL.contradictions || [];
-  const list = filter === 'all' ? all : all.filter((c) => c.type === filter);
-  const counts = { all: all.length, self: all.filter((c) => c.type === 'self').length, record: all.filter((c) => c.type === 'record').length };
-
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
-  const typePill = (type) => ({
-    record:        <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-rose-50 text-rose-700">vs. Record</span>,
-    self:          <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700">Self</span>,
-    'cross-witness': <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-blue-50 text-blue-700">Cross</span>,
-  }[type]);
-
-  const statusBadge = (s) => s === 'verified'
-    ? <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700"><Ic.checkC size={9}/>Verified</span>
-    : <span className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-700"><Ic.alert size={9}/>Probable</span>;
+  const groups = [
+    { key: 'record', label: 'vs. Record',    dot: '#ef4444', items: all.filter(c => c.type === 'record') },
+    { key: 'self',   label: 'Self-contradiction', dot: '#f59e0b', items: all.filter(c => c.type === 'self') },
+  ].filter(g => g.items.length > 0);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
-        <div className="flex items-center gap-2 mb-1">
-          <Ic.alert size={13} className="text-rose-600"/>
-          <span className="text-sm font-semibold text-rose-800">{all.length} Contradictions Detected</span>
-        </div>
-        <p className="text-xs text-rose-600 leading-relaxed">AI identified statements that conflict with prior testimony or documentary evidence. Review and add key items to your brief.</p>
-      </div>
-
-      <div className="flex items-center gap-1.5 flex-wrap">
-        {[['all', 'All'], ['self', 'Self'], ['record', 'vs. Record']].map(([key, label]) => (
-          <button key={key} onClick={() => setFilter(key)} className={cls(
-            'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
-            filter === key ? 'bg-[#14110D] text-white' : 'bg-[#F8F8F7] border border-[#E2E1DF] text-[#6B5744] hover:bg-[#E9E8E7]'
-          )}>
-            {label}
-            <span className={cls('font-mono text-[10px]', filter === key ? 'opacity-70' : 'text-[#9A8573]')}>{counts[key]}</span>
-          </button>
-        ))}
-      </div>
-
-      {list.map((c, idx) => (
-        <div key={c.id} className="rounded-xl border border-[#E2E1DF] bg-[#F8F8F7] overflow-hidden">
-          <div className="flex">
-            <div className={cls('w-1 shrink-0', c.type === 'record' ? 'bg-rose-500' : 'bg-amber-500')}/>
-            <div className="flex-1 p-3.5 min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                <span className="font-mono text-[10px] font-bold text-[#C4B5A2]">{String(idx+1).padStart(2,'0')}</span>
-                {typePill(c.type)}
-                <span className="text-xs font-medium text-[#6B5744]">{c.category}</span>
-                {statusBadge(c.status)}
-              </div>
-              <p className="text-xs font-semibold text-[#14110D] mb-3 leading-snug">{c.title}</p>
-
-              <div className="grid grid-cols-[1fr_auto_1fr] gap-2 mb-3 items-stretch">
-                <div className="rounded-lg bg-[#F0F0EE] border border-[#E2E1DF] border-l-2 border-l-[#9A8573] p-2.5">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtA.label}</p>
-                  {c.stmtA.page && <p className="font-mono text-[9px] text-[#9A8573] mb-1">p.{c.stmtA.page} · l.{c.stmtA.line}</p>}
-                  <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtA.quote}"</p>
-                  {c.stmtA.timestamp && (
-                    <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#7A2E20] mt-1.5 font-mono hover:underline block">{fmt(c.stmtA.timestamp)}</button>
-                  )}
-                </div>
-                <div className="flex items-center self-center shrink-0">
-                  <span className="font-mono text-[9px] font-bold text-[#C4B5A2] uppercase tracking-wider">vs</span>
-                </div>
-                <div className="rounded-lg bg-[#F0F0EE] border border-[#E2E1DF] border-l-2 border-l-rose-400 p-2.5">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#9A8573] mb-1">{c.stmtB.label}</p>
-                  <p className="text-xs text-[#3D2E1E] italic leading-relaxed">"{c.stmtB.quote}"</p>
-                </div>
-              </div>
-
-              <div className="text-xs text-amber-800 bg-amber-50 border-l-2 border-amber-400 px-3 py-2 rounded-r-lg mb-3 leading-relaxed">{c.why}</div>
-
-              <div className="flex items-center gap-1.5 flex-wrap border-t border-dashed border-[#E2E1DF] pt-2.5">
-                {c.crosslinks?.map((link) => (
-                  <span key={link} className="inline-flex items-center text-[10px] font-medium text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-2 py-0.5">{link}</span>
-                ))}
-                <div className="flex items-center gap-1.5 ml-auto">
-                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E2E1DF]/50 text-[#6B5744] hover:bg-[#E2E1DF] transition-colors">Dismiss</button>
-                  <button className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#14110D] text-white hover:bg-[#2C2316] transition-colors">Add to Brief</button>
-                </div>
-              </div>
-            </div>
+    <div className="flex flex-col">
+      {groups.map(({ key, label, dot, items }) => (
+        <div key={key} className="border-b border-[#F0F0EE] last:border-0">
+          <div className="flex items-center gap-2 px-4 py-3">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
+            <span className="text-sm font-semibold text-[#14110D]">{label}</span>
+            <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{items.length}</span>
           </div>
+          {items.map((c) => (
+            <div key={c.id} className="border-t border-[#F0F0EE]">
+              <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
+                className="w-full text-left px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
+                <div className="text-sm font-semibold text-[#14110D] leading-snug">{c.title}</div>
+                <div className="flex items-center justify-between mt-0.5 gap-2">
+                  <div className="text-sm text-[#9A8573] line-clamp-2 leading-snug">{c.why}</div>
+                  <Ic.chevD size={12} className={cls('text-[#9A8573] shrink-0 transition-transform', expanded === c.id && 'rotate-180')}/>
+                </div>
+              </button>
+              {expanded === c.id && (
+                <div className="px-4 pb-4 flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg bg-[#F8F8F7] border border-[#F0F0EE] p-3">
+                      <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-wide mb-1.5">{c.stmtA.label}</p>
+                      <p className="text-xs text-[#14110D] italic leading-relaxed">"{c.stmtA.quote}"</p>
+                      {c.stmtA.timestamp && <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#7A2E20] mt-2 font-mono hover:underline">{fmt(c.stmtA.timestamp)}</button>}
+                    </div>
+                    <div className="rounded-lg bg-[#F8F8F7] border border-[#F0F0EE] p-3">
+                      <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-wide mb-1.5">{c.stmtB.label}</p>
+                      <p className="text-xs text-[#14110D] italic leading-relaxed">"{c.stmtB.quote}"</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="flex-1 text-sm font-medium py-1.5 rounded-lg border border-[#E2E1DF] text-[#6B5744] hover:bg-[#F0F0EE] transition-colors">Dismiss</button>
+                    <button className="flex-1 text-sm font-medium py-1.5 rounded-lg bg-[#14110D] text-white hover:bg-[#2C2316] transition-colors">Add to Brief</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       ))}
-      {list.length === 0 && <div className="text-center py-8 text-sm text-[#9A8573]">No contradictions match this filter.</div>}
-      <p className="text-xs text-[#9A8573] bg-[#F0F0EE] border border-dashed border-[#E2E1DF] rounded-lg px-3 py-2.5 leading-relaxed">AI contradiction detection is based on semantic analysis and may require human review. Verify against source documents before use in proceedings.</p>
     </div>
   );
 }
@@ -1459,37 +1453,35 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
+        <div className="flex-1 flex flex-col bg-white overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap gap-0.5 border-b border-[#E2E1DF] shrink-0 px-3 pt-2.5 pb-0">
+          <div className="flex flex-wrap border-b border-[#F0F0EE] shrink-0 px-4 pt-3 gap-x-4 gap-y-0">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={cls(
-                    'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t text-xs font-medium transition-colors whitespace-nowrap',
-                    isActive
-                      ? 'text-[#14110D] bg-[#FFFEFB] border border-b-0 border-[#E2E1DF]'
-                      : 'text-[#9A8573] hover:text-[#14110D]'
+                    'relative inline-flex items-center gap-1.5 pb-2.5 text-sm font-medium transition-colors whitespace-nowrap border-b-2',
+                    isActive ? 'text-[#14110D] border-[#14110D]' : 'text-[#9A8573] border-transparent hover:text-[#14110D]'
                   )}>
                   {t.label}
                   {t.count > 0 && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white text-[9px] font-bold w-3.5 h-3.5">{t.count}</span>
+                    <span className="text-[10px] font-semibold text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5">{t.count}</span>
                   )}
                 </button>
               );
             })}
           </div>
 
-          <div className={cls('flex-1 min-h-0', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
+          <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
             {tab === 'chat'           && <ChatTab depo={depo}/>}
             {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals}/>}
             {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
             {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
-            {tab === 'exhibits'       && <ExhibitsTab jump={jump}/>}
-            {tab === 'sentiment'      && <SentimentTab data={MOCK_DETAIL.sentiment}/>}
-            {tab === 'timeline'       && <TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/>}
-            {tab === 'summaries'      && <SummariesTab topics={MOCK_DETAIL.topics}/>}
+            {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
+            {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
+            {tab === 'timeline'       && <div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div>}
+            {tab === 'summaries'      && <div className="px-4 py-3"><SummariesTab topics={MOCK_DETAIL.topics}/></div>}
           </div>
         </div>
       </div>
