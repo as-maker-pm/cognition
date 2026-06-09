@@ -162,13 +162,13 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
                 const isLast = idx === breadcrumb.length - 1;
                 return (
                   <React.Fragment key={idx}>
-                    {idx > 0 && <span className="text-[#C4B5A2] text-sm shrink-0">›</span>}
+                    {idx > 0 && <span className="text-[#C4B5A2] text-xs shrink-0">›</span>}
                     {isLast ? (
-                      <span className="text-sm font-medium text-[#14110D] truncate max-w-[200px]">{item.label}</span>
+                      <span className="text-xs font-medium text-[#14110D] truncate max-w-[200px]">{item.label}</span>
                     ) : (
                       <button
                         onClick={item.onClick}
-                        className="text-sm text-[#6B5744] hover:text-[#14110D] transition-colors truncate max-w-[200px]"
+                        className="text-xs text-[#6B5744] hover:text-[#14110D] transition-colors truncate max-w-[200px]"
                       >
                         {item.label}
                       </button>
