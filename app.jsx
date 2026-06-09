@@ -405,16 +405,11 @@ const CASE_TYPE_COLOR = {
 
 function CaseLibrary({ onSelect }) {
   const { user } = useAuth();
-  const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [view, setView] = useState('list');
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
   const types = ['all', ...Array.from(new Set(MOCK_CASES.map((c) => c.type)))];
-  const list = MOCK_CASES.filter((c) => {
-    const m = [c.caseName, c.caseNumber, c.client, c.type].some((s) => s.toLowerCase().includes(search.toLowerCase()));
-    const t = typeFilter === 'all' || c.type === typeFilter;
-    return m && t;
-  });
+  const list = MOCK_CASES.filter((c) => typeFilter === 'all' || c.type === typeFilter);
 
   return (
     <div className="flex-1 flex flex-col bg-[#F8F8F7]">
@@ -422,14 +417,10 @@ function CaseLibrary({ onSelect }) {
         <div className="flex items-center gap-3 min-w-0">
           <h1 className="text-xl font-semibold text-[#14110D] tracking-tight shrink-0">Cases</h1>
           <span className="text-xs text-[#9A8573] bg-[#E2E1DF]/60 rounded-full px-2 py-0.5 shrink-0">{list.length}</span>
-          <div className="relative w-56">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={13}/></span>
-            <Input placeholder="Search cases..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-sm"/>
-          </div>
-          <div className="flex items-center gap-1 overflow-x-auto">
+          <div className="flex items-center gap-1.5 overflow-x-auto">
             {types.map((t) => (
               <button key={t} onClick={() => setTypeFilter(t)}
-                className={cls('shrink-0 px-2.5 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap',
+                className={cls('shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap',
                   typeFilter === t ? 'bg-[#14110D] text-white' : 'border border-[#E2E1DF] text-[#6B5744] hover:bg-[#E9E8E7]')}>
                 {t === 'all' ? 'All types' : t}
               </button>
@@ -437,9 +428,9 @@ function CaseLibrary({ onSelect }) {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-md p-0.5 bg-[#F8F8F7]">
-            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
-            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
+          <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-lg p-1 bg-[#F8F8F7]">
+            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={16}/></Button>
+            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={16}/></Button>
           </div>
           {canEdit && <Button><Ic.plus size={14}/> Create New</Button>}
         </div>
@@ -502,13 +493,73 @@ function CaseLibrary({ onSelect }) {
   );
 }
 
+// ---------- Case AI Chat ----------
+const CASE_SUGGESTIONS = [
+  { icon: Ic.sparkles, title: 'Summarize all depositions', desc: 'Get a high-level overview across all witnesses in this case' },
+  { icon: Ic.alert,    title: 'Find contradictions across witnesses', desc: 'Surface conflicting testimony between deponents' },
+  { icon: Ic.flag,     title: 'Identify key themes', desc: 'What topics and patterns emerge across the depositions?' },
+  { icon: Ic.fileText, title: 'Draft case timeline', desc: 'Build a chronological narrative from all testimony' },
+];
+
+function CaseChatPanel({ selectedCase }) {
+  const [msgs, setMsgs] = useState([]);
+  const [input, setInput] = useState('');
+  const send = (text) => {
+    if (!text.trim()) return;
+    setMsgs((m) => [...m, { role: 'user', text }]);
+    setInput('');
+    setTimeout(() => setMsgs((m) => [...m, { role: 'ai', text: 'This is a prototype response. In production, this would query across all depositions in this case.' }]), 600);
+  };
+  return (
+    <div className="w-80 shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
+      <div className="px-4 py-3.5 border-b border-[#E2E1DF] flex items-center gap-2">
+        <Ic.sparkles size={14} className="text-[#7A2E20]"/>
+        <span className="text-sm font-semibold text-[#14110D]">Case AI</span>
+        <span className="ml-auto text-[10px] text-[#9A8573] bg-[#E2E1DF]/60 rounded-full px-2 py-0.5">All depositions</span>
+      </div>
+      <div className="flex-1 overflow-auto p-4 flex flex-col gap-3">
+        {msgs.length === 0 ? (
+          <>
+            <p className="text-xs text-[#9A8573] mb-1">Ask anything about <span className="font-medium text-[#6B5744]">{selectedCase?.caseName}</span></p>
+            {CASE_SUGGESTIONS.map(({ icon: Icon, title, desc }) => (
+              <button key={title} onClick={() => send(title)}
+                className="text-left p-3 rounded-xl border border-[#E2E1DF] bg-white hover:bg-[#F0F0EE] hover:border-[#D0C5B0] transition-all group">
+                <div className="flex items-start gap-2.5">
+                  <Icon size={13} className="text-[#7A2E20] mt-0.5 shrink-0"/>
+                  <div>
+                    <div className="text-xs font-semibold text-[#14110D]">{title}</div>
+                    <div className="text-[11px] text-[#9A8573] mt-0.5 leading-relaxed">{desc}</div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </>
+        ) : (
+          msgs.map((m, i) => (
+            <div key={i} className={cls('text-sm rounded-xl px-3 py-2.5 leading-relaxed', m.role === 'user' ? 'bg-[#14110D] text-white self-end max-w-[85%]' : 'bg-white border border-[#E2E1DF] text-[#14110D] self-start max-w-[95%]')}>
+              {m.text}
+            </div>
+          ))
+        )}
+      </div>
+      <div className="p-3 border-t border-[#E2E1DF]">
+        <div className="flex gap-2">
+          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send(input)}
+            placeholder="Ask about this case..." className="flex-1 text-sm bg-white border border-[#E2E1DF] rounded-lg px-3 py-2 outline-none focus:border-[#9A8573] placeholder:text-[#C4B5A2]"/>
+          <button onClick={() => send(input)} className="w-8 h-8 rounded-lg bg-[#14110D] flex items-center justify-center shrink-0 hover:bg-[#2C2316] transition-colors">
+            <Ic.send size={13} className="text-white"/>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Deposition Library ----------
 function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
-  const [search, setSearch] = useState('');
   const [view, setView] = useState('grid');
   const selectedCase = MOCK_CASES.find((c) => c.id === caseId);
-  const all = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : MOCK_DEPOSITIONS;
-  const list = all.filter((d) => [d.title, d.witness, d.caseNumber].some((s) => s.toLowerCase().includes(search.toLowerCase())));
+  const list = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : MOCK_DEPOSITIONS;
   const fmt = (m) => { const h = Math.floor(m/60); const r = m%60; return h ? `${h}h ${r}m` : `${r}m`; };
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
@@ -518,111 +569,116 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
       ? <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5"><Ic.alert size={9}/> Mixed</span>
       : <span className="inline-flex items-center gap-1 text-[10px] font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded px-1.5 py-0.5"><Ic.sparkles size={9}/> AI</span>;
 
+  const Thumbnail = ({ d, className = '' }) => (
+    <div className={cls('bg-[#2C2316] relative flex items-center justify-center shrink-0 overflow-hidden', className)}>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#3D2E18] to-[#14110D]"/>
+      <span className="brand text-white/70 select-none relative z-10" style={{ fontSize: '2.8rem', fontWeight: 400 }}>{witnessInitials(d.witness)}</span>
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
+        <div className="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+          <Ic.play size={16} className="text-white ml-0.5"/>
+        </div>
+      </div>
+      <div className="absolute top-2.5 right-2.5 z-10">{srcBadge(d.transcriptSource)}</div>
+      <div className="absolute bottom-2.5 left-2.5 z-10">
+        <span className="text-[10px] text-white/70 font-mono bg-black/40 rounded px-2 py-0.5">{fmt(d.duration)}</span>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex-1 flex flex-col bg-[#F8F8F7]">
-      <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold text-[#14110D] tracking-tight truncate">{selectedCase?.caseName || 'Depositions'}</h1>
+    <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
+        <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between gap-4 shrink-0">
+          <div>
+            <h1 className="text-xl font-semibold text-[#14110D] tracking-tight">{selectedCase?.caseName || 'Depositions'}</h1>
             {selectedCase && <p className="text-[11px] text-[#9A8573] font-mono">{selectedCase.caseNumber}</p>}
           </div>
-          <div className="relative w-52 shrink-0">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={13}/></span>
-            <Input placeholder="Search witnesses..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-8 text-sm"/>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-lg p-1 bg-[#F8F8F7]">
+              <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-8 w-8 p-0"><Ic.list size={16}/></Button>
+              <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-8 w-8 p-0"><Ic.grid size={16}/></Button>
+            </div>
+            <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1 border border-[#E2E1DF] rounded-md p-0.5 bg-[#F8F8F7]">
-            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('list')} className="h-7 w-7 p-0"><Ic.list size={13}/></Button>
-            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setView('grid')} className="h-7 w-7 p-0"><Ic.grid size={13}/></Button>
-          </div>
-          <Button variant="outline" onClick={onAdd}><Ic.upload size={14}/> Upload New</Button>
-        </div>
-      </div>
 
-      <div className="flex-1 overflow-auto p-6">
-        {view === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {list.map((d) => (
-              <button key={d.id} onClick={() => onSelect(d.id)}
-                className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
-                {/* Thumbnail */}
-                <div className="bg-[#2C2316] h-36 relative flex items-center justify-center shrink-0 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#3D2E18] to-[#14110D]"/>
-                  <span className="brand text-white/70 select-none relative z-10" style={{ fontSize: '3rem', fontWeight: 400 }}>{witnessInitials(d.witness)}</span>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                      <Ic.play size={18} className="text-white ml-0.5"/>
+        <div className="flex-1 overflow-auto p-6">
+          {view === 'grid' ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {list.map((d) => (
+                <button key={d.id} onClick={() => onSelect(d.id)}
+                  className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
+                  <Thumbnail d={d} className="h-36 w-full"/>
+                  <div className="p-4 flex flex-col gap-3 flex-1">
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
+                      <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
                     </div>
-                  </div>
-                  <div className="absolute top-3 right-3 z-10">{srcBadge(d.transcriptSource)}</div>
-                  <div className="absolute bottom-3 left-3 z-10">
-                    <span className="text-[10px] text-white/70 font-mono bg-black/40 rounded px-2 py-0.5">{fmt(d.duration)}</span>
-                  </div>
-                </div>
-                {/* Body */}
-                <div className="p-4 flex flex-col gap-3 flex-1">
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
-                    <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
-                  </div>
-                  {d.goals.total > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
+                    {d.goals.total > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
+                          <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
+                        </div>
+                        <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total} goals</span>
                       </div>
-                      <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total} goals</span>
-                    </div>
-                  )}
-                  {d.tags && d.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {d.tags.slice(0,3).map((t) => (
-                        <span key={t} className="text-[10px] bg-[#F0F0EE] text-[#6B5744] rounded px-1.5 py-0.5">{t}</span>
-                      ))}
-                      {d.tags.length > 3 && <span className="text-[10px] text-[#9A8573]">+{d.tags.length - 3}</span>}
-                    </div>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col divide-y divide-[#E2E1DF] bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
-            {list.map((d) => (
-              <button key={d.id} onClick={() => onSelect(d.id)}
-                className="group flex items-center gap-5 px-6 py-5 text-left hover:bg-[#F8F8F7] transition-colors">
-                <div className="w-10 h-10 rounded-full bg-[#2C2316] flex items-center justify-center shrink-0">
-                  <span className="brand text-white/80 text-sm select-none">{witnessInitials(d.witness)}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
-                    {srcBadge(d.transcriptSource)}
+                    )}
+                    {d.tags && d.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {d.tags.slice(0,3).map((t) => <span key={t} className="text-[10px] bg-[#F0F0EE] text-[#6B5744] rounded px-1.5 py-0.5">{t}</span>)}
+                        {d.tags.length > 3 && <span className="text-[10px] text-[#9A8573]">+{d.tags.length - 3}</span>}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2.5 mt-1.5 flex-wrap">
-                    <span className="text-sm text-[#6B5744] flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
-                    <span className="text-[#C4B5A2]">·</span>
-                    <span className="text-sm text-[#6B5744] flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
-                    {d.goals.total > 0 && <>
-                      <span className="text-[#C4B5A2]">·</span>
-                      <span className="text-sm text-[#6B5744]">{d.goals.covered}/{d.goals.total} goals</span>
-                    </>}
-                  </div>
-                  {d.tags && d.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {d.tags.slice(0,3).map((t) => (
-                        <span key={t} className="text-[11px] bg-[#F0F0EE] text-[#6B5744] rounded px-2 py-0.5">{t}</span>
-                      ))}
-                      {d.tags.length > 3 && <span className="text-[11px] text-[#9A8573]">+{d.tags.length - 3}</span>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {list.map((d) => (
+                <button key={d.id} onClick={() => onSelect(d.id)}
+                  className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex">
+                  <Thumbnail d={d} className="w-36 shrink-0"/>
+                  <div className="flex-1 min-w-0 p-4 flex flex-col justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
+                        {srcBadge(d.transcriptSource)}
+                      </div>
+                      <div className="flex items-center gap-2.5 mt-1 text-sm text-[#6B5744] flex-wrap">
+                        <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
+                        <span className="text-[#C4B5A2]">·</span>
+                        <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
+                        {d.goals.total > 0 && <>
+                          <span className="text-[#C4B5A2]">·</span>
+                          <span>{d.goals.covered}/{d.goals.total} goals</span>
+                        </>}
+                      </div>
                     </div>
-                  )}
-                </div>
-                <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] shrink-0 transition-colors"/>
-              </button>
-            ))}
-          </div>
-        )}
+                    {d.tags && d.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {d.tags.slice(0,4).map((t) => <span key={t} className="text-[11px] bg-[#F0F0EE] text-[#6B5744] rounded px-2 py-0.5">{t}</span>)}
+                        {d.tags.length > 4 && <span className="text-[11px] text-[#9A8573]">+{d.tags.length - 4}</span>}
+                      </div>
+                    )}
+                    {d.goals.total > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
+                          <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
+                        </div>
+                        <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center pr-4">
+                    <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+      <CaseChatPanel selectedCase={selectedCase}/>
     </div>
   );
 }
