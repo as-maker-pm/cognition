@@ -1232,22 +1232,29 @@ function TimelineTab({ events, jump }) {
 
                     <p className="text-[12px] text-[#6B5744] leading-relaxed mb-3">{ev.description}</p>
 
-                    {/* Exhibits + Citations row */}
-                    {((ev.references && ev.references.length > 0) || (ev.mentionedBy && ev.mentionedBy.length > 0)) && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {(ev.references || []).map((r, i) => (
-                          <span key={i} className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">
-                            {r.label}
-                          </span>
-                        ))}
-                        {(ev.mentionedBy || []).map((m, i) => (
-                          <button key={i} onClick={() => jump && jump(m.timestamp)}
-                            className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
-                            <span>{Math.floor(m.timestamp/60)}:{String(m.timestamp%60).padStart(2,'0')}</span>
-                            <span className="text-[#D0C8BF]">·</span>
-                            <span>p.{m.page} l.{m.line}</span>
-                          </button>
-                        ))}
+                    {ev.references && ev.references.length > 0 && (
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] shrink-0">Exhibits</span>
+                        <div className="flex flex-wrap gap-1">
+                          {ev.references.map((r, i) => (
+                            <span key={i} className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 whitespace-nowrap">{r.label}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {ev.mentionedBy && ev.mentionedBy.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A8573] shrink-0">Citations</span>
+                        <div className="flex flex-wrap gap-1">
+                          {ev.mentionedBy.map((m, i) => (
+                            <button key={i} onClick={() => jump && jump(m.timestamp)}
+                              className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                              <span>{Math.floor(m.timestamp/60)}:{String(m.timestamp%60).padStart(2,'0')}</span>
+                              <span className="text-[#D0C8BF]">·</span>
+                              <span>p.{m.page} l.{m.line}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
 
