@@ -828,45 +828,46 @@ function GoalsTab({ goals }) {
   const [collapsed, setCollapsed] = useState({});
   const covered = goals.filter((g) => g.covered);
   const uncovered = goals.filter((g) => !g.covered);
-  const pct = Math.round((covered.length / goals.length) * 100);
+  const pct = goals.length ? Math.round((covered.length / goals.length) * 100) : 0;
 
-  const Section = ({ label, color, dot, items, defaultOpen = true }) => {
-    const key = label;
-    const open = collapsed[key] !== false;
-    return (
-      <div className="border-b border-[#F0F0EE] last:border-0">
-        <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
-            <span className="text-sm font-semibold text-[#14110D]">{label}</span>
-            <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{items.length}</span>
-          </div>
-          <Ic.chevD size={13} className={cls('text-[#9A8573] transition-transform', open && 'rotate-180')}/>
-        </button>
-        {open && items.map((g) => (
-          <div key={g.id} className="px-4 pb-3">
-            <div className="text-sm font-semibold text-[#14110D] leading-snug">{g.title}</div>
-            {g.notes && <div className="text-sm text-[#9A8573] mt-0.5 leading-snug">{g.notes}</div>}
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const groups = [
+    { key: 'uncovered', label: 'Needs coverage', dot: '#f59e0b', items: uncovered },
+    { key: 'covered',   label: 'Covered',         dot: '#10b981', items: covered },
+  ].filter(g => g.items.length > 0);
 
   return (
     <div className="flex flex-col">
-      <div className="px-4 py-3 border-b border-[#F0F0EE]">
+      <div className="px-5 py-3 border-b border-[#F3F3F3]">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs text-[#9A8573]">Coverage</span>
-          <span className="text-xs font-semibold text-[#14110D]">{covered.length}/{goals.length}</span>
+          <span className="text-[13px] text-[#9CA3AF]">Coverage</span>
+          <span className="text-[13px] font-semibold text-[#111]">{covered.length}/{goals.length}</span>
         </div>
-        <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden">
+        <div className="h-1 bg-[#F3F3F3] rounded-full overflow-hidden">
           <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }}/>
         </div>
       </div>
-      {uncovered.length > 0 && <Section label="Not covered" dot="#f59e0b" items={uncovered}/>}
-      {covered.length > 0 && <Section label="Covered" dot="#10b981" items={covered}/>}
+      {groups.map(({ key, label, dot, items }) => {
+        const open = collapsed[key] !== false;
+        return (
+          <div key={key}>
+            <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
+              className="w-full flex items-center justify-between px-5 py-3 hover:bg-[#F9F9F9] transition-colors">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
+                <span className="text-[15px] font-semibold text-[#111]">{label}</span>
+                <span className="text-[13px] text-[#9CA3AF]">{items.length}</span>
+              </div>
+              <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
+            </button>
+            {open && items.map((g) => (
+              <div key={g.id} className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
+                <div className="text-[15px] font-semibold text-[#111] leading-snug">{g.title}</div>
+                {g.notes && <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{g.notes}</div>}
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -886,24 +887,22 @@ function FlaggedTab({ items, jump }) {
       {groups.map(({ key, label, dot, items: groupItems }) => {
         const open = collapsed[key] !== false;
         return (
-          <div key={key} className="border-b border-[#F0F0EE] last:border-0">
+          <div key={key}>
             <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
-              className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
-              <div className="flex items-center gap-2">
+              className="w-full flex items-center justify-between px-5 py-3 hover:bg-[#F9F9F9] transition-colors">
+              <div className="flex items-center gap-2.5">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
-                <span className="text-sm font-semibold text-[#14110D]">{label}</span>
-                <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{groupItems.length}</span>
+                <span className="text-[15px] font-semibold text-[#111]">{label}</span>
+                <span className="text-[13px] text-[#9CA3AF]">{groupItems.length}</span>
               </div>
-              <Ic.chevD size={13} className={cls('text-[#9A8573] transition-transform', open && 'rotate-180')}/>
+              <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
             </button>
             {open && groupItems.map((f) => (
               <button key={f.id} onClick={() => jump(f.timestamp)}
-                className="w-full text-left px-4 pb-3 hover:bg-[#F8F8F7] transition-colors">
-                <div className="text-sm font-semibold text-[#14110D] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
-                <div className="flex items-center justify-between mt-0.5 gap-2">
-                  <div className="text-sm text-[#9A8573] leading-snug line-clamp-2">{f.description}</div>
-                  <span className="text-xs text-[#9A8573] font-mono shrink-0">{fmt(f.timestamp)}</span>
-                </div>
+                className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
+                <div className="text-[15px] font-semibold text-[#111] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+                <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{f.description}</div>
+                <div className="text-[11px] text-[#9CA3AF] font-mono mt-1.5">{fmt(f.timestamp)}</div>
               </button>
             ))}
           </div>
@@ -1178,57 +1177,72 @@ function ChatTab({ depo }) {
 
 // ---------- Contradictions Tab ----------
 function ContradictionsTab({ jump }) {
+  const [collapsed, setCollapsed] = useState({});
   const [expanded, setExpanded] = useState(null);
   const all = MOCK_DETAIL.contradictions || [];
   const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 
   const groups = [
-    { key: 'record', label: 'vs. Record',    dot: '#ef4444', items: all.filter(c => c.type === 'record') },
-    { key: 'self',   label: 'Self-contradiction', dot: '#f59e0b', items: all.filter(c => c.type === 'self') },
+    { key: 'record', label: 'vs. Record',         dot: '#ef4444', items: all.filter(c => c.type === 'record') },
+    { key: 'self',   label: 'Self-contradiction',  dot: '#f59e0b', items: all.filter(c => c.type === 'self') },
   ].filter(g => g.items.length > 0);
 
   return (
     <div className="flex flex-col">
-      {groups.map(({ key, label, dot, items }) => (
-        <div key={key} className="border-b border-[#F0F0EE] last:border-0">
-          <div className="flex items-center gap-2 px-4 py-3">
-            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
-            <span className="text-sm font-semibold text-[#14110D]">{label}</span>
-            <span className="text-xs text-[#9A8573] bg-[#F0F0EE] rounded-full px-2 py-0.5">{items.length}</span>
+      {groups.map(({ key, label, dot, items }) => {
+        const open = collapsed[key] !== false;
+        return (
+          <div key={key}>
+            <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
+              className="w-full flex items-center justify-between px-5 py-3 hover:bg-[#F9F9F9] transition-colors">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
+                <span className="text-[15px] font-semibold text-[#111]">{label}</span>
+                <span className="text-[13px] text-[#9CA3AF]">{items.length}</span>
+              </div>
+              <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
+            </button>
+            {open && items.map((c) => (
+              <div key={c.id}>
+                <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
+                  className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[15px] font-semibold text-[#111] leading-snug">{c.title}</div>
+                      <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{c.why}</div>
+                    </div>
+                    <Ic.chevD size={14} className={cls('text-[#9CA3AF] shrink-0 mt-0.5 transition-transform', expanded === c.id && 'rotate-180')}/>
+                  </div>
+                </button>
+                {expanded === c.id && (
+                  <div className="px-5 pb-4 border-t border-[#F3F3F3] flex flex-col gap-3 pt-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="border border-[#F3F3F3] p-3">
+                        <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wide mb-1.5">{c.stmtA.label}</p>
+                        <p className="text-[13px] text-[#111] italic leading-relaxed">"{c.stmtA.quote}"</p>
+                        {c.stmtA.timestamp && (
+                          <button onClick={() => jump(c.stmtA.timestamp)} className="text-[11px] text-[#9CA3AF] font-mono mt-2 hover:underline">{fmt(c.stmtA.timestamp)}</button>
+                        )}
+                      </div>
+                      <div className="border border-[#F3F3F3] p-3">
+                        <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wide mb-1.5">{c.stmtB.label}</p>
+                        <p className="text-[13px] text-[#111] italic leading-relaxed">"{c.stmtB.quote}"</p>
+                        {c.stmtB.timestamp && (
+                          <button onClick={() => jump(c.stmtB.timestamp)} className="text-[11px] text-[#9CA3AF] font-mono mt-2 hover:underline">{fmt(c.stmtB.timestamp)}</button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="flex-1 text-[13px] font-medium py-1.5 border border-[#F3F3F3] text-[#6B7280] hover:bg-[#F9F9F9] transition-colors">Dismiss</button>
+                      <button className="flex-1 text-[13px] font-medium py-1.5 bg-[#111] text-white hover:bg-[#333] transition-colors">Add to Brief</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          {items.map((c) => (
-            <div key={c.id} className="border-t border-[#F0F0EE]">
-              <button onClick={() => setExpanded(expanded === c.id ? null : c.id)}
-                className="w-full text-left px-4 py-3 hover:bg-[#F8F8F7] transition-colors">
-                <div className="text-sm font-semibold text-[#14110D] leading-snug">{c.title}</div>
-                <div className="flex items-center justify-between mt-0.5 gap-2">
-                  <div className="text-sm text-[#9A8573] line-clamp-2 leading-snug">{c.why}</div>
-                  <Ic.chevD size={12} className={cls('text-[#9A8573] shrink-0 transition-transform', expanded === c.id && 'rotate-180')}/>
-                </div>
-              </button>
-              {expanded === c.id && (
-                <div className="px-4 pb-4 flex flex-col gap-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg bg-[#F8F8F7] border border-[#F0F0EE] p-3">
-                      <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-wide mb-1.5">{c.stmtA.label}</p>
-                      <p className="text-xs text-[#14110D] italic leading-relaxed">"{c.stmtA.quote}"</p>
-                      {c.stmtA.timestamp && <button onClick={() => jump(c.stmtA.timestamp)} className="text-[10px] text-[#7A2E20] mt-2 font-mono hover:underline">{fmt(c.stmtA.timestamp)}</button>}
-                    </div>
-                    <div className="rounded-lg bg-[#F8F8F7] border border-[#F0F0EE] p-3">
-                      <p className="text-[10px] font-bold text-[#9A8573] uppercase tracking-wide mb-1.5">{c.stmtB.label}</p>
-                      <p className="text-xs text-[#14110D] italic leading-relaxed">"{c.stmtB.quote}"</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="flex-1 text-sm font-medium py-1.5 rounded-lg border border-[#E2E1DF] text-[#6B5744] hover:bg-[#F0F0EE] transition-colors">Dismiss</button>
-                    <button className="flex-1 text-sm font-medium py-1.5 rounded-lg bg-[#14110D] text-white hover:bg-[#2C2316] transition-colors">Add to Brief</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
