@@ -1648,7 +1648,7 @@ function DepositionDetail({ id, onBack }) {
                   />
                 </div>
                 {MOCK_DETAIL.goals.map((g) => (
-                  <div key={g.id} className="flex items-start gap-2 py-1.5 border-b border-[#E9E8E7] last:border-0">
+                  <div key={g.id} className="flex items-start gap-2 py-3 border-b border-[#E9E8E7] last:border-0">
                     <div className={cls('w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5',
                       g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#D0C5B0]'
                     )}>
