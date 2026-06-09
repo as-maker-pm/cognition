@@ -944,8 +944,10 @@ function GoalsTab({ goals: initialGoals, jump }) {
                           <div className="mt-2 flex flex-wrap gap-1">
                             {g.citations.map((c, i) => (
                               <button key={i} onClick={() => jump && jump(c.timestamp)}
-                                className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
-                                p.{c.page} l.{c.line}
+                                className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                                <span>{Math.floor(c.timestamp/60)}:{String(c.timestamp%60).padStart(2,'0')}</span>
+                                <span className="text-[#D0C8BF]">·</span>
+                                <span>p.{c.page} l.{c.line}</span>
                               </button>
                             ))}
                           </div>
@@ -1670,8 +1672,10 @@ function DepositionDetail({ id, onBack }) {
                         <div className="mt-1.5 flex flex-wrap gap-1">
                           {g.citations.map((c, i) => (
                             <button key={i} onClick={() => jump(c.timestamp)}
-                              className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
-                              p.{c.page} l.{c.line}
+                              className="inline-flex items-center gap-1 text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] border border-[#E2E1DF] rounded-full px-1.5 py-0.5 hover:bg-[#E2E1DF] hover:text-[#14110D] transition-colors whitespace-nowrap">
+                              <span>{Math.floor(c.timestamp/60)}:{String(c.timestamp%60).padStart(2,'0')}</span>
+                              <span className="text-[#D0C8BF]">·</span>
+                              <span>p.{c.page} l.{c.line}</span>
                             </button>
                           ))}
                         </div>
