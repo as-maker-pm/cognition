@@ -1798,7 +1798,7 @@ function DepositionDetail({ id, onBack }) {
           {/* Recording */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, recording: !c.recording }))}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-[#E9E8E7]/40 transition-colors">
+              className="w-full flex items-center justify-between px-4 hover:bg-[#E9E8E7]/40 transition-colors" style={{ minHeight: '52px' }}>
               <span className="text-[13px] font-semibold text-[#14110D]">Recording</span>
               <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.recording && '-rotate-90')}/>
             </button>
@@ -1906,7 +1906,7 @@ function DepositionDetail({ id, onBack }) {
 
         {/* CENTER: TRANSCRIPT */}
         <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F8F8F7]" style={{ maxWidth: '42%' }}>
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E1DF] shrink-0">
+          <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '52px' }}>
             <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
             <button
               onClick={() => setTab('flagged')}
@@ -1924,7 +1924,7 @@ function DepositionDetail({ id, onBack }) {
         {/* RIGHT PANEL */}
         <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
           {/* Tab bar */}
-          <div className="flex flex-wrap shrink-0 px-4 py-3.5 gap-1.5 border-b border-[#E2E1DF]">
+          <div className="flex flex-wrap shrink-0 px-4 gap-1.5 border-b border-[#E2E1DF] items-center" style={{ minHeight: '52px' }}>
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
