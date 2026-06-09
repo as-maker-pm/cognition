@@ -119,7 +119,7 @@ const Badge = ({ variant = 'secondary', className = '', children }) => {
 };
 
 const Card = ({ className = '', children, ...rest }) => (
-  <div className={cls('rounded-xl border border-[#E4DCC9] bg-[#FBF8F1]', className)} {...rest}>{children}</div>
+  <div className={cls('rounded-lg border border-slate-100 bg-white', className)} {...rest}>{children}</div>
 );
 
 // ---------- Top Nav ----------
@@ -698,13 +698,12 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
         </div>
       </div>
 
-      <div className="border-t border-[#E4DCC9]/60 pt-3">
+      <div className="border-t border-[#E4DCC9]/40 pt-3">
         <p className="text-[10px] font-semibold text-[#9A8573] uppercase tracking-wider mb-2">Summary</p>
-        <p className="text-xs text-[#3D2E1E] leading-relaxed line-clamp-6">{MOCK_DETAIL.summary}</p>
-        <button onClick={() => setSummaryOpen((o) => !o)} className="text-[11px] text-[#7A2E20] mt-1.5 hover:underline">
+        <p className="text-xs text-[#6B5744] leading-relaxed">{summaryOpen ? MOCK_DETAIL.summary : MOCK_DETAIL.summary.slice(0, 200) + '…'}</p>
+        <button onClick={() => setSummaryOpen((o) => !o)} className="text-[11px] text-[#9A8573] mt-1.5 hover:text-[#7A2E20] hover:underline transition-colors">
           {summaryOpen ? 'Show less' : 'Read more'}
         </button>
-        {summaryOpen && <p className="text-xs text-[#3D2E1E] leading-relaxed mt-2">{MOCK_DETAIL.summary}</p>}
       </div>
     </div>
   );
@@ -712,36 +711,42 @@ function VideoPanel({ depo, currentTime, setCurrentTime, playing, setPlaying }) 
 
 function TranscriptViewer({ topics, currentTime, setCurrentTime }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {topics.map((topic) => (
         <div key={topic.id}>
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-sm font-semibold text-[#14110D]">{topic.title}</h3>
-            <Badge variant="outline">{topic.segments.length} segments</Badge>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">{topic.title}</h3>
           </div>
-          {topic.summary && <p className="text-xs text-[#6B5744] mb-3 leading-relaxed">{topic.summary}</p>}
-          <div className="flex flex-col gap-2">
+          {topic.summary && <p className="text-xs text-slate-400 mb-4 leading-relaxed">{topic.summary}</p>}
+          <div className="flex flex-col border-l-2 border-slate-100 ml-0.5">
             {topic.segments.map((s) => {
               const active = currentTime >= s.timestamp - 3 && currentTime <= s.timestamp + 6;
               const isW = s.speaker === 'Witness';
               return (
-                <button key={s.id} onClick={() => setCurrentTime(s.timestamp)} className={cls('text-left rounded-lg border p-3 transition-all', active ? 'border-[#7A2E20] bg-[#FBF8F1]' : 'border-[#E4DCC9] bg-[#FBF8F1]/60 hover:border-[#D0C5B0]')}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={isW ? 'amber' : 'blue'}>{s.speaker}</Badge>
-                      <span className="text-xs text-[#9A8573]">p.{s.page} · l.{s.line}</span>
-                      {s.source === 'verified'
-                        ? <Badge variant="green"><Ic.checkC size={10}/>Verified</Badge>
-                        : <Badge variant="blue"><Ic.sparkles size={10}/>AI</Badge>}
-                    </div>
-                    <span className="text-xs text-[#9A8573] tabular-nums font-mono">{Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}</span>
+                <button
+                  key={s.id}
+                  onClick={() => setCurrentTime(s.timestamp)}
+                  className={cls(
+                    'text-left pl-4 pr-2 py-3 border-l-2 -ml-0.5 transition-all',
+                    active
+                      ? 'border-[#7A2E20] bg-rose-50/30'
+                      : 'border-transparent hover:border-slate-200 hover:bg-slate-50/60'
+                  )}
+                >
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <span className={cls('text-[11px] font-semibold tracking-wide', isW ? 'text-[#7A2E20]' : 'text-slate-500')}>
+                      {s.speaker}
+                    </span>
+                    <span className="text-[10px] text-slate-300 tabular-nums font-mono shrink-0 ml-3">
+                      {Math.floor(s.timestamp/60)}:{String(s.timestamp%60).padStart(2,'0')}
+                    </span>
                   </div>
-                  <p className="text-sm text-[#14110D] leading-relaxed">{s.text}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">{s.text}</p>
                   {s.cues?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
+                    <div className="flex flex-wrap gap-1 mt-2">
                       {s.cues.map((c, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                          <Ic.alert size={10}/> {c.type}: {c.description}
+                        <span key={i} className="text-[11px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                          ⚑ {c.description}
                         </span>
                       ))}
                     </div>
@@ -762,28 +767,28 @@ function GoalsTab({ goals }) {
   return (
     <div className="flex flex-col gap-3">
       {/* Progress summary */}
-      <div className="rounded-xl border border-[#E4DCC9] bg-[#FBF8F1] p-4">
+      <div className="rounded-lg border border-slate-100 bg-white p-3.5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-[#6B5744] uppercase tracking-wider">Goal Coverage</span>
-          <span className="text-sm font-semibold text-[#14110D]">{covered}/{goals.length}</span>
+          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Goal Coverage</span>
+          <span className="text-sm font-semibold text-slate-700">{covered}/{goals.length}</span>
         </div>
-        <div className="h-1.5 bg-[#E4DCC9]/60 rounded-full overflow-hidden">
+        <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-700"
-            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#14110D' }}
+            style={{ width: `${pct}%`, background: pct === 100 ? '#10b981' : '#64748b' }}
           />
         </div>
-        <p className="text-xs text-[#9A8573] mt-1.5">{pct}% of deposition goals addressed</p>
+        <p className="text-[11px] text-slate-400 mt-1.5">{pct}% of deposition goals addressed</p>
       </div>
       {goals.map((g) => (
         <Card key={g.id} className="p-3">
           <div className="flex items-start gap-3">
-            <div className={cls('w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5', g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-[#E4DCC9]')}>
+            <div className={cls('w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5', g.covered ? 'bg-emerald-500 text-white' : 'border-2 border-slate-200')}>
               {g.covered && <Ic.check size={12}/>}
             </div>
             <div className="flex-1 min-w-0">
-              <div className={cls('text-sm font-medium', g.covered ? 'text-[#14110D]' : 'text-[#6B5744]')}>{g.title}</div>
-              {g.notes && <div className={cls('text-xs mt-1', g.covered ? 'text-[#6B5744]' : 'text-amber-600')}>{g.notes}</div>}
+              <div className={cls('text-sm', g.covered ? 'text-slate-700' : 'text-slate-500')}>{g.title}</div>
+              {g.notes && <div className={cls('text-xs mt-0.5', g.covered ? 'text-slate-400' : 'text-amber-600')}>{g.notes}</div>}
             </div>
           </div>
         </Card>
@@ -1317,30 +1322,30 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
         {/* Left: video + controls */}
-        <div className="col-span-3 border-r border-[#E4DCC9] overflow-y-auto">
+        <div className="col-span-3 border-r border-[#E4DCC9] overflow-y-auto bg-[#F7F2EA]">
           <div className="p-4">
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
           </div>
         </div>
 
-        {/* Middle: transcript */}
-        <div className="col-span-5 border-r border-[#E4DCC9] flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E4DCC9]/60 shrink-0">
-            <span className="text-xs font-medium text-[#9A8573] uppercase tracking-wider">Transcript</span>
-            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1.5 text-xs text-rose-600 hover:text-rose-700 transition-colors">
-              <Ic.flag size={11}/>
+        {/* Middle: transcript — clean white working surface */}
+        <div className="col-span-5 border-r border-[#E4DCC9] flex flex-col overflow-hidden bg-white">
+          <div className="flex items-center justify-between px-6 py-2.5 border-b border-slate-100 shrink-0">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Transcript</span>
+            <button onClick={() => setTab('flagged')} className="inline-flex items-center gap-1 text-[11px] text-rose-400 hover:text-rose-600 transition-colors">
+              <Ic.flag size={10}/>
               {MOCK_DETAIL.flaggedItems.length} flagged
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="flex-1 overflow-y-auto px-6 py-5">
             <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime}/>
           </div>
         </div>
 
-        {/* Right panel: tabs */}
-        <div className="col-span-4 flex flex-col bg-[#FBF8F1] overflow-hidden">
+        {/* Right panel: tabs — clean white */}
+        <div className="col-span-4 flex flex-col bg-white overflow-hidden">
           {/* Text tab bar */}
-          <div className="flex flex-wrap gap-0.5 border-b border-[#E4DCC9] shrink-0 px-2 pt-2 pb-0">
+          <div className="flex flex-wrap gap-0.5 border-b border-slate-100 shrink-0 px-3 pt-2.5 pb-0">
             {tabs.map((t) => {
               const isActive = tab === t.id;
               return (
@@ -1348,10 +1353,10 @@ function DepositionDetail({ id, onBack }) {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   className={cls(
-                    'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t-md text-xs font-medium transition-colors whitespace-nowrap',
+                    'relative inline-flex items-center gap-1 px-2.5 py-1.5 rounded-t text-xs font-medium transition-colors whitespace-nowrap',
                     isActive
-                      ? 'text-[#14110D] bg-[#F7F2EA] border border-b-0 border-[#E4DCC9]'
-                      : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#E4DCC9]/20'
+                      ? 'text-slate-900 bg-slate-50 border border-b-0 border-slate-200'
+                      : 'text-slate-400 hover:text-slate-700'
                   )}
                 >
                   {t.label}
@@ -1365,7 +1370,7 @@ function DepositionDetail({ id, onBack }) {
             })}
           </div>
 
-          <div className={cls('flex-1 min-h-0', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
+          <div className={cls('flex-1 min-h-0 bg-slate-50/40', tab === 'chat' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto px-3 py-3')}>
             {tab === 'chat'           && <ChatTab depo={depo}/>}
             {tab === 'goals'          && <GoalsTab goals={MOCK_DETAIL.goals}/>}
             {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
