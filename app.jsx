@@ -543,7 +543,7 @@ function CaseChatPanel({ selectedCase }) {
   const isEmpty = messages.length === 0 && !busy;
 
   return (
-    <div className="w-80 shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
+    <div className="w-96 shrink-0 border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7]">
       <div className="flex flex-col h-full min-h-0">
         <div className="flex-1 overflow-y-auto min-h-0">
           {isEmpty ? (
@@ -665,19 +665,14 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                       <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
                       <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
                     </div>
-                    {d.goals.total > 0 && (
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
-                        </div>
-                        <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total} goals</span>
-                      </div>
-                    )}
                     {d.tags && d.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {d.tags.slice(0,3).map((t) => <span key={t} className="text-[10px] bg-[#F0F0EE] text-[#6B5744] rounded px-1.5 py-0.5">{t}</span>)}
-                        {d.tags.length > 3 && <span className="text-[10px] text-[#9A8573]">+{d.tags.length - 3}</span>}
-                      </div>
+                      <>
+                        <div className="h-px bg-[#E2E1DF]"/>
+                        <div className="flex flex-wrap gap-1">
+                          {d.tags.slice(0,3).map((t) => <span key={t} className="text-[10px] bg-[#F0F0EE] text-[#6B5744] rounded px-1.5 py-0.5">{t}</span>)}
+                          {d.tags.length > 3 && <span className="text-[10px] text-[#9A8573]">+{d.tags.length - 3}</span>}
+                        </div>
+                      </>
                     )}
                   </div>
                 </button>
@@ -689,7 +684,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                 <button key={d.id} onClick={() => onSelect(d.id)}
                   className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex">
                   <Thumbnail d={d} className="w-36 shrink-0"/>
-                  <div className="flex-1 min-w-0 p-4 flex flex-col justify-between gap-2">
+                  <div className="flex-1 min-w-0 p-4 flex flex-col justify-center gap-2">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
@@ -699,24 +694,12 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                         <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
                         <span className="text-[#C4B5A2]">·</span>
                         <span className="flex items-center gap-1"><Ic.clock size={11}/>{fmt(d.duration)}</span>
-                        {d.goals.total > 0 && <>
-                          <span className="text-[#C4B5A2]">·</span>
-                          <span>{d.goals.covered}/{d.goals.total} goals</span>
-                        </>}
                       </div>
                     </div>
                     {d.tags && d.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {d.tags.slice(0,4).map((t) => <span key={t} className="text-[11px] bg-[#F0F0EE] text-[#6B5744] rounded px-2 py-0.5">{t}</span>)}
                         {d.tags.length > 4 && <span className="text-[11px] text-[#9A8573]">+{d.tags.length - 4}</span>}
-                      </div>
-                    )}
-                    {d.goals.total > 0 && (
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1 bg-[#E2E1DF] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#7A2E20] rounded-full" style={{ width: `${(d.goals.covered/d.goals.total)*100}%` }}/>
-                        </div>
-                        <span className="text-[10px] text-[#9A8573] shrink-0">{d.goals.covered}/{d.goals.total}</span>
                       </div>
                     )}
                   </div>
