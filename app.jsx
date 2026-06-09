@@ -1246,16 +1246,16 @@ function ChatTab({ depo }) {
       </div>
 
       <div className="px-4 pb-4 pt-2 shrink-0">
-        <div className="bg-[#F4F3F1] rounded-2xl px-4 pt-3 pb-2.5 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
+        <div className="bg-[#EFEFED] rounded-2xl px-4 pt-4 pb-3 focus-within:ring-1 focus-within:ring-[#C0BDB9] transition-all">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
             placeholder="Ask Cognition anything…"
-            rows={1}
-            className="w-full text-[14px] text-[#14110D] placeholder:text-[#B5B0AB] outline-none resize-none bg-transparent leading-5 mb-2"
-            style={{ minHeight: '22px' }}
+            rows={2}
+            className="w-full text-[14px] text-[#14110D] placeholder:text-[#B5B0AB] outline-none resize-none bg-transparent leading-5 mb-3"
+            style={{ minHeight: '44px' }}
           />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
