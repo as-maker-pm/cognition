@@ -1149,7 +1149,7 @@ function TimelineTab({ events, jump }) {
 
   const CATEGORY_ICON = {
     document: <Ic.fileText size={10}/>,
-    meeting:  <Ic.users size={10}/>,
+    meeting:  <Ic.calendar size={10}/>,
     action:   <Ic.clock size={10}/>,
   };
 
