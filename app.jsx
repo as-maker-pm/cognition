@@ -1017,7 +1017,7 @@ function FlaggedTab({ items, jump }) {
                   const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
                   return (
                     <button key={f.id} onClick={() => jump(f.timestamp)}
-                      className="w-full text-left rounded-lg bg-[#F7F7F5] overflow-hidden hover:shadow-sm transition-all"
+                      className="w-full text-left rounded-lg bg-[#FAFAF9] overflow-hidden hover:shadow-sm transition-all"
                       style={{ border: `1px solid ${cfg.color}22` }}>
                       <div className="flex items-stretch">
                         {/* Colored left strip */}
@@ -1737,7 +1737,7 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F7F7F5]" style={{ maxWidth: '42%' }}>
+        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#FAFAF9]" style={{ maxWidth: '42%' }}>
           <div className="flex items-center justify-between px-5 py-2.5 border-b border-[#E2E1DF] shrink-0">
             <span className="text-sm font-semibold text-[#14110D]">Transcript</span>
             <button
