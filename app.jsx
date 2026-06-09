@@ -1141,26 +1141,120 @@ function SentimentTab({ data }) {
 }
 
 function TimelineTab({ events, jump }) {
+  const fmt = (d) => {
+    const [y, m, day] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[parseInt(m,10)-1]} ${parseInt(day,10)}, ${y}`;
+  };
+
+  const CATEGORY_ICON = {
+    document: <Ic.fileText size={10}/>,
+    meeting:  <Ic.users size={10}/>,
+    action:   <Ic.clock size={10}/>,
+  };
+
+  const sorted = [...events].sort((a, b) => {
+    const dateCompare = a.date.localeCompare(b.date);
+    if (dateCompare !== 0) return dateCompare;
+    return (a.time || '').localeCompare(b.time || '');
+  });
+
+  const grouped = sorted.reduce((acc, ev) => {
+    if (!acc[ev.date]) acc[ev.date] = [];
+    acc[ev.date].push(ev);
+    return acc;
+  }, {});
+
+  const contradictionCount = events.filter(e => e.contradiction).length;
+
   return (
-    <div className="flex flex-col gap-2">
-      {events.map((e) => (
-        <Card key={e.id} className={cls('p-3', e.contradiction && 'border-rose-300 bg-rose-50/50')}>
-          <div className="flex items-start gap-3">
-            <div className="text-xs text-[#6B5744] shrink-0 w-24">
-              <div className="font-medium text-[#3D2E1E]">{e.date}</div>
-              {e.time && <div>{e.time}</div>}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-[#14110D]">{e.title}</span>
-                <Badge variant="outline" className="capitalize">{e.category}</Badge>
-                {e.contradiction && <Badge variant="destructive"><Ic.alert size={10}/> Contradiction</Badge>}
-              </div>
-              <p className="text-xs text-[#6B5744] leading-relaxed">{e.description}</p>
-              {e.contradiction && <p className="text-xs text-rose-700 mt-2 leading-relaxed">{e.contradictionDetails}</p>}
+    <div className="px-4 py-3">
+      {/* Summary strip */}
+      {contradictionCount > 0 && (
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-[#FEF2F2] border border-[#FECACA]">
+          <Ic.alert size={12} className="text-[#DC2626] shrink-0"/>
+          <span className="text-[11px] text-[#DC2626] font-medium">{contradictionCount} contradiction{contradictionCount > 1 ? 's' : ''} flagged in this timeline</span>
+        </div>
+      )}
+
+      {Object.keys(grouped).map((date) => (
+        <div key={date} className="mb-5">
+          {/* Date label */}
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A8573]">{fmt(date)}</span>
+            <div className="flex-1 h-px bg-[#E2E1DF]"/>
+          </div>
+
+          {/* Events for this date */}
+          <div className="relative pl-4">
+            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-[#E2E1DF]"/>
+
+            <div className="flex flex-col gap-2">
+              {grouped[date].map((ev) => (
+                <div key={ev.id} className="relative flex items-start gap-3">
+                  {/* Node */}
+                  <div className={cls(
+                    'absolute -left-[11px] top-3 w-2.5 h-2.5 rounded-full border-2 shrink-0 z-10',
+                    ev.contradiction ? 'bg-[#DC2626] border-[#DC2626]' : 'bg-white border-[#C5BEB5]'
+                  )}/>
+
+                  {/* Card */}
+                  <div className={cls(
+                    'flex-1 rounded-lg px-3 py-2.5 border',
+                    ev.contradiction
+                      ? 'bg-[#FEF2F2] border-[#FECACA]'
+                      : 'bg-white border-[#E2E1DF] hover:bg-[#F0F0EE] transition-colors cursor-default'
+                  )}>
+                    {/* Header row */}
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {ev.time && (
+                          <span className="text-[10px] font-mono text-[#9A8573] shrink-0">{ev.time}</span>
+                        )}
+                        <span className="text-[12px] font-semibold text-[#14110D] leading-snug">{ev.title}</span>
+                      </div>
+                      {ev.contradiction && (
+                        <span className="shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#DC2626] bg-[#FEE2E2] px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                          <Ic.alert size={8}/> Conflict
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-[11px] text-[#6B5744] leading-relaxed">{ev.description}</p>
+
+                    {/* Source pill */}
+                    {ev.source && (
+                      <div className="mt-1.5 flex items-center gap-1">
+                        <span className="text-[#C5BEB5]">{CATEGORY_ICON[ev.category]}</span>
+                        <span className="text-[10px] font-mono text-[#9A8573]">{ev.source}</span>
+                      </div>
+                    )}
+
+                    {/* Contradiction detail */}
+                    {ev.contradiction && ev.contradictionDetails && (
+                      <div className="mt-2.5 pt-2.5 border-t border-[#FECACA]">
+                        <div className="flex items-start gap-1.5">
+                          <Ic.alert size={10} className="text-[#DC2626] shrink-0 mt-0.5"/>
+                          <p className="text-[11px] text-[#B91C1C] leading-relaxed">{ev.contradictionDetails}</p>
+                        </div>
+                        {ev.contradictionRef && (
+                          <p className="text-[10px] font-mono text-[#DC2626]/70 mt-1.5">↳ {ev.contradictionRef}</p>
+                        )}
+                        {ev.transcriptTimestamp && (
+                          <button onClick={() => jump && jump(ev.transcriptTimestamp)}
+                            className="mt-2 inline-flex items-center gap-1 text-[10px] font-mono text-[#9A8573] bg-[#F0F0EE] hover:bg-[#E2E1DF] rounded-full px-2 py-0.5 transition-colors">
+                            <Ic.play size={8}/> Jump to testimony
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </Card>
+        </div>
       ))}
     </div>
   );
