@@ -995,22 +995,28 @@ function FlaggedTab({ items, jump }) {
         return (
           <div key={key}>
             <button onClick={() => setCollapsed(c => ({ ...c, [key]: !open }))}
-              className="w-full flex items-center justify-between px-5 py-3 hover:bg-[#F9F9F9] transition-colors">
+              className="w-full flex items-center justify-between px-5 py-2.5 hover:bg-[#F9F9F9] transition-colors">
               <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: dot }}/>
-                <span className="text-[15px] font-semibold text-[#111]">{label}</span>
-                <span className="text-[13px] text-[#9CA3AF]">{groupItems.length}</span>
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: dot }}/>
+                <span className="text-[13px] font-semibold text-[#111]">{label}</span>
+                <span className="text-[12px] text-[#9CA3AF]">{groupItems.length}</span>
               </div>
-              <Ic.chevD size={14} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
+              <Ic.chevD size={13} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
             </button>
-            {open && groupItems.map((f) => (
-              <button key={f.id} onClick={() => jump(f.timestamp)}
-                className="w-full text-left px-5 py-3.5 border-t border-[#F3F3F3] hover:bg-[#F9F9F9] transition-colors">
-                <div className="text-[15px] font-semibold text-[#111] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
-                <div className="text-[13px] text-[#6B7280] leading-relaxed mt-1 line-clamp-2">{f.description}</div>
-                <div className="text-[11px] text-[#9CA3AF] font-mono mt-1.5">{fmt(f.timestamp)}</div>
-              </button>
-            ))}
+            {open && (
+              <div className="px-4 pb-2 flex flex-col gap-1.5">
+                {groupItems.map((f) => (
+                  <button key={f.id} onClick={() => jump(f.timestamp)}
+                    className="w-full text-left px-3.5 py-2.5 rounded-lg bg-white border border-[#EFEFED] hover:border-[#D8D6D3] hover:shadow-sm transition-all">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="text-[12px] font-semibold text-[#111] leading-snug">{f.type.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+                      <span className="inline-flex items-center text-[9px] font-mono text-[#9A8573] bg-[#F0F0EE] rounded-full px-1.5 py-0.5 shrink-0 whitespace-nowrap">{fmt(f.timestamp)}</span>
+                    </div>
+                    <div className="text-[12px] text-[#6B7280] leading-relaxed line-clamp-2">{f.description}</div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
