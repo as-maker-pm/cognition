@@ -1012,7 +1012,7 @@ function FlaggedTab({ items, jump }) {
               <Ic.chevD size={13} className={cls('text-[#9CA3AF] transition-transform', open && 'rotate-180')}/>
             </button>
             {open && (
-              <div className="px-4 py-2.5 flex flex-col gap-1.5 bg-white">
+              <div className="px-4 py-2.5 flex flex-col gap-1.5 bg-[#F8F8F7]">
                 {groupItems.map((f) => {
                   const cfg = FLAG_TYPE_CONFIG[f.type] || { color: '#9CA3AF', bg: '#F9FAFB' };
                   return (
