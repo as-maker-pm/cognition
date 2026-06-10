@@ -1906,7 +1906,7 @@ function DepositionDetail({ id, onBack }) {
 
         {/* LEFT FLYOUT: tab content */}
         {flyoutOpen && (
-          <div className="w-[460px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
+          <div className="w-[540px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
               <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
                 {tabs.find(t => t.id === tab)?.label}
@@ -1944,7 +1944,7 @@ function DepositionDetail({ id, onBack }) {
         </div>
 
         {/* RIGHT SIDEBAR: Video + Summary, Goals, Topics */}
-        <div className={cls('shrink-0 border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7] transition-all', flyoutOpen ? 'w-[300px]' : 'w-[360px]')}>
+        <div className={cls('shrink-0 border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7] transition-all', flyoutOpen ? 'w-[340px]' : 'w-[400px]')}>
           {/* Video */}
           <div className="border-b border-[#E2E1DF] p-3">
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
