@@ -1878,7 +1878,7 @@ function DepositionDetail({ id, onBack }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT SIDEBAR: Video + Summary, Goals, Topics */}
-        <div style={{ flex: '0 0 25%', minWidth: 0 }} className="border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
+        <div style={{ flex: '0 0 22%', minWidth: 0 }} className="border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
           {/* Video */}
           <div className="border-b border-[#E2E1DF] p-3">
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
@@ -1998,8 +1998,8 @@ function DepositionDetail({ id, onBack }) {
 
         {/* RIGHT FLYOUT: tab content */}
         {flyoutOpen && (
-          <div style={{ flex: '0 0 35%', minWidth: 0 }} className="border-l border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
+          <div style={{ flex: '0 0 32%', minWidth: 0 }} className="border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0 bg-white">
               <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
                 {tabs.find(t => t.id === tab)?.label}
               </span>
@@ -2019,7 +2019,7 @@ function DepositionDetail({ id, onBack }) {
         )}
 
         {/* FAR RIGHT: icon + label toolbar */}
-        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#F8F8F7]">
+        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#ECEAE8]">
           {tabs.map(({ id, label, short, icon: Icon, count }) => {
             const isActive = tab === id && flyoutOpen;
             return (
