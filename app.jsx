@@ -1999,11 +1999,11 @@ function DepositionDetail({ id, onBack }) {
         {/* RIGHT FLYOUT: tab content */}
         {flyoutOpen && (
           <div style={{ flex: '0 0 32%', minWidth: 0 }} className="border-l border-[#E2E1DF] flex flex-col bg-[#F8F8F7] overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0 bg-white">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
+            <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0 bg-[#F8F8F7]" style={{ minHeight: '44px' }}>
+              <span className="text-[13px] font-semibold text-[#14110D]">
                 {tabs.find(t => t.id === tab)?.label}
               </span>
-              <button onClick={() => setFlyoutOpen(false)} className="w-6 h-6 rounded flex items-center justify-center text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors">
+              <button onClick={() => setFlyoutOpen(false)} className="w-6 h-6 rounded flex items-center justify-center text-[#9A8573] hover:text-[#14110D] hover:bg-[#E9E8E7] transition-colors">
                 <Ic.x size={13}/>
               </button>
             </div>
@@ -2013,13 +2013,13 @@ function DepositionDetail({ id, onBack }) {
               {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
               {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
               {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
-              {tab === 'timeline'       && <ErrorBoundary><div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div></ErrorBoundary>}
+              {tab === 'timeline'       && <ErrorBoundary><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></ErrorBoundary>}
             </div>
           </div>
         )}
 
         {/* FAR RIGHT: icon + label toolbar */}
-        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#ECEAE8]">
+        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#F0F0EE]">
           {tabs.map(({ id, label, short, icon: Icon, count }) => {
             const isActive = tab === id && flyoutOpen;
             return (
