@@ -1820,9 +1820,8 @@ function ExhibitsTab({ jump }) {
 function DepositionDetail({ id, onBack }) {
   const depo = MOCK_DEPOSITIONS.find((d) => d.id === id);
   const selectedCase = MOCK_CASES.find((c) => c.caseNumber === depo.caseNumber);
-  const { user } = useAuth();
-  const canEdit = user?.role === 'admin' || user?.role === 'editor';
   const [tab, setTab] = useState('chat');
+  const [flyoutOpen, setFlyoutOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -1831,12 +1830,12 @@ function DepositionDetail({ id, onBack }) {
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
   const tabs = [
-    { id: 'chat',           label: 'AI Chat' },
-    { id: 'contradictions', label: 'Contradictions', count: MOCK_DETAIL.contradictions?.length },
-    { id: 'flagged',        label: 'Flagged',         count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
-    { id: 'sentiment',      label: 'Sentiment' },
-    { id: 'exhibits',       label: 'Exhibits' },
-    { id: 'timeline',       label: 'Timeline' },
+    { id: 'chat',           label: 'AI Chat',        icon: Ic.sparkles },
+    { id: 'contradictions', label: 'Contradictions', icon: Ic.alert,    count: MOCK_DETAIL.contradictions?.length },
+    { id: 'flagged',        label: 'Flagged',         icon: Ic.flag,     count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
+    { id: 'sentiment',      label: 'Sentiment',       icon: Ic.scale },
+    { id: 'exhibits',       label: 'Exhibits',        icon: Ic.fileText },
+    { id: 'timeline',       label: 'Timeline',        icon: Ic.calendar },
   ];
 
   const exportOptions = [
@@ -1879,23 +1878,74 @@ function DepositionDetail({ id, onBack }) {
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT SIDEBAR */}
-        <div className="w-80 shrink-0 border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
+        {/* FAR LEFT: icon toolbar */}
+        <div className="w-[52px] shrink-0 border-r border-[#E2E1DF] flex flex-col items-center py-3 gap-1 bg-[#F8F8F7]">
+          {tabs.map(({ id, label, icon: Icon, count }) => {
+            const isActive = tab === id && flyoutOpen;
+            return (
+              <button key={id}
+                onClick={() => { if (tab === id && flyoutOpen) { setFlyoutOpen(false); } else { setTab(id); setFlyoutOpen(true); } }}
+                title={label}
+                className={cls(
+                  'w-9 h-9 rounded-lg flex items-center justify-center transition-all relative',
+                  isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
+                )}>
+                <Icon size={16}/>
+                {count > 0 && (
+                  <span className={cls(
+                    'absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center',
+                    isActive ? 'bg-white text-[#14110D]' : 'bg-[#7A2E20] text-white'
+                  )}>{count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Recording */}
-          <div className="border-b border-[#E2E1DF]">
-            <button onClick={() => setSideCollapsed(c => ({ ...c, recording: !c.recording }))}
-              className="w-full flex items-center justify-between px-4 hover:bg-[#E9E8E7]/40 transition-colors" style={{ minHeight: '52px' }}>
-              <span className="text-[13px] font-semibold text-[#14110D]">Recording</span>
-              <Ic.chevD size={12} className={cls('text-[#9A8573] transition-transform', sideCollapsed.recording && '-rotate-90')}/>
-            </button>
-            {!sideCollapsed.recording && (
-              <div className="px-4 pb-4">
-                <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
-              </div>
-            )}
+        {/* LEFT FLYOUT: tab content */}
+        {flyoutOpen && (
+          <div className="w-[320px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
+                {tabs.find(t => t.id === tab)?.label}
+              </span>
+              <button onClick={() => setFlyoutOpen(false)} className="w-6 h-6 rounded flex items-center justify-center text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors">
+                <Ic.x size={13}/>
+              </button>
+            </div>
+            <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
+              {tab === 'chat'           && <ChatTab depo={depo}/>}
+              {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
+              {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
+              {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
+              {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
+              {tab === 'timeline'       && <ErrorBoundary><div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div></ErrorBoundary>}
+            </div>
           </div>
+        )}
 
+        {/* CENTER: Video + Transcript */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#F8F8F7]">
+          <div className="shrink-0 border-b border-[#E2E1DF] p-4">
+            <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+          </div>
+          <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '44px' }}>
+            <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
+            <button
+              onClick={() => { setTab('flagged'); setFlyoutOpen(true); }}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+            >
+              <Ic.flag size={11}/>
+              {MOCK_DETAIL.flaggedItems.length} flagged
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-5 py-5">
+            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing}/>
+          </div>
+        </div>
+
+        {/* RIGHT SIDEBAR: Summary, Goals, Topics */}
+        <div className="w-[280px] shrink-0 border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
           {/* Summary */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, summary: !c.summary }))}
@@ -1988,54 +2038,6 @@ function DepositionDetail({ id, onBack }) {
                 ))}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* CENTER: TRANSCRIPT */}
-        <div className="flex-1 border-r border-[#E2E1DF] flex flex-col overflow-hidden bg-[#F8F8F7]" style={{ maxWidth: '42%' }}>
-          <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '52px' }}>
-            <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
-            <button
-              onClick={() => setTab('flagged')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
-            >
-              <Ic.flag size={11}/>
-              {MOCK_DETAIL.flaggedItems.length} flagged
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-5 py-5">
-            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing}/>
-          </div>
-        </div>
-
-        {/* RIGHT PANEL */}
-        <div className="flex-1 flex flex-col bg-[#F8F8F7] overflow-hidden">
-          {/* Tab bar */}
-          <div className="flex flex-wrap shrink-0 px-4 gap-1.5 border-b border-[#E2E1DF] items-center" style={{ minHeight: '52px' }}>
-            {tabs.map((t) => {
-              const isActive = tab === t.id;
-              return (
-                <button key={t.id} onClick={() => setTab(t.id)}
-                  className={cls(
-                    'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap rounded-md px-3 py-1.5',
-                    isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
-                  )}>
-                  {t.label}
-                  {t.count > 0 && (
-                    <span className={cls('text-[9px] font-bold rounded-full px-1.5 py-0.5', isActive ? 'bg-white/20 text-white' : 'bg-[#E8E7E5] text-[#9A8573]')}>{t.count}</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
-            {tab === 'chat'           && <ChatTab depo={depo}/>}
-            {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
-            {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
-            {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
-            {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
-            {tab === 'timeline'       && <ErrorBoundary><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></ErrorBoundary>}
           </div>
         </div>
       </div>
