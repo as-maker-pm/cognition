@@ -2019,7 +2019,7 @@ function DepositionDetail({ id, onBack }) {
         )}
 
         {/* FAR RIGHT: icon + label toolbar */}
-        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#F0F0EE]">
+        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-4 bg-[#F8F8F7]">
           {tabs.map(({ id, label, short, icon: Icon, count }) => {
             const isActive = tab === id && flyoutOpen;
             return (
