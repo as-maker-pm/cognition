@@ -1830,12 +1830,12 @@ function DepositionDetail({ id, onBack }) {
   const jump = (t) => { setCurrentTime(t); setPlaying(true); };
 
   const tabs = [
-    { id: 'chat',           label: 'AI Chat',        icon: Ic.sparkles },
-    { id: 'contradictions', label: 'Contradictions', icon: Ic.alert,    count: MOCK_DETAIL.contradictions?.length },
-    { id: 'flagged',        label: 'Flagged',         icon: Ic.flag,     count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
-    { id: 'sentiment',      label: 'Sentiment',       icon: Ic.scale },
-    { id: 'exhibits',       label: 'Exhibits',        icon: Ic.fileText },
-    { id: 'timeline',       label: 'Timeline',        icon: Ic.calendar },
+    { id: 'chat',           label: 'AI Chat',        short: 'Chat',      icon: Ic.sparkles },
+    { id: 'contradictions', label: 'Contradictions', short: 'Issues',    icon: Ic.alert,    count: MOCK_DETAIL.contradictions?.length },
+    { id: 'flagged',        label: 'Flagged',         short: 'Flagged',   icon: Ic.flag,     count: MOCK_DETAIL.flaggedItems.filter((f) => f.severity === 'high').length },
+    { id: 'sentiment',      label: 'Sentiment',       short: 'Sentiment', icon: Ic.scale },
+    { id: 'exhibits',       label: 'Exhibits',        short: 'Exhibits',  icon: Ic.fileText },
+    { id: 'timeline',       label: 'Timeline',        short: 'Timeline',  icon: Ic.calendar },
   ];
 
   const exportOptions = [
@@ -1878,25 +1878,28 @@ function DepositionDetail({ id, onBack }) {
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* FAR LEFT: icon toolbar */}
-        <div className="w-[52px] shrink-0 border-r border-[#E2E1DF] flex flex-col items-center py-3 gap-1 bg-[#F8F8F7]">
-          {tabs.map(({ id, label, icon: Icon, count }) => {
+        {/* FAR LEFT: icon + label toolbar */}
+        <div className="w-[76px] shrink-0 border-r border-[#E2E1DF] flex flex-col items-center py-3 gap-0.5 bg-[#F8F8F7]">
+          {tabs.map(({ id, label, short, icon: Icon, count }) => {
             const isActive = tab === id && flyoutOpen;
             return (
               <button key={id}
                 onClick={() => { if (tab === id && flyoutOpen) { setFlyoutOpen(false); } else { setTab(id); setFlyoutOpen(true); } }}
                 title={label}
                 className={cls(
-                  'w-9 h-9 rounded-lg flex items-center justify-center transition-all relative',
+                  'w-[62px] flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-all relative',
                   isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
                 )}>
-                <Icon size={16}/>
-                {count > 0 && (
-                  <span className={cls(
-                    'absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center',
-                    isActive ? 'bg-white text-[#14110D]' : 'bg-[#7A2E20] text-white'
-                  )}>{count}</span>
-                )}
+                <div className="relative">
+                  <Icon size={15}/>
+                  {count > 0 && (
+                    <span className={cls(
+                      'absolute -top-1 -right-1.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center',
+                      isActive ? 'bg-white text-[#14110D]' : 'bg-[#7A2E20] text-white'
+                    )}>{count}</span>
+                  )}
+                </div>
+                <span className="text-[9px] font-medium leading-none">{short}</span>
               </button>
             );
           })}
@@ -1904,7 +1907,7 @@ function DepositionDetail({ id, onBack }) {
 
         {/* LEFT FLYOUT: tab content */}
         {flyoutOpen && (
-          <div className="w-[320px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
+          <div className="w-[400px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
               <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
                 {tabs.find(t => t.id === tab)?.label}
@@ -1924,11 +1927,8 @@ function DepositionDetail({ id, onBack }) {
           </div>
         )}
 
-        {/* CENTER: Video + Transcript */}
+        {/* CENTER: Transcript only */}
         <div className="flex-1 flex flex-col overflow-hidden bg-[#F8F8F7]">
-          <div className="shrink-0 border-b border-[#E2E1DF] p-4">
-            <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
-          </div>
           <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '44px' }}>
             <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
             <button
@@ -1944,8 +1944,13 @@ function DepositionDetail({ id, onBack }) {
           </div>
         </div>
 
-        {/* RIGHT SIDEBAR: Summary, Goals, Topics */}
-        <div className="w-[280px] shrink-0 border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
+        {/* RIGHT SIDEBAR: Video + Summary, Goals, Topics */}
+        <div className={cls('shrink-0 border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7] transition-all', flyoutOpen ? 'w-[300px]' : 'w-[360px]')}>
+          {/* Video */}
+          <div className="border-b border-[#E2E1DF] p-3">
+            <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
+          </div>
+
           {/* Summary */}
           <div className="border-b border-[#E2E1DF]">
             <button onClick={() => setSideCollapsed(c => ({ ...c, summary: !c.summary }))}
