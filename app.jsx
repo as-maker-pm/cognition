@@ -1877,74 +1877,8 @@ function DepositionDetail({ id, onBack }) {
       </header>
 
       <div className="flex-1 flex overflow-hidden">
-        {/* FAR LEFT: icon + label toolbar */}
-        <div className="w-[76px] shrink-0 border-r border-[#E2E1DF] flex flex-col items-center py-3 gap-0.5 bg-[#F8F8F7]">
-          {tabs.map(({ id, label, short, icon: Icon, count }) => {
-            const isActive = tab === id && flyoutOpen;
-            return (
-              <button key={id}
-                onClick={() => { if (tab === id && flyoutOpen) { setFlyoutOpen(false); } else { setTab(id); setFlyoutOpen(true); } }}
-                title={label}
-                className={cls(
-                  'w-[62px] flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-all relative',
-                  isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
-                )}>
-                <div className="relative">
-                  <Icon size={15}/>
-                  {count > 0 && (
-                    <span className={cls(
-                      'absolute -top-1 -right-1.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center',
-                      isActive ? 'bg-white text-[#14110D]' : 'bg-[#7A2E20] text-white'
-                    )}>{count}</span>
-                  )}
-                </div>
-                <span className="text-[9px] font-medium leading-none">{short}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* LEFT FLYOUT: tab content */}
-        {flyoutOpen && (
-          <div style={{ flex: '0 0 35%', minWidth: 0 }} className="border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
-                {tabs.find(t => t.id === tab)?.label}
-              </span>
-              <button onClick={() => setFlyoutOpen(false)} className="w-6 h-6 rounded flex items-center justify-center text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors">
-                <Ic.x size={13}/>
-              </button>
-            </div>
-            <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
-              {tab === 'chat'           && <ChatTab depo={depo}/>}
-              {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
-              {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
-              {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
-              {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
-              {tab === 'timeline'       && <ErrorBoundary><div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div></ErrorBoundary>}
-            </div>
-          </div>
-        )}
-
-        {/* CENTER: Transcript only */}
-        <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#F8F8F7]">
-          <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '44px' }}>
-            <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
-            <button
-              onClick={() => { setTab('flagged'); setFlyoutOpen(true); }}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
-            >
-              <Ic.flag size={11}/>
-              {MOCK_DETAIL.flaggedItems.length} flagged
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-5 py-5">
-            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing}/>
-          </div>
-        </div>
-
-        {/* RIGHT SIDEBAR: Video + Summary, Goals, Topics */}
-        <div style={{ flex: '0 0 25%', minWidth: 0 }} className="border-l border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
+        {/* LEFT SIDEBAR: Video + Summary, Goals, Topics */}
+        <div style={{ flex: '0 0 25%', minWidth: 0 }} className="border-r border-[#E2E1DF] flex flex-col overflow-y-auto bg-[#F8F8F7]">
           {/* Video */}
           <div className="border-b border-[#E2E1DF] p-3">
             <VideoPanel depo={depo} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing} setPlaying={setPlaying}/>
@@ -2043,6 +1977,72 @@ function DepositionDetail({ id, onBack }) {
               </div>
             )}
           </div>
+        </div>
+
+        {/* CENTER: Transcript only */}
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#F8F8F7]">
+          <div className="flex items-center justify-between px-5 border-b border-[#E2E1DF] shrink-0" style={{ minHeight: '44px' }}>
+            <span className="text-[13px] font-semibold text-[#14110D]">Transcript</span>
+            <button
+              onClick={() => { setTab('flagged'); setFlyoutOpen(true); }}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+            >
+              <Ic.flag size={11}/>
+              {MOCK_DETAIL.flaggedItems.length} flagged
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-5 py-5">
+            <TranscriptViewer topics={MOCK_DETAIL.topics} currentTime={currentTime} setCurrentTime={setCurrentTime} playing={playing}/>
+          </div>
+        </div>
+
+        {/* RIGHT FLYOUT: tab content */}
+        {flyoutOpen && (
+          <div style={{ flex: '0 0 35%', minWidth: 0 }} className="border-l border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
+                {tabs.find(t => t.id === tab)?.label}
+              </span>
+              <button onClick={() => setFlyoutOpen(false)} className="w-6 h-6 rounded flex items-center justify-center text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE] transition-colors">
+                <Ic.x size={13}/>
+              </button>
+            </div>
+            <div className={cls('flex-1 min-h-0 overflow-y-auto', tab === 'chat' && 'overflow-hidden flex flex-col')}>
+              {tab === 'chat'           && <ChatTab depo={depo}/>}
+              {tab === 'flagged'        && <FlaggedTab items={MOCK_DETAIL.flaggedItems} jump={jump}/>}
+              {tab === 'contradictions' && <ContradictionsTab jump={jump}/>}
+              {tab === 'exhibits'       && <div className="px-4 py-3"><ExhibitsTab jump={jump}/></div>}
+              {tab === 'sentiment'      && <div className="px-4 py-3"><SentimentTab data={MOCK_DETAIL.sentiment}/></div>}
+              {tab === 'timeline'       && <ErrorBoundary><div className="px-4 py-3"><TimelineTab events={MOCK_DETAIL.timeline} jump={jump}/></div></ErrorBoundary>}
+            </div>
+          </div>
+        )}
+
+        {/* FAR RIGHT: icon + label toolbar */}
+        <div className="w-[76px] shrink-0 border-l border-[#E2E1DF] flex flex-col items-center py-4 gap-2 bg-[#F8F8F7]">
+          {tabs.map(({ id, label, short, icon: Icon, count }) => {
+            const isActive = tab === id && flyoutOpen;
+            return (
+              <button key={id}
+                onClick={() => { if (tab === id && flyoutOpen) { setFlyoutOpen(false); } else { setTab(id); setFlyoutOpen(true); } }}
+                title={label}
+                className={cls(
+                  'w-[62px] flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-lg transition-all relative',
+                  isActive ? 'bg-[#14110D] text-white' : 'text-[#9A8573] hover:text-[#14110D] hover:bg-[#F0F0EE]'
+                )}>
+                <div className="relative">
+                  <Icon size={18}/>
+                  {count > 0 && (
+                    <span className={cls(
+                      'absolute -top-1 -right-2 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center',
+                      isActive ? 'bg-white text-[#14110D]' : 'bg-[#7A2E20] text-white'
+                    )}>{count}</span>
+                  )}
+                </div>
+                <span className="text-[9px] font-medium leading-none">{short}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
