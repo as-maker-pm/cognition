@@ -1186,8 +1186,7 @@ function SentimentTab({ data }) {
       {/* 1×4 metrics */}
       <div className="grid grid-cols-4 gap-2">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded-xl border border-[#E2E1DF] px-3 py-2.5 overflow-hidden"
-            style={{ background: `linear-gradient(to bottom, #ffffff 40%, ${m.grad}18 100%)` }}>
+          <div key={m.label} className="rounded-xl border border-[#E2E1DF] px-3 py-2.5 overflow-hidden bg-white">
             <div className="text-[9px] text-[#9A8573] mb-1.5 uppercase tracking-wider leading-tight">{m.label}</div>
             <div className="text-[15px] font-bold text-[#14110D]">{m.value}</div>
           </div>
@@ -1907,7 +1906,7 @@ function DepositionDetail({ id, onBack }) {
 
         {/* LEFT FLYOUT: tab content */}
         {flyoutOpen && (
-          <div className="w-[400px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
+          <div className="w-[460px] shrink-0 border-r border-[#E2E1DF] flex flex-col bg-white overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF] shrink-0">
               <span className="text-xs font-bold uppercase tracking-wider text-[#14110D]">
                 {tabs.find(t => t.id === tab)?.label}
