@@ -125,6 +125,251 @@ const Card = ({ className = '', children, ...rest }) => (
   <div className={cls('rounded-lg border border-slate-100 bg-white', className)} {...rest}>{children}</div>
 );
 
+// ---------- Three-Dot Menu ----------
+function ThreeDotMenu({ items, className = '' }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+  return (
+    <div className={cls('relative shrink-0', className)} ref={ref}>
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        className="w-7 h-7 flex items-center justify-center rounded-md text-[#9A8573] hover:text-[#14110D] hover:bg-[#E9E8E7] transition-colors"
+      >
+        <Ic.more size={14}/>
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-1 w-44 bg-[#F8F8F7] border border-[#E2E1DF] rounded-lg shadow-lg p-1 z-50">
+          {items.map((item, i) => item === 'divider'
+            ? <div key={i} className="h-px bg-[#E2E1DF]/60 my-1"/>
+            : (
+              <button key={item.label} onClick={(e) => { e.stopPropagation(); setOpen(false); item.onClick?.(); }}
+                className={cls('w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors flex items-center gap-2',
+                  item.danger ? 'text-rose-600 hover:bg-rose-50' : 'text-[#3D2E1E] hover:bg-[#E9E8E7]'
+                )}>
+                {item.icon && React.createElement(item.icon, { size: 13 })}
+                {item.label}
+              </button>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- Notification Panel ----------
+function NotificationPanel({ notifications, onMarkAllRead }) {
+  const typeIcon = { deposition: Ic.fileText, flag: Ic.flag, issue: Ic.alert, user: Ic.user };
+  return (
+    <div className="absolute right-0 mt-2 w-80 bg-[#F8F8F7] border border-[#E2E1DF] rounded-xl shadow-xl z-50 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E1DF]">
+        <span className="text-sm font-semibold text-[#14110D]">Notifications</span>
+        <button onClick={onMarkAllRead} className="text-xs text-[#7A2E20] hover:text-[#5A1E10] font-medium transition-colors">Mark all read</button>
+      </div>
+      <div className="max-h-[360px] overflow-y-auto">
+        {notifications.length === 0 ? (
+          <div className="px-4 py-8 text-center text-sm text-[#9A8573]">No notifications</div>
+        ) : notifications.map((n) => {
+          const Icon = typeIcon[n.type] || Ic.bell;
+          return (
+            <div key={n.id} className={cls('flex items-start gap-3 px-4 py-3 border-b border-[#E2E1DF]/50 hover:bg-[#F0F0EE] transition-colors cursor-pointer', !n.read && 'bg-[#FDF5F0]')}>
+              <div className={cls('w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5', !n.read ? 'bg-[#7A2E20]/10 text-[#7A2E20]' : 'bg-[#E2E1DF]/50 text-[#9A8573]')}>
+                <Icon size={13}/>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className={cls('text-xs font-semibold', !n.read ? 'text-[#14110D]' : 'text-[#6B5744]')}>{n.title}</span>
+                  <span className="text-[10px] text-[#9A8573] shrink-0">{n.time}</span>
+                </div>
+                <p className="text-xs text-[#6B5744] mt-0.5 leading-snug">{n.desc}</p>
+              </div>
+              {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#7A2E20] shrink-0 mt-2"/>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------- User Management ----------
+function UserManagement() {
+  const { user } = useAuth();
+  const t = useToast();
+  const [users, setUsers] = useState(MOCK_USERS);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newRole, setNewRole] = useState('reader');
+
+  const roleBadge = (role) => {
+    const cfg = { admin: 'bg-[#F5E6E1] text-[#7A2E20] border-[#E8CCBF]', editor: 'bg-amber-50 text-amber-700 border-amber-200', reader: 'bg-[#E2E1DF]/50 text-[#6B5744] border-[#E2E1DF]' };
+    return <span className={cls('inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border capitalize', cfg[role] || cfg.reader)}>{role}</span>;
+  };
+
+  const addUser = () => {
+    if (!newName.trim() || !newEmail.trim()) return;
+    setUsers(us => [...us, { id: `user-${Date.now()}`, name: newName.trim(), email: newEmail.trim(), role: newRole, organization: user.organization }]);
+    setNewName(''); setNewEmail(''); setNewRole('reader'); setShowAdd(false);
+    t.success('User invited', `${newName} has been invited.`);
+  };
+
+  const removeUser = (id) => { setUsers(us => us.filter(u => u.id !== id)); t.success('User removed'); };
+  const changeRole = (id, role) => { setUsers(us => us.map(u => u.id === id ? { ...u, role } : u)); t.success('Role updated'); };
+
+  return (
+    <div className="flex-1 flex flex-col bg-[#F8F8F7]">
+      <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-[#14110D] tracking-tight">User Management</h1>
+          <p className="text-sm text-[#6B5744] mt-0.5">{user?.organization?.name}</p>
+        </div>
+        <Button onClick={() => setShowAdd(true)}><Ic.plus size={14}/> Invite User</Button>
+      </div>
+      <div className="flex-1 overflow-auto p-6">
+        {showAdd && (
+          <div className="bg-white border border-[#E2E1DF] rounded-xl p-5 mb-6">
+            <h3 className="text-sm font-semibold text-[#14110D] mb-4">Invite New User</h3>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Full Name</label>
+                <Input placeholder="Jane Smith" value={newName} onChange={e => setNewName(e.target.value)}/>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Email</label>
+                <Input type="email" placeholder="jane@firm.com" value={newEmail} onChange={e => setNewEmail(e.target.value)}/>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Role</label>
+                <select value={newRole} onChange={e => setNewRole(e.target.value)} className="h-9 w-full rounded-md border border-[#E2E1DF] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
+                  <option value="reader">Reader</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={addUser} disabled={!newName.trim() || !newEmail.trim()}>Send Invite</Button>
+              <Button variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
+            </div>
+          </div>
+        )}
+        <div className="bg-white border border-[#E2E1DF] rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-[#E2E1DF] flex items-center gap-2">
+            <span className="text-sm font-semibold text-[#14110D]">Members</span>
+            <span className="text-xs text-[#9A8573]">{users.length}</span>
+          </div>
+          {users.map((u, i) => (
+            <div key={u.id} className={cls('flex items-center gap-4 px-5 py-4', i < users.length - 1 && 'border-b border-[#E2E1DF]/60')}>
+              <div className="w-9 h-9 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center shrink-0">
+                {u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-[#14110D]">{u.name}</span>
+                  {u.id === user?.id && <span className="text-[10px] text-[#9A8573] bg-[#E2E1DF]/50 rounded px-1.5 py-0.5">You</span>}
+                </div>
+                <span className="text-xs text-[#6B5744]">{u.email}</span>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                {roleBadge(u.role)}
+                {u.id !== user?.id && (
+                  <>
+                    <select value={u.role} onChange={e => changeRole(u.id, e.target.value)} className="h-7 rounded-md border border-[#E2E1DF] bg-white px-2 text-xs outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
+                      <option value="reader">Reader</option>
+                      <option value="editor">Editor</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <button onClick={() => removeUser(u.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-[#9A8573] hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                      <Ic.x size={13}/>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Profile Page ----------
+function ProfilePage() {
+  const { user, logout } = useAuth();
+  const t = useToast();
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [currentPw, setCurrentPw] = useState('');
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const initials = user ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : '';
+
+  const saveProfile = () => {
+    if (!name.trim() || !email.trim()) return;
+    t.success('Profile updated');
+  };
+
+  const changePassword = () => {
+    if (!currentPw || !newPw || !confirmPw) { t.error('All fields required'); return; }
+    if (newPw !== confirmPw) { t.error('Passwords do not match'); return; }
+    if (newPw.length < 8) { t.error('Password too short', 'Must be at least 8 characters.'); return; }
+    t.success('Password updated');
+    setCurrentPw(''); setNewPw(''); setConfirmPw('');
+  };
+
+  return (
+    <div className="flex-1 flex flex-col bg-[#F8F8F7]">
+      <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4">
+        <h1 className="text-xl font-semibold text-[#14110D] tracking-tight">Profile</h1>
+        <p className="text-sm text-[#6B5744] mt-0.5">Manage your account settings</p>
+      </div>
+      <div className="flex-1 overflow-auto p-6">
+        <div className="max-w-xl space-y-5">
+          <div className="bg-white border border-[#E2E1DF] rounded-xl p-6">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-14 h-14 rounded-full bg-[#14110D] text-white text-lg font-medium flex items-center justify-center shrink-0">{initials}</div>
+              <div>
+                <div className="text-base font-semibold text-[#14110D]">{user?.name}</div>
+                <div className="text-sm text-[#6B5744]">{user?.email}</div>
+                <div className="text-xs text-[#9A8573] mt-1 capitalize">{user?.role} · {user?.organization?.name}</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div><label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Full Name</label><Input value={name} onChange={e => setName(e.target.value)}/></div>
+              <div><label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Email</label><Input type="email" value={email} onChange={e => setEmail(e.target.value)}/></div>
+            </div>
+            <Button onClick={saveProfile}>Save Changes</Button>
+          </div>
+          <div className="bg-white border border-[#E2E1DF] rounded-xl p-6">
+            <h3 className="text-sm font-semibold text-[#14110D] mb-4">Change Password</h3>
+            <div className="space-y-3 mb-4">
+              <div><label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Current Password</label><Input type="password" placeholder="Enter current password" value={currentPw} onChange={e => setCurrentPw(e.target.value)}/></div>
+              <div><label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">New Password</label><Input type="password" placeholder="At least 8 characters" value={newPw} onChange={e => setNewPw(e.target.value)}/></div>
+              <div><label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Confirm New Password</label><Input type="password" placeholder="Repeat new password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)}/></div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button onClick={changePassword}>Update Password</Button>
+              <button className="text-sm text-[#7A2E20] hover:text-[#5A1E10] font-medium transition-colors">Forgot password?</button>
+            </div>
+          </div>
+          <div className="bg-white border border-[#E2E1DF] rounded-xl p-6">
+            <h3 className="text-sm font-semibold text-rose-700 mb-1">Sign Out</h3>
+            <p className="text-xs text-[#6B5744] mb-4">You will be signed out of this session.</p>
+            <Button variant="destructive" onClick={logout}>Sign out</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 class ErrorBoundary extends React.Component {
   constructor(p) { super(p); this.state = { err: null }; }
   static getDerivedStateFromError(e) { return { err: e }; }
@@ -139,11 +384,15 @@ class ErrorBoundary extends React.Component {
 }
 
 // ---------- Top Nav ----------
-function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
+function TopNav({ onLogo, onUserManagement, onProfile, breadcrumb = [] }) {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState(typeof MOCK_NOTIFICATIONS !== 'undefined' ? MOCK_NOTIFICATIONS : []);
+  const unreadCount = notifications.filter(n => !n.read).length;
   const initials = user ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '';
   const RoleIcon = { admin: Ic.shield, editor: Ic.edit, reader: Ic.eye }[user?.role] || (() => null);
+  const markAllRead = () => setNotifications(ns => ns.map(n => ({ ...n, read: true })));
 
   return (
     <header className="border-b border-[#E2E1DF] bg-[#F8F8F7] sticky top-0 z-40 h-14">
@@ -189,12 +438,15 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={14}/></span>
             <Input placeholder="Search depositions..." className="pl-9 h-8 text-sm"/>
           </div>
-          <Button variant="ghost" size="icon" className="relative h-8 w-8">
-            <Ic.bell size={16}/>
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">3</span>
-          </Button>
           <div className="relative">
-            <button onClick={() => setMenuOpen((o) => !o)} className="w-8 h-8 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center hover:bg-[#2C2316] transition-colors">
+            <Button variant="ghost" size="icon" className="relative h-8 w-8" onClick={() => { setNotifOpen(o => !o); setMenuOpen(false); }}>
+              <Ic.bell size={16}/>
+              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center">{unreadCount}</span>}
+            </Button>
+            {notifOpen && <NotificationPanel notifications={notifications} onMarkAllRead={markAllRead}/>}
+          </div>
+          <div className="relative">
+            <button onClick={() => { setMenuOpen((o) => !o); setNotifOpen(false); }} className="w-8 h-8 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center hover:bg-[#2C2316] transition-colors">
               {initials || <Ic.user size={14}/>}
             </button>
             {menuOpen && (
@@ -210,9 +462,12 @@ function TopNav({ onLogo, onUserManagement, breadcrumb = [] }) {
                   </div>
                 </div>
                 <div className="h-px bg-[#E2E1DF]/60 my-1"/>
+                <button onClick={() => { setMenuOpen(false); onProfile(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#E2E1DF]/40 flex items-center gap-2 text-[#3D2E1E]">
+                  <Ic.user size={13}/> Profile
+                </button>
                 {user?.role === 'admin' && (
                   <button onClick={() => { setMenuOpen(false); onUserManagement(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#E2E1DF]/40 flex items-center gap-2 text-[#3D2E1E]">
-                    <Ic.user size={13}/> User Management
+                    <Ic.shield size={13}/> User Management
                   </button>
                 )}
                 <button onClick={() => { setMenuOpen(false); logout(); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-rose-50 text-rose-600 flex items-center gap-2">
@@ -445,11 +700,16 @@ function CaseLibrary({ onSelect }) {
                     <span className="text-xs">Updated {c.lastActivity}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-5 shrink-0">
+                <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right">
                     <div className="text-base font-semibold text-[#14110D]">{c.depositionCount}</div>
                     <div className="text-xs text-[#9A8573]">depositions</div>
                   </div>
+                  <ThreeDotMenu items={[
+                    ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
+                    { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
+                    ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                  ].filter(Boolean)}/>
                   <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                 </div>
               </button>
@@ -462,10 +722,17 @@ function CaseLibrary({ onSelect }) {
                 className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
                 <div className="h-2 w-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
                 <div className="p-5 flex flex-col gap-4 flex-1">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[#9A8573]">{c.type}</span>
-                    <h3 className="text-base font-semibold text-[#14110D] mt-1.5 leading-snug line-clamp-2">{c.caseName}</h3>
-                    <p className="text-xs text-[#9A8573] font-mono mt-1">{c.caseNumber}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[#9A8573]">{c.type}</span>
+                      <h3 className="text-base font-semibold text-[#14110D] mt-1.5 leading-snug line-clamp-2">{c.caseName}</h3>
+                      <p className="text-xs text-[#9A8573] font-mono mt-1">{c.caseNumber}</p>
+                    </div>
+                    <ThreeDotMenu items={[
+                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
+                      { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
+                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                    ].filter(Boolean)}/>
                   </div>
                   <div className="h-px bg-[#E2E1DF]/60"/>
                   <div className="flex items-center justify-between">
@@ -640,6 +907,8 @@ function CaseChatPanel({ selectedCase }) {
 
 // ---------- Deposition Library ----------
 function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
+  const { user } = useAuth();
+  const canEdit = user?.role === 'admin' || user?.role === 'editor';
   const [view, setView] = useState('grid');
   const selectedCase = MOCK_CASES.find((c) => c.id === caseId);
   const list = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : MOCK_DEPOSITIONS;
@@ -661,7 +930,6 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
           <Ic.play size={16} className="text-white ml-0.5"/>
         </div>
       </div>
-      <div className="absolute top-2.5 right-2.5 z-10">{srcBadge(d.transcriptSource)}</div>
       <div className="absolute bottom-2.5 left-2.5 z-10">
         <span className="text-[10px] text-white/70 font-mono bg-black/40 rounded px-2 py-0.5">{fmt(d.duration)}</span>
       </div>
@@ -693,9 +961,17 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   className="group rounded-xl border border-[#E2E1DF] bg-white text-left hover:border-[#D0C5B0] hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col">
                   <Thumbnail d={d} className="h-36 w-full"/>
                   <div className="p-4 flex flex-col gap-3 flex-1">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
-                      <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-[#14110D] leading-snug">{d.witness}</h3>
+                        <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
+                      </div>
+                      <ThreeDotMenu items={[
+                        ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
+                        { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
+                        { label: 'Download', icon: Ic.fileText, onClick: () => {} },
+                        ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                      ].filter(Boolean)}/>
                     </div>
                     {d.tags && d.tags.length > 0 && (
                       <>
@@ -718,10 +994,7 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   <Thumbnail d={d} className="w-36 shrink-0"/>
                   <div className="flex-1 min-w-0 p-4 flex flex-col justify-center gap-2">
                     <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
-                        {srcBadge(d.transcriptSource)}
-                      </div>
+                      <span className="text-[15px] font-semibold text-[#14110D]">{d.witness}</span>
                       <div className="flex items-center gap-2.5 mt-1 text-sm text-[#6B5744] flex-wrap">
                         <span className="flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</span>
                         <span className="text-[#C4B5A2]">·</span>
@@ -735,7 +1008,13 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center pr-4">
+                  <div className="flex items-center gap-2 pr-4">
+                    <ThreeDotMenu items={[
+                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
+                      { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
+                      { label: 'Download', icon: Ic.fileText, onClick: () => {} },
+                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                    ].filter(Boolean)}/>
                     <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                   </div>
                 </button>
@@ -2326,13 +2605,18 @@ function AppContent() {
       { label: selectedCase.caseName, onClick: () => { setView('depositions'); setDepoId(null); } },
       { label: selectedDepo ? selectedDepo.witness : 'Deposition' },
     ];
+  } else if (view === 'userManagement') {
+    breadcrumb = [{ label: 'User Management' }];
+  } else if (view === 'profile') {
+    breadcrumb = [{ label: 'Profile' }];
   }
 
   return (
     <div className="h-full flex flex-col bg-[#F8F8F7]" data-screen-label={view}>
       <TopNav
         onLogo={() => { setView('cases'); setCaseId(null); setDepoId(null); }}
-        onUserManagement={() => {}}
+        onUserManagement={() => setView('userManagement')}
+        onProfile={() => setView('profile')}
         breadcrumb={breadcrumb}
       />
       {view === 'cases' && (
@@ -2358,6 +2642,8 @@ function AppContent() {
           onBack={() => { setView('depositions'); setDepoId(null); }}
         />
       )}
+      {view === 'userManagement' && <UserManagement/>}
+      {view === 'profile' && <ProfilePage/>}
     </div>
   );
 }
