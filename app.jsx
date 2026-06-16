@@ -163,6 +163,27 @@ function ThreeDotMenu({ items, className = '' }) {
   );
 }
 
+// ---------- Modal ----------
+function Modal({ title, onClose, children, footer }) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#F8F8F7] border border-[#E2E1DF] rounded-2xl shadow-2xl w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E1DF]">
+          <span className="text-base font-semibold text-[#14110D]">{title}</span>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-md text-[#9A8573] hover:text-[#14110D] hover:bg-[#E9E8E7] transition-colors"><Ic.x size={14}/></button>
+        </div>
+        <div className="px-5 py-4">{children}</div>
+        {footer && <div className="px-5 py-4 border-t border-[#E2E1DF] flex items-center justify-end gap-2">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
 // ---------- Notification Panel ----------
 function NotificationPanel({ notifications, onMarkAllRead }) {
   const typeIcon = { deposition: Ic.fileText, flag: Ic.flag, issue: Ic.alert, user: Ic.user };
@@ -207,6 +228,8 @@ function UserManagement() {
   const [newEmail, setNewEmail] = useState('');
   const [newName, setNewName] = useState('');
   const [newRole, setNewRole] = useState('reader');
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('members');
 
   const roleBadge = (role) => {
     const cfg = { admin: 'bg-[#F5E6E1] text-[#7A2E20] border-[#E8CCBF]', editor: 'bg-amber-50 text-amber-700 border-amber-200', reader: 'bg-[#E2E1DF]/50 text-[#6B5744] border-[#E2E1DF]' };
@@ -223,6 +246,24 @@ function UserManagement() {
   const removeUser = (id) => { setUsers(us => us.filter(u => u.id !== id)); t.success('User removed'); };
   const changeRole = (id, role) => { setUsers(us => us.map(u => u.id === id ? { ...u, role } : u)); t.success('Role updated'); };
 
+  const filtered = users.filter(u =>
+    u.name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const stats = [
+    { label: 'Total Members', value: users.length, icon: Ic.user },
+    { label: 'Admins', value: users.filter(u => u.role === 'admin').length, icon: Ic.shield },
+    { label: 'Editors', value: users.filter(u => u.role === 'editor').length, icon: Ic.edit },
+    { label: 'Readers', value: users.filter(u => u.role === 'reader').length, icon: Ic.eye },
+  ];
+
+  const ROLE_PERMS = [
+    { role: 'admin', color: '#7A2E20', bg: '#F5E6E1', Icon: Ic.shield, perms: ['Invite & remove users', 'Change roles', 'Create & delete cases', 'Manage all depositions', 'View all reports'] },
+    { role: 'editor', color: '#92630A', bg: '#FEF3C7', Icon: Ic.edit, perms: ['Create & edit cases', 'Upload depositions', 'Add goals & flags', 'View all reports'] },
+    { role: 'reader', color: '#374151', bg: '#F3F4F6', Icon: Ic.eye, perms: ['View cases & depositions', 'View reports & analysis', 'No editing permissions'] },
+  ];
+
   return (
     <div className="flex-1 flex flex-col bg-[#F8F8F7]">
       <div className="border-b border-[#E2E1DF] bg-[#F8F8F7] px-6 py-4 flex items-center justify-between">
@@ -233,68 +274,165 @@ function UserManagement() {
         <Button onClick={() => setShowAdd(true)}><Ic.plus size={14}/> Invite User</Button>
       </div>
       <div className="flex-1 overflow-auto p-6">
-        {showAdd && (
-          <div className="bg-white border border-[#E2E1DF] rounded-xl p-5 mb-6">
-            <h3 className="text-sm font-semibold text-[#14110D] mb-4">Invite New User</h3>
-            <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {stats.map(({ label, value, icon: Icon }) => (
+            <div key={label} className="bg-white border border-[#E2E1DF] rounded-xl px-4 py-3 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#E2E1DF]/50 flex items-center justify-center text-[#6B5744] shrink-0"><Icon size={15}/></div>
               <div>
-                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Full Name</label>
-                <Input placeholder="Jane Smith" value={newName} onChange={e => setNewName(e.target.value)}/>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Email</label>
-                <Input type="email" placeholder="jane@firm.com" value={newEmail} onChange={e => setNewEmail(e.target.value)}/>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Role</label>
-                <select value={newRole} onChange={e => setNewRole(e.target.value)} className="h-9 w-full rounded-md border border-[#E2E1DF] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
-                  <option value="reader">Reader</option>
-                  <option value="editor">Editor</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={addUser} disabled={!newName.trim() || !newEmail.trim()}>Send Invite</Button>
-              <Button variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
-            </div>
-          </div>
-        )}
-        <div className="bg-white border border-[#E2E1DF] rounded-xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-[#E2E1DF] flex items-center gap-2">
-            <span className="text-sm font-semibold text-[#14110D]">Members</span>
-            <span className="text-xs text-[#9A8573]">{users.length}</span>
-          </div>
-          {users.map((u, i) => (
-            <div key={u.id} className={cls('flex items-center gap-4 px-5 py-4', i < users.length - 1 && 'border-b border-[#E2E1DF]/60')}>
-              <div className="w-9 h-9 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center shrink-0">
-                {u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[#14110D]">{u.name}</span>
-                  {u.id === user?.id && <span className="text-[10px] text-[#9A8573] bg-[#E2E1DF]/50 rounded px-1.5 py-0.5">You</span>}
-                </div>
-                <span className="text-xs text-[#6B5744]">{u.email}</span>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                {roleBadge(u.role)}
-                {u.id !== user?.id && (
-                  <>
-                    <select value={u.role} onChange={e => changeRole(u.id, e.target.value)} className="h-7 rounded-md border border-[#E2E1DF] bg-white px-2 text-xs outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
-                      <option value="reader">Reader</option>
-                      <option value="editor">Editor</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <button onClick={() => removeUser(u.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-[#9A8573] hover:text-rose-600 hover:bg-rose-50 transition-colors">
-                      <Ic.x size={13}/>
-                    </button>
-                  </>
-                )}
+                <div className="text-lg font-bold text-[#14110D]">{value}</div>
+                <div className="text-xs text-[#9A8573]">{label}</div>
               </div>
             </div>
           ))}
         </div>
+
+        <div className="flex items-center gap-1 border-b border-[#E2E1DF] mb-5">
+          {[['members', 'Members'], ['caseAccess', 'Case Access'], ['permissions', 'Role Permissions']].map(([id, label]) => (
+            <button key={id} onClick={() => setActiveTab(id)}
+              className={cls('px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors',
+                activeTab === id ? 'border-[#14110D] text-[#14110D]' : 'border-transparent text-[#6B5744] hover:text-[#14110D]'
+              )}>{label}</button>
+          ))}
+        </div>
+
+        {activeTab === 'members' && (
+          <>
+            {showAdd && (
+              <div className="bg-white border border-[#E2E1DF] rounded-xl p-5 mb-5">
+                <h3 className="text-sm font-semibold text-[#14110D] mb-4">Invite New User</h3>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Full Name</label>
+                    <Input placeholder="Jane Smith" value={newName} onChange={e => setNewName(e.target.value)}/>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Email</label>
+                    <Input type="email" placeholder="jane@firm.com" value={newEmail} onChange={e => setNewEmail(e.target.value)}/>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#6B5744] mb-1.5">Role</label>
+                    <select value={newRole} onChange={e => setNewRole(e.target.value)} className="h-9 w-full rounded-md border border-[#E2E1DF] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
+                      <option value="reader">Reader</option>
+                      <option value="editor">Editor</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={addUser} disabled={!newName.trim() || !newEmail.trim()}>Send Invite</Button>
+                  <Button variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
+                </div>
+              </div>
+            )}
+            <div className="bg-white border border-[#E2E1DF] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#E2E1DF] flex items-center gap-3">
+                <span className="text-sm font-semibold text-[#14110D]">Members</span>
+                <span className="text-xs text-[#9A8573]">{filtered.length}</span>
+                <div className="flex-1"/>
+                <div className="relative w-52">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A8573]"><Ic.search size={13}/></span>
+                  <Input placeholder="Search members…" value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-7 text-xs"/>
+                </div>
+              </div>
+              {filtered.map((u, i) => (
+                <div key={u.id} className={cls('flex items-center gap-4 px-5 py-4', i < filtered.length - 1 && 'border-b border-[#E2E1DF]/60')}>
+                  <div className="w-9 h-9 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center shrink-0">
+                    {u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#14110D]">{u.name}</span>
+                      {u.id === user?.id && <span className="text-[10px] text-[#9A8573] bg-[#E2E1DF]/50 rounded px-1.5 py-0.5">You</span>}
+                    </div>
+                    <span className="text-xs text-[#6B5744]">{u.email}</span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {roleBadge(u.role)}
+                    {u.id !== user?.id && (
+                      <>
+                        <select value={u.role} onChange={e => changeRole(u.id, e.target.value)} className="h-7 rounded-md border border-[#E2E1DF] bg-white px-2 text-xs outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
+                          <option value="reader">Reader</option>
+                          <option value="editor">Editor</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <button onClick={() => removeUser(u.id)} className="w-7 h-7 flex items-center justify-center rounded-md text-[#9A8573] hover:text-rose-600 hover:bg-rose-50 transition-colors">
+                          <Ic.x size={13}/>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {filtered.length === 0 && (
+                <div className="px-5 py-8 text-center text-sm text-[#9A8573]">No members match your search</div>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === 'caseAccess' && (
+          <div className="bg-white border border-[#E2E1DF] rounded-xl overflow-hidden">
+            <div className="px-5 py-3 border-b border-[#E2E1DF]">
+              <span className="text-sm font-semibold text-[#14110D]">Case Access by User</span>
+              <p className="text-xs text-[#9A8573] mt-0.5">Admins have access to all cases automatically</p>
+            </div>
+            {users.map((u, ui) => (
+              <div key={u.id} className={cls('px-5 py-4', ui < users.length - 1 && 'border-b border-[#E2E1DF]/60')}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-7 h-7 rounded-full bg-[#14110D] text-white text-[10px] font-medium flex items-center justify-center shrink-0">
+                    {u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-[#14110D]">{u.name}</span>
+                  {roleBadge(u.role)}
+                </div>
+                <div className="flex flex-wrap gap-2 pl-10">
+                  {u.role === 'admin' ? (
+                    <span className="text-xs text-[#9A8573] italic">Access to all cases</span>
+                  ) : (
+                    <>
+                      {MOCK_CASES.map((c, ci) => {
+                        const hasAccess = ci < (u.role === 'editor' ? 4 : 2);
+                        return hasAccess ? (
+                          <div key={c.id} className="inline-flex items-center gap-1.5 text-xs rounded-md px-2.5 py-1 border bg-[#F0FAF5] text-emerald-700 border-emerald-200">
+                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#9A8573' }}/>
+                            {c.caseName.split(' ').slice(0, 3).join(' ')}
+                            <button className="ml-1 text-emerald-600/60 hover:text-emerald-800 transition-colors"><Ic.x size={9}/></button>
+                          </div>
+                        ) : null;
+                      })}
+                      <button className="inline-flex items-center gap-1 text-xs text-[#7A2E20] hover:text-[#5A1E10] font-medium transition-colors">
+                        <Ic.plus size={11}/> Add case
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab === 'permissions' && (
+          <div className="grid grid-cols-3 gap-4">
+            {ROLE_PERMS.map(({ role, color, bg, Icon, perms }) => (
+              <div key={role} className="bg-white border border-[#E2E1DF] rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: bg, color }}>
+                    <Icon size={14}/>
+                  </div>
+                  <span className="text-sm font-semibold text-[#14110D] capitalize">{role}</span>
+                </div>
+                <ul className="space-y-2">
+                  {perms.map(p => (
+                    <li key={p} className="flex items-start gap-2">
+                      <Ic.check size={13} className="text-emerald-500 mt-0.5 shrink-0"/>
+                      <span className="text-xs text-[#4A3828]">{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -658,11 +796,123 @@ const CASE_TYPE_COLOR = {
   'Corporate Litigation':'#7A5C20',
 };
 
+// ---------- Edit Case Modal ----------
+function EditCaseModal({ c, onClose, onSave }) {
+  const [caseName, setCaseName] = useState(c.caseName);
+  const [type, setType] = useState(c.type);
+  const [client, setClient] = useState(c.client);
+  const t = useToast();
+  const save = () => {
+    if (!caseName.trim()) return;
+    onSave({ ...c, caseName: caseName.trim(), type, client: client.trim() });
+    t.success('Case updated');
+    onClose();
+  };
+  return (
+    <Modal title="Edit Case" onClose={onClose} footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={!caseName.trim()}>Save Changes</Button></>}>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Case Name</label>
+          <Input value={caseName} onChange={e => setCaseName(e.target.value)} placeholder="Enter case name"/>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Case Type</label>
+          <select value={type} onChange={e => setType(e.target.value)} className="h-9 w-full rounded-md border border-[#E2E1DF] bg-white px-3 text-sm outline-none focus:border-[#7A2E20]/40 text-[#14110D]">
+            {Object.keys(CASE_TYPE_COLOR).map(tp => <option key={tp} value={tp}>{tp}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Client</label>
+          <Input value={client} onChange={e => setClient(e.target.value)} placeholder="Client name"/>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+// ---------- Edit Deposition Modal ----------
+function EditDepositionModal({ d, onClose, onSave }) {
+  const [witness, setWitness] = useState(d.witness);
+  const [date, setDate] = useState(d.date || '');
+  const [tags, setTags] = useState((d.tags || []).join(', '));
+  const t = useToast();
+  const save = () => {
+    if (!witness.trim()) return;
+    onSave({ ...d, witness: witness.trim(), date: date.trim(), tags: tags.split(',').map(s => s.trim()).filter(Boolean) });
+    t.success('Deposition updated');
+    onClose();
+  };
+  return (
+    <Modal title="Edit Deposition" onClose={onClose} footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={!witness.trim()}>Save Changes</Button></>}>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Witness Name</label>
+          <Input value={witness} onChange={e => setWitness(e.target.value)} placeholder="Witness full name"/>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Deposition Date</label>
+          <Input type="date" value={date} onChange={e => setDate(e.target.value)}/>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-[#6B5744] mb-1.5 uppercase tracking-wider">Tags (comma-separated)</label>
+          <Input value={tags} onChange={e => setTags(e.target.value)} placeholder="e.g. Expert Witness, Medical"/>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+// ---------- Manage Access Modal ----------
+function ManageAccessModal({ title, onClose }) {
+  const t = useToast();
+  const [access, setAccess] = useState(() =>
+    MOCK_USERS.reduce((acc, u, i) => ({ ...acc, [u.id]: u.role === 'admin' || i < 3 }), {})
+  );
+  const toggle = (uid) => setAccess(a => ({ ...a, [uid]: !a[uid] }));
+  const roleCfg = { admin: 'text-[#7A2E20] bg-[#F5E6E1]', editor: 'text-amber-700 bg-amber-50', reader: 'text-[#6B5744] bg-[#E2E1DF]/50' };
+  return (
+    <Modal title={`Manage Access · ${title}`} onClose={onClose} footer={
+      <><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={() => { t.success('Access updated'); onClose(); }}>Save Access</Button></>
+    }>
+      <p className="text-xs text-[#9A8573] mb-3">Control who can view and interact with this item. Admins always have access.</p>
+      <div className="space-y-1">
+        {MOCK_USERS.map(u => (
+          <div key={u.id} className="flex items-center gap-3 py-2.5 border-b border-[#E2E1DF]/50 last:border-0">
+            <div className="w-8 h-8 rounded-full bg-[#14110D] text-white text-xs font-medium flex items-center justify-center shrink-0">
+              {u.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-[#14110D]">{u.name}</span>
+                <span className={cls('text-[10px] rounded px-1.5 py-0.5 capitalize font-medium', roleCfg[u.role] || roleCfg.reader)}>{u.role}</span>
+              </div>
+              <span className="text-xs text-[#9A8573]">{u.email}</span>
+            </div>
+            <button
+              onClick={() => u.role !== 'admin' && toggle(u.id)}
+              disabled={u.role === 'admin'}
+              className={cls('w-10 h-5 rounded-full relative transition-colors shrink-0', access[u.id] ? 'bg-[#14110D]' : 'bg-[#E2E1DF]', u.role === 'admin' && 'opacity-50 cursor-not-allowed')}
+            >
+              <span className={cls('absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform', access[u.id] ? 'translate-x-5' : 'translate-x-0.5')}/>
+            </button>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
 function CaseLibrary({ onSelect }) {
   const { user } = useAuth();
+  const t = useToast();
   const [view, setView] = useState('list');
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
-  const list = MOCK_CASES;
+  const [cases, setCases] = useState(MOCK_CASES);
+  const [editCase, setEditCase] = useState(null);
+  const [accessCase, setAccessCase] = useState(null);
+  const list = cases;
+
+  const deleteCase = (c) => { setCases(cs => cs.filter(x => x.id !== c.id)); t.success('Case deleted', c.caseName); };
 
   return (
     <div className="flex-1 flex flex-col bg-[#F8F8F7]">
@@ -682,10 +932,10 @@ function CaseLibrary({ onSelect }) {
 
       <div className="flex-1 overflow-auto p-6">
         {view === 'list' ? (
-          <div className="flex flex-col divide-y divide-[#E2E1DF] bg-white rounded-xl border border-[#E2E1DF] overflow-hidden">
+          <div className="flex flex-col gap-3">
             {list.map((c) => (
               <button key={c.id} onClick={() => onSelect(c.id)}
-                className="group flex items-center gap-5 px-6 py-5 text-left hover:bg-[#F8F8F7] transition-colors">
+                className="group flex items-center gap-5 px-6 py-5 text-left bg-white rounded-xl border border-[#E2E1DF] hover:border-[#D0C5B0] hover:shadow-sm transition-all duration-150">
                 <div className="w-1 h-12 rounded-full shrink-0" style={{ background: CASE_TYPE_COLOR[c.type] || '#6B5744' }}/>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2.5 flex-wrap">
@@ -706,9 +956,9 @@ function CaseLibrary({ onSelect }) {
                     <div className="text-xs text-[#9A8573]">depositions</div>
                   </div>
                   <ThreeDotMenu items={[
-                    ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
-                    { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
-                    ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                    ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => setEditCase(c) }] : []),
+                    { label: 'Manage Access', icon: Ic.shield, onClick: () => setAccessCase(c) },
+                    ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => deleteCase(c) }] : []),
                   ].filter(Boolean)}/>
                   <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                 </div>
@@ -729,9 +979,9 @@ function CaseLibrary({ onSelect }) {
                       <p className="text-xs text-[#9A8573] font-mono mt-1">{c.caseNumber}</p>
                     </div>
                     <ThreeDotMenu items={[
-                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
-                      { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
-                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => setEditCase(c) }] : []),
+                      { label: 'Manage Access', icon: Ic.shield, onClick: () => setAccessCase(c) },
+                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => deleteCase(c) }] : []),
                     ].filter(Boolean)}/>
                   </div>
                   <div className="h-px bg-[#E2E1DF]/60"/>
@@ -745,6 +995,11 @@ function CaseLibrary({ onSelect }) {
           </div>
         )}
       </div>
+      {editCase && (
+        <EditCaseModal c={editCase} onClose={() => setEditCase(null)}
+          onSave={(updated) => { setCases(cs => cs.map(x => x.id === updated.id ? updated : x)); setEditCase(null); }}/>
+      )}
+      {accessCase && <ManageAccessModal title={accessCase.caseName} onClose={() => setAccessCase(null)}/>}
     </div>
   );
 }
@@ -908,10 +1163,17 @@ function CaseChatPanel({ selectedCase }) {
 // ---------- Deposition Library ----------
 function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
   const { user } = useAuth();
+  const t = useToast();
   const canEdit = user?.role === 'admin' || user?.role === 'editor';
   const [view, setView] = useState('grid');
   const selectedCase = MOCK_CASES.find((c) => c.id === caseId);
-  const list = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : MOCK_DEPOSITIONS;
+  const baseList = selectedCase ? MOCK_DEPOSITIONS.filter((d) => d.caseNumber === selectedCase.caseNumber) : MOCK_DEPOSITIONS;
+  const [depos, setDepos] = useState(baseList);
+  const [editDepo, setEditDepo] = useState(null);
+  const [accessDepo, setAccessDepo] = useState(null);
+  const list = depos;
+
+  const deleteDepo = (d) => { setDepos(ds => ds.filter(x => x.id !== d.id)); t.success('Deposition deleted', d.witness); };
   const fmt = (m) => { const h = Math.floor(m/60); const r = m%60; return h ? `${h}h ${r}m` : `${r}m`; };
   const witnessInitials = (name) => name ? name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() : '??';
 
@@ -967,10 +1229,10 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                         <p className="text-xs text-[#9A8573] mt-1 flex items-center gap-1"><Ic.calendar size={11}/>{d.date}</p>
                       </div>
                       <ThreeDotMenu items={[
-                        ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
-                        { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
-                        { label: 'Download', icon: Ic.fileText, onClick: () => {} },
-                        ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                        ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => setEditDepo(d) }] : []),
+                        { label: 'Manage Access', icon: Ic.shield, onClick: () => setAccessDepo(d) },
+                        { label: 'Download', icon: Ic.fileText, onClick: () => t.success('Download started', d.witness) },
+                        ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => deleteDepo(d) }] : []),
                       ].filter(Boolean)}/>
                     </div>
                     {d.tags && d.tags.length > 0 && (
@@ -1010,10 +1272,10 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
                   </div>
                   <div className="flex items-center gap-2 pr-4">
                     <ThreeDotMenu items={[
-                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => {} }] : []),
-                      { label: 'Manage Access', icon: Ic.shield, onClick: () => {} },
-                      { label: 'Download', icon: Ic.fileText, onClick: () => {} },
-                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => {} }] : []),
+                      ...(canEdit ? [{ label: 'Edit', icon: Ic.edit, onClick: () => setEditDepo(d) }] : []),
+                      { label: 'Manage Access', icon: Ic.shield, onClick: () => setAccessDepo(d) },
+                      { label: 'Download', icon: Ic.fileText, onClick: () => t.success('Download started', d.witness) },
+                      ...(canEdit ? ['divider', { label: 'Delete', icon: Ic.x, danger: true, onClick: () => deleteDepo(d) }] : []),
                     ].filter(Boolean)}/>
                     <Ic.chevR size={15} className="text-[#C4B5A2] group-hover:text-[#6B5744] transition-colors"/>
                   </div>
@@ -1024,6 +1286,11 @@ function DepositionLibrary({ caseId, onSelect, onBack, onAdd }) {
         </div>
       </div>
       <CaseChatPanel selectedCase={selectedCase}/>
+      {editDepo && (
+        <EditDepositionModal d={editDepo} onClose={() => setEditDepo(null)}
+          onSave={(updated) => { setDepos(ds => ds.map(x => x.id === updated.id ? updated : x)); setEditDepo(null); }}/>
+      )}
+      {accessDepo && <ManageAccessModal title={accessDepo.witness} onClose={() => setAccessDepo(null)}/>}
     </div>
   );
 }
@@ -1487,8 +1754,17 @@ function SentimentTab({ data }) {
                   onMouseEnter={() => setHoverIdx(i)}
                   onMouseLeave={() => setHoverIdx(null)}>
                   {hoverIdx === i && (
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-20 bg-[#14110D] text-white text-[9px] font-mono rounded-md px-2 py-1 whitespace-nowrap pointer-events-none">
-                      {fmt(d.t)} – {fmt(next ? next.t : xMax)}{d.label ? ` · ${d.label}` : ''}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 pointer-events-none flex flex-col items-center">
+                      <div className="bg-[#14110D] text-white rounded-lg px-3 py-2 shadow-xl" style={{ minWidth: '130px' }}>
+                        <div className="text-[9px] font-mono text-white/60 mb-1.5">{fmt(d.t)} → {fmt(next ? next.t : xMax)}</div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: bg }}/>
+                          <span className="text-[11px] font-semibold text-white">{sentLabel(d.v)}</span>
+                          <span className="text-[9px] font-mono text-white/50 ml-auto">{d.v > 0 ? '+' : ''}{d.v.toFixed(2)}</span>
+                        </div>
+                        {d.label && <div className="text-[9px] text-white/50 mt-1 truncate" style={{ maxWidth: '160px' }}>{d.label}</div>}
+                      </div>
+                      <div className="w-2 h-2 bg-[#14110D] rotate-45 -mt-1"/>
                     </div>
                   )}
                 </div>
