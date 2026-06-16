@@ -868,13 +868,59 @@ function ManageAccessModal({ title, onClose }) {
   const [access, setAccess] = useState(() =>
     MOCK_USERS.reduce((acc, u, i) => ({ ...acc, [u.id]: u.role === 'admin' || i < 3 }), {})
   );
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('reader');
+  const [invited, setInvited] = useState([]);
+
   const toggle = (uid) => setAccess(a => ({ ...a, [uid]: !a[uid] }));
+
+  const sendInvite = () => {
+    if (!inviteEmail.trim()) return;
+    setInvited(prev => [...prev, { email: inviteEmail.trim(), role: inviteRole }]);
+    setInviteEmail('');
+    t.success('Invite sent', `${inviteEmail.trim()} has been invited.`);
+  };
+
   const roleCfg = { admin: 'text-[#7A2E20] bg-[#F5E6E1]', editor: 'text-amber-700 bg-amber-50', reader: 'text-[#6B5744] bg-[#E2E1DF]/50' };
   return (
     <Modal title={`Manage Access · ${title}`} onClose={onClose} footer={
       <><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={() => { t.success('Access updated'); onClose(); }}>Save Access</Button></>
     }>
-      <p className="text-xs text-[#9A8573] mb-3">Control who can view and interact with this item. Admins always have access.</p>
+      <div className="bg-[#F0F0EE] rounded-xl p-3.5 mb-4">
+        <p className="text-xs font-semibold text-[#14110D] mb-2.5">Invite someone</p>
+        <div className="flex gap-2">
+          <Input
+            type="email"
+            placeholder="name@firm.com"
+            value={inviteEmail}
+            onChange={e => setInviteEmail(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && sendInvite()}
+            className="flex-1 h-8 text-xs"
+          />
+          <select value={inviteRole} onChange={e => setInviteRole(e.target.value)}
+            className="h-8 rounded-md border border-[#E2E1DF] bg-white px-2 text-xs outline-none focus:border-[#7A2E20]/40 text-[#14110D] shrink-0">
+            <option value="reader">Reader</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <Button size="sm" onClick={sendInvite} disabled={!inviteEmail.trim()} className="h-8 px-3 shrink-0">
+            <Ic.send size={11}/>
+          </Button>
+        </div>
+        {invited.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {invited.map((inv, i) => (
+              <span key={i} className="inline-flex items-center gap-1 text-[10px] bg-white border border-[#E2E1DF] rounded-full px-2 py-0.5 text-[#6B5744]">
+                <Ic.check size={9} className="text-emerald-500 shrink-0"/> {inv.email}
+                <button onClick={() => setInvited(prev => prev.filter((_, j) => j !== i))} className="ml-0.5 text-[#9A8573] hover:text-rose-500 transition-colors"><Ic.x size={8}/></button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs font-semibold text-[#14110D] mb-2">Members</p>
+      <p className="text-[10px] text-[#9A8573] mb-3">Toggle access on or off. Admins always have access.</p>
       <div className="space-y-1">
         {MOCK_USERS.map(u => (
           <div key={u.id} className="flex items-center gap-3 py-2.5 border-b border-[#E2E1DF]/50 last:border-0">
@@ -888,13 +934,21 @@ function ManageAccessModal({ title, onClose }) {
               </div>
               <span className="text-xs text-[#9A8573]">{u.email}</span>
             </div>
-            <button
-              onClick={() => u.role !== 'admin' && toggle(u.id)}
-              disabled={u.role === 'admin'}
-              className={cls('w-10 h-5 rounded-full relative transition-colors shrink-0', access[u.id] ? 'bg-[#14110D]' : 'bg-[#E2E1DF]', u.role === 'admin' && 'opacity-50 cursor-not-allowed')}
-            >
-              <span className={cls('absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform', access[u.id] ? 'translate-x-5' : 'translate-x-0.5')}/>
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] text-[#9A8573]">{access[u.id] ? 'Has access' : 'No access'}</span>
+              <button
+                onClick={() => u.role !== 'admin' && toggle(u.id)}
+                disabled={u.role === 'admin'}
+                title={u.role === 'admin' ? 'Admins always have access' : access[u.id] ? 'Remove access' : 'Grant access'}
+                className={cls(
+                  'w-10 h-5 rounded-full relative transition-colors shrink-0',
+                  access[u.id] ? 'bg-[#14110D]' : 'bg-[#D0C8BF] hover:bg-[#B8B0A8]',
+                  u.role === 'admin' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                )}
+              >
+                <span className={cls('absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform', access[u.id] ? 'translate-x-5' : 'translate-x-0.5')}/>
+              </button>
+            </div>
           </div>
         ))}
       </div>
